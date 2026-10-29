@@ -2,11 +2,34 @@ import { Product } from '@/types/product';
 
 export const PRODUCTS: Product[] = [
   {
+    slug: 'royal-oud',
+    name: 'ROYAL OUD',
+    arabicName: 'متمرد',
+    subtitle: 'عود عصري متمرد على التقاليد',
+    originalInspiration: 'توليفة خشبية حرة مع العود المصفى',
+    category: 'Oud / Luxury',
+    brandFeel: 'Rebellious royalty',
+    scentType: 'عود • خشبي • متبل',
+    description: 'عود استثنائي نقي بنكهة عصرية راقية غير ثقيلة. تمتزج فيه حمضيات منعشة مع فلفل أسود وخشب الأرز لتبرز نغمة العود الملكي المصفى بأعلى درجات النقاء والجاذبية.',
+    mood: 'royal_oud',
+    isBestSeller: true,
+    notes: {
+      top: ['الليمون الصقلي', 'البرغموت الإيطالي', 'التوت الوردي'],
+      heart: ['خشب الأرز الأطلسي', 'الفلفل الأسود الحار', 'الأنجيليكا'],
+      base: ['العود النادر الفاخر', 'خشب الصندل', 'المسك الدخاني']
+    },
+    variants: [
+      { size: '50ml', price: 1190, inStock: true },
+      { size: '100ml', price: 1999, inStock: true }
+    ],
+    image: '/media/orq/royal_oud_photoreal.jpg'
+  },
+  {
     slug: 'chaos',
     name: 'CHAOS',
     arabicName: 'كايوس',
     subtitle: 'حضور بري وهيمنة مغناطيسية',
-    originalInspiration: 'Sauvage',
+    originalInspiration: 'توليفة برية من البرغموت والأمبروكسان',
     category: 'Power / Signature',
     brandFeel: 'Wild dominance',
     scentType: 'منعش • متبل • خشبي',
@@ -29,7 +52,7 @@ export const PRODUCTS: Product[] = [
     name: 'ALPHA',
     arabicName: 'ألفا',
     subtitle: 'طاقة النصر ومغناطيس الإطراءات',
-    originalInspiration: 'Invictus',
+    originalInspiration: 'توليفة بحرية مفعمة بالحيوية والظفر',
     category: 'Power / Signature',
     brandFeel: 'Winner / leader',
     scentType: 'منعش • حلو • مائي',
@@ -45,14 +68,14 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 790, inStock: true },
       { size: '100ml', price: 1290, inStock: true }
     ],
-    image: '/media/orq/aa51d35b-b89c-475b-9c4b-0e4e192d327c.jpg'
+    image: '/media/orq/11206483-815d-4610-a05d-b5d5fc2397db.jpg'
   },
   {
     slug: 'dom',
     name: 'DOM',
     arabicName: 'دوم',
     subtitle: 'عطر السهرات والجاذبية الصريحة',
-    originalInspiration: '212 VIP',
+    originalInspiration: 'توليفة ليلية جذابة بالباشن فروت والتونكا',
     category: 'Social / Loud',
     brandFeel: 'Social dominance',
     scentType: 'حلو • عطري • مسائي',
@@ -67,14 +90,14 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 790, inStock: true },
       { size: '100ml', price: 1290, inStock: true }
     ],
-    image: '/media/orq/royal_oud_photoreal.jpg'
+    image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
   },
   {
     slug: 'pompous',
     name: 'POMPOUS',
     arabicName: 'بومبوس',
     subtitle: 'فخامة صاخبة وأثر عطري هائل',
-    originalInspiration: 'Erba Pura',
+    originalInspiration: 'توليفة فاكهية مخملية بالمسك النقي',
     category: 'Attention / Loud',
     brandFeel: 'Flashy luxury',
     scentType: 'فاكهي • مسكي • حلو',
@@ -89,14 +112,14 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 820, inStock: true },
       { size: '100ml', price: 1350, inStock: true }
     ],
-    image: '/media/orq/19558efb-3e5a-4c4e-9fc7-4e6a38d1425d.jpg'
+    image: '/media/orq/ac8eac34-874a-49dc-8ecf-dd73aa4d4d22.jpg'
   },
   {
     slug: 'electro',
     name: 'ELECTRO',
     arabicName: 'إلكترو',
     subtitle: 'طاقة حركية وحضور مشحون بالنقاء',
-    originalInspiration: 'Allure Sport',
+    originalInspiration: 'توليفة رياضية حمضية متألقة',
     category: 'Energy / Active',
     brandFeel: 'Charged presence',
     scentType: 'حمضي • كريمي • رياضي',
@@ -118,7 +141,7 @@ export const PRODUCTS: Product[] = [
     name: 'GIGANTIC',
     arabicName: 'جيجانتيك',
     subtitle: 'دفء مغرٍ وحضور آسر للقلوب',
-    originalInspiration: 'Stronger With You',
+    originalInspiration: 'توليفة كستناء مدخنة وفانيليا آسرة',
     category: 'Intense / Addictive',
     brandFeel: 'Overwhelming presence',
     scentType: 'دافئ • حلو • فانيليا',
@@ -141,7 +164,7 @@ export const PRODUCTS: Product[] = [
     name: 'DARKNIGHT',
     arabicName: 'دارك نايت',
     subtitle: 'الهيبة الصامتة والعمق الأرستقراطي',
-    originalInspiration: 'Bleu de Chanel',
+    originalInspiration: 'توليفة خشبية بخورية كلاسيكية غامضة',
     category: 'Fresh / Deep',
     brandFeel: 'Silent dominance',
     scentType: 'خشبي • عطري • منعش',
@@ -157,14 +180,14 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 890, inStock: true },
       { size: '100ml', price: 1490, inStock: true }
     ],
-    image: '/media/orq/19558efb-3e5a-4c4e-9fc7-4e6a38d1425d.jpg'
+    image: '/media/orq/aa51d35b-b89c-475b-9c4b-0e4e192d327c.jpg'
   },
   {
     slug: 'vigorous',
     name: 'VIGOROUS',
     arabicName: 'فيجوروس',
     subtitle: 'انتعاش مائي وحيوية نقية لا تنضب',
-    originalInspiration: 'Cool Water',
+    originalInspiration: 'توليفة بحرية عشبية منعشة',
     category: 'Fresh / Clean',
     brandFeel: 'Active freshness',
     scentType: 'مائي • أخضر • منعش',
@@ -179,14 +202,14 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 720, inStock: true },
       { size: '100ml', price: 1199, inStock: true }
     ],
-    image: '/media/orq/aa51d35b-b89c-475b-9c4b-0e4e192d327c.jpg'
+    image: '/media/orq/11206483-815d-4610-a05d-b5d5fc2397db.jpg'
   },
   {
     slug: 'saint',
     name: 'SAINT',
     arabicName: 'سينت',
     subtitle: 'نقاء المسك البودري ورقي الحضور الهادئ',
-    originalInspiration: 'I Am White',
+    originalInspiration: 'توليفة نقية من أصفى أنواع المسك الأبيض',
     category: 'Clean / Skin',
     brandFeel: 'Pure superiority',
     scentType: 'مسكي • بودري • ناعم',
@@ -204,34 +227,11 @@ export const PRODUCTS: Product[] = [
     image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
   },
   {
-    slug: 'royal-oud',
-    name: 'متمرد',
-    arabicName: 'متمرد',
-    subtitle: 'عود عصري متمرد على التقاليد',
-    originalInspiration: 'Royal Oud',
-    category: 'Oud / Luxury',
-    brandFeel: 'Rebellious royalty',
-    scentType: 'عود • خشبي • متبل',
-    description: 'عود استثنائي نقي بنكهة عصرية راقية غير ثقيلة. تمتزج فيه حمضيات منعشة مع فلفل أسود وخشب الأرز لتبرز نغمة العود الملكي المصفى بأعلى درجات النقاء والجاذبية.',
-    mood: 'royal_oud',
-    isBestSeller: true,
-    notes: {
-      top: ['الليمون الصقلي', 'البرغموت الإيطالي', 'التوت الوردي'],
-      heart: ['خشب الأرز الأطلسي', 'الفلفل الأسود الحار', 'الأنجيليكا'],
-      base: ['العود النادر الفاخر', 'خشب الصندل', 'المسك الدخاني']
-    },
-    variants: [
-      { size: '50ml', price: 1190, inStock: true },
-      { size: '100ml', price: 1999, inStock: true }
-    ],
-    image: '/media/orq/royal_oud_photoreal.jpg'
-  },
-  {
     slug: 'oud-ambassador',
     name: 'غرور',
-    arabicName: 'غرور',
+    arabicName: 'Oud Ambassador',
     subtitle: 'العود الناعم والتفوق الهادئ',
-    originalInspiration: 'Oud Ambassador',
+    originalInspiration: 'عود معتق فاخر بلمسات الورد والزعفران',
     category: 'Oud / Luxury',
     brandFeel: 'Calm superiority',
     scentType: 'عود • حلو • خشبي',
@@ -247,14 +247,14 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 1190, inStock: true },
       { size: '100ml', price: 1999, inStock: true }
     ],
-    image: '/media/orq/ac8eac34-874a-49dc-8ecf-dd73aa4d4d22.jpg'
+    image: '/media/orq/e15d2bf1-23e2-4bf9-9a8b-e8845ffd973d.jpg'
   },
   {
     slug: 'oud-madawi',
     name: 'كاسح',
-    arabicName: 'كاسح',
+    arabicName: 'Oud Madawi',
     subtitle: 'فوحان كاسح وهيمنة لا تتكرر',
-    originalInspiration: 'Oud Madawi',
+    originalInspiration: 'عود شرقي مكثف بلمسات الفاكهة والعنبر',
     category: 'Oud / Luxury',
     brandFeel: 'Overpowering dominance',
     scentType: 'عود • حلو • فاكهي',
@@ -273,7 +273,32 @@ export const PRODUCTS: Product[] = [
   }
 ];
 
+// Dedicated Royal Gift Box Bundle SKU
+export const GIFT_BUNDLE: Product = {
+  slug: 'bundle-gift-box',
+  name: 'باقة الهدايا الملكية',
+  arabicName: 'صندوق التجربة المتكامل',
+  subtitle: 'عطر 50 مل + معطر سيارة + 4 عينات لاكتشاف التشكيلة',
+  originalInspiration: 'إصدار الهدايا والتجربة الشاملة من ORQ',
+  category: 'Exclusive Bundle',
+  brandFeel: 'The Complete Gift Experience',
+  scentType: 'صندوق فاخر متكامل',
+  description: 'كل ما تحتاجه في صندوق فاخر واحد: اختر أي عطر مفضل لديك بحجم 50 مل، بالإضافة إلى معطر سيارة فاخر من نفس الهوية، و4 عينات عطرية مجانية لاكتشاف باقي المجموعة.',
+  mood: 'royal_oud',
+  isBestSeller: true,
+  notes: {
+    top: ['خلاصات البرغموت المنعشة'],
+    heart: ['الأخشاب والجلود النادرة'],
+    base: ['العود الملكي والمسك النقي']
+  },
+  variants: [
+    { size: '50ml', price: 750, inStock: true }
+  ],
+  image: '/media/orq/52adf269-3af1-47ab-9da9-af148cbd6349.jpg'
+};
+
 export function getProductBySlug(slug: string): Product | undefined {
+  if (slug === GIFT_BUNDLE.slug) return GIFT_BUNDLE;
   return PRODUCTS.find((p) => p.slug === slug);
 }
 
@@ -281,4 +306,3 @@ export function getProductsByMood(mood: string): Product[] {
   if (mood === 'all') return PRODUCTS;
   return PRODUCTS.filter((p) => p.mood === mood);
 }
-

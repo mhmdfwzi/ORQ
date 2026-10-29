@@ -10,11 +10,6 @@ export default function CinematicAtomizerHero() {
   const heroProduct = PRODUCTS.find((p) => p.slug === 'chaos') || PRODUCTS[1];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // 3-Stage Entrance Sequence (Seamless, Zero Harsh Cuts)
-  // Stage 0: Golden Volumetric Light & Atmospheric Rays
-  // Stage 1: Bottle Manifestation & High-Pressure Atomizer Burst
-  // Stage 2: Smooth Glide into Store Elements
-  const [stage, setStage] = useState<number>(0);
   const [sprayActive, setSprayActive] = useState(false);
   const [sprayCount, setSprayCount] = useState(0);
 
@@ -33,28 +28,12 @@ export default function CinematicAtomizerHero() {
     }[]
   >([]);
 
-  // Sequence playback
-  const runSequence = () => {
-    setStage(0);
-    setSprayActive(false);
-
-    const t1 = setTimeout(() => {
-      setStage(1);
+  // Auto trigger one soft spray on mount with cleanup
+  useEffect(() => {
+    const t = setTimeout(() => {
       triggerSpray();
     }, 600);
-
-    const t2 = setTimeout(() => {
-      setStage(2);
-    }, 2400);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  };
-
-  useEffect(() => {
-    runSequence();
+    return () => clearTimeout(t);
   }, []);
 
   // Function to trigger atomizer mist explosion
@@ -97,6 +76,9 @@ export default function CinematicAtomizerHero() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     let animId: number;
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
@@ -111,6 +93,11 @@ export default function CinematicAtomizerHero() {
     let rayAngle = 0;
 
     const render = () => {
+      if (document.hidden) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       rayAngle += 0.002;
 
@@ -183,7 +170,7 @@ export default function CinematicAtomizerHero() {
   }, []);
 
   return (
-    <section className="relative min-h-[640px] sm:min-h-[740px] lg:min-h-[820px] bg-[#070707] overflow-hidden flex items-center justify-center border-b border-[#1E1B18] select-none py-10">
+    <section className="relative min-h-[580px] sm:min-h-[680px] lg:min-h-[760px] bg-[#070707] overflow-hidden flex items-center justify-center border-b border-[#1E1B18] select-none py-6 sm:py-10">
       {/* Background Volumetric Rays & Particle Canvas */}
       <canvas
         ref={canvasRef}
@@ -196,32 +183,24 @@ export default function CinematicAtomizerHero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
           
-          {/* 1. Photorealistic Perfume Bottle: STRICTLY ON TOP on Mobile (order-1), Left Column on Desktop (lg:order-2) */}
-          <div className="lg:col-span-7 flex justify-center items-center relative order-1 lg:order-2 py-2 sm:py-6">
+          {/* 1. Photorealistic Perfume Bottle: Strictly ON TOP on Mobile (order-1), Left Column on Desktop (lg:order-2) */}
+          <div className="lg:col-span-7 flex justify-center items-center relative order-1 lg:order-2 py-2 sm:py-4">
             
             {/* Dynamic Scent Halo */}
             <div
-              className={`absolute w-64 h-64 sm:w-[460px] sm:h-[460px] rounded-full bg-gradient-to-tr from-[#C4A265]/35 via-amber-600/15 to-transparent blur-3xl pointer-events-none transition-all duration-700 ${
-                sprayActive
-                  ? 'scale-125 opacity-100'
-                  : stage >= 1
-                  ? 'scale-100 opacity-60'
-                  : 'scale-75 opacity-0'
+              className={`absolute w-64 h-64 sm:w-[460px] sm:h-[460px] rounded-full bg-gradient-to-tr from-[#C4A265]/35 via-amber-600/15 to-transparent blur-3xl pointer-events-none transition-transform duration-500 ${
+                sprayActive ? 'scale-125 opacity-100' : 'scale-100 opacity-60'
               }`}
             />
 
-            {/* Bottle Container with Smooth Manifestation Transition */}
+            {/* Bottle Container */}
             <div
-              className={`relative w-64 sm:w-80 md:w-[390px] aspect-[3/4] transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                stage >= 1
-                  ? 'scale-100 opacity-100 blur-0 translate-y-0'
-                  : 'scale-90 opacity-0 blur-2xl translate-y-12'
-              }`}
+              className="relative w-64 sm:w-80 md:w-[380px] aspect-[3/4] transition-transform duration-500 hover:scale-102"
             >
-              {/* Seamless Photorealistic Luxury Bottle */}
+              {/* Correct Product Image matching CHAOS */}
               <img
-                src="/media/orq/royal_oud_photoreal.jpg"
-                alt="ORQ Luxury Perfume Bottle"
+                src={heroProduct.image}
+                alt={`ORQ ${heroProduct.name}`}
                 className="w-full h-full object-contain filter contrast-110 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
                 style={{
                   maskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 75%, transparent 100%)',
@@ -242,15 +221,11 @@ export default function CinematicAtomizerHero() {
 
           </div>
 
-          {/* 2. Clean Luxury Typography & Purchasing: BELOW Bottle on Mobile (order-2), Right Column on Desktop (lg:order-1) */}
+          {/* 2. Clean Luxury Typography & Purchasing: Immediately Visible (Zero Blank Wait) */}
           <div
-            className={`lg:col-span-5 space-y-5 text-center sm:text-right z-10 order-2 lg:order-1 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              stage >= 2
-                ? 'opacity-100 translate-y-0 filter-none'
-                : 'opacity-0 translate-y-8 blur-sm pointer-events-none'
-            }`}
+            className="lg:col-span-5 space-y-5 text-center sm:text-right z-10 order-2 lg:order-1"
           >
-            {/* Minimal Brand Tag */}
+            {/* Brand Tag & Title */}
             <div className="space-y-1.5">
               <span className="font-serif tracking-[0.3em] text-[#C4A265] text-xs font-bold uppercase block">
                 ORQ HAUTE PARFUMERIE
@@ -270,7 +245,7 @@ export default function CinematicAtomizerHero() {
 
             {/* Price & Status */}
             <div className="pt-1 flex items-baseline justify-center sm:justify-start gap-3">
-              <span className="text-2xl sm:text-4xl font-extrabold text-[#ECC480] font-mono">
+              <span className="text-2xl sm:text-4xl font-extrabold text-[#ECC480] font-mono whitespace-nowrap">
                 {formatPrice(heroProduct.variants[1].price)} ج.م
               </span>
               <span className="text-xs text-zinc-400 font-mono">100 ML • EDP</span>
@@ -281,7 +256,7 @@ export default function CinematicAtomizerHero() {
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
               <button
                 onClick={() => addToCart(heroProduct, '100ml')}
-                className="gold-button text-xs sm:text-sm px-7 py-3.5 rounded-full font-bold shadow-2xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2"
+                className="gold-button text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-2xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2 min-h-[44px]"
               >
                 <span>أضف للسلة الآن</span>
                 <span>🛒</span>
@@ -290,7 +265,7 @@ export default function CinematicAtomizerHero() {
               {/* Trigger Atomizer Spray */}
               <button
                 onClick={triggerSpray}
-                className={`px-4 py-3.5 rounded-full border text-xs font-bold transition flex items-center gap-2 ${
+                className={`px-4 py-3.5 rounded-full border text-xs font-bold transition flex items-center gap-2 min-h-[44px] ${
                   sprayActive
                     ? 'bg-[#C4A265] text-black border-white ring-2 ring-white/50 scale-95'
                     : 'bg-[#141210]/90 border-[#38332D] text-[#ECC480] hover:border-[#C4A265]'
@@ -300,15 +275,6 @@ export default function CinematicAtomizerHero() {
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-black/40 text-[#ECC480]">
                   {sprayCount}
                 </span>
-              </button>
-
-              {/* Replay Scene */}
-              <button
-                onClick={runSequence}
-                className="px-4 py-3.5 rounded-full border border-[#38332D] hover:border-[#C4A265] bg-[#141210]/90 text-zinc-400 hover:text-[#ECC480] text-xs font-semibold transition"
-                title="إعادة المشهد السينمائي"
-              >
-                <span>↺</span>
               </button>
             </div>
 
@@ -333,16 +299,15 @@ export default function CinematicAtomizerHero() {
       </div>
 
       {/* Seamless Bottom Gradient to Connect with Next Section */}
-      <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-[#070707] to-transparent pointer-events-none z-10" />
+      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#070707] to-transparent pointer-events-none z-10" />
 
       {/* Seamless Scroll Connection Indicator */}
       <a
         href="#signature"
-        className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-[11px] text-zinc-400 hover:text-[#ECC480] transition-all duration-700 cursor-pointer ${
-          stage >= 2 ? 'opacity-90 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
+        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-[11px] text-zinc-400 hover:text-[#ECC480] transition-colors cursor-pointer"
+        aria-label="الانتقال إلى المجموعة العطرية"
       >
-        <span className="font-serif tracking-widest uppercase text-[10px] text-[#C4A265]/80">
+        <span className="font-serif tracking-widest uppercase text-[10px] text-[#C4A265]/90">
           تصفح التشكيلة
         </span>
         <span className="animate-scroll-pulse text-base text-[#ECC480]">↓</span>

@@ -24,11 +24,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
       
-      {/* Breadcrumb */}
+      {/* Breadcrumb with valid working routes */}
       <nav className="text-xs text-[#8E867B] flex items-center gap-2">
-        <Link href="/preview" className="hover:text-white transition">الرئيسية</Link>
+        <Link href="/preview/concept-1" className="hover:text-white transition">الرئيسية</Link>
         <span>/</span>
-        <a href="/preview#signature" className="hover:text-white transition">المجموعة العطرية</a>
+        <Link href="/preview/concept-1#signature" className="hover:text-white transition">المجموعة العطرية</Link>
         <span>/</span>
         <span className="text-[#ECC480] font-semibold">{product.name}</span>
       </nav>
@@ -70,8 +70,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <span className="text-xs font-bold text-[#C4A265] tracking-widest uppercase">
                   {product.category}
                 </span>
-                <span className="text-xs text-zinc-400 font-mono">
-                  مستوحى من: {product.originalInspiration}
+                <span className="text-xs text-zinc-400">
+                  {product.brandFeel}
                 </span>
               </div>
 
@@ -89,6 +89,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <p className="text-xs sm:text-sm text-[#B9B1A5] leading-relaxed pt-2">
                 {product.description}
               </p>
+
+              <div className="pt-2 text-xs text-zinc-400">
+                <span className="text-[#C4A265] font-semibold">الهوية العطرية: </span>
+                <span>{product.originalInspiration}</span>
+              </div>
             </div>
 
             {/* Size Variant Selector */}
@@ -101,7 +106,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   <button
                     key={v.size}
                     onClick={() => setSelectedSize(v.size)}
-                    className={`p-3.5 rounded-xl border text-right transition flex items-center justify-between ${
+                    className={`p-3.5 rounded-xl border text-right transition flex items-center justify-between min-h-[44px] ${
                       selectedSize === v.size
                         ? 'bg-[#1C1814] border-[#C4A265] text-[#ECC480] shadow-md'
                         : 'bg-[#141210] border-[#2B2723] text-zinc-300 hover:border-[#3E3832]'
@@ -111,7 +116,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       <div className="font-bold text-xs sm:text-sm">{v.size === '100ml' ? '100 مل (الحجم الكبير)' : '50 مل (حجم السفر)'}</div>
                       <div className="text-[10px] text-zinc-400">Eau de Parfum مكثف</div>
                     </div>
-                    <div className="font-mono font-bold text-sm text-[#ECC480]">
+                    <div className="font-mono font-bold text-sm text-[#ECC480] whitespace-nowrap mr-2">
                       {formatPrice(v.price)} ج.م
                     </div>
                   </button>
@@ -124,7 +129,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <div className="flex items-baseline justify-between">
                 <div>
                   <span className="text-xs text-zinc-400 ml-2">السعر الإجمالي:</span>
-                  <span className="text-2xl sm:text-3xl font-extrabold text-[#ECC480] font-mono">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-[#ECC480] font-mono whitespace-nowrap">
                     {formatPrice(selectedVariant.price * quantity)} ج.م
                   </span>
                 </div>
@@ -133,28 +138,30 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               <div className="flex gap-3">
                 {/* Quantity selector */}
-                <div className="flex items-center border border-[#332E28] rounded-xl bg-[#141210] px-2">
+                <div className="flex items-center border border-[#332E28] rounded-xl bg-[#141210] px-1 shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-2 text-zinc-400 hover:text-white text-base"
+                    className="w-9 h-11 flex items-center justify-center text-zinc-400 hover:text-white text-base focus:outline-none"
+                    aria-label="تقليل الكمية"
                   >
                     -
                   </button>
-                  <span className="px-3 text-white font-mono text-sm font-bold">{quantity}</span>
+                  <span className="px-2 text-white font-mono text-sm font-bold">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-2 text-zinc-400 hover:text-white text-base"
+                    className="w-9 h-11 flex items-center justify-center text-zinc-400 hover:text-white text-base focus:outline-none"
+                    aria-label="زيادة الكمية"
                   >
                     +
                   </button>
                 </div>
 
-                {/* Add to Cart Button */}
+                {/* Add to Cart Button (Concise for 320px screens) */}
                 <button
                   onClick={() => addToCart(product, selectedSize, quantity)}
-                  className="flex-1 gold-button py-3.5 px-6 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xl"
+                  className="flex-1 gold-button py-3.5 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xl min-h-[44px]"
                 >
-                  <span>أضف للسلة — معاينة الشراء كاش</span>
+                  <span>أضف للسلة</span>
                   <span>🛒</span>
                 </button>
               </div>
@@ -204,7 +211,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         <ScrollReveal direction="up" delay={50}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-white">عطور أخرى قد تناسب ذوقك</h2>
-            <Link href="/preview#signature" className="text-xs text-[#C4A265] hover:underline">
+            <Link href="/preview/concept-1#signature" className="text-xs text-[#C4A265] hover:underline">
               عرض كل المجموعة ←
             </Link>
           </div>

@@ -18,7 +18,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="bg-[#12100E] border border-[#24211D] rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-[#C4A265]/70 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(196,162,101,0.18)]">
       
       {/* Clickable Image & Badges */}
-      <Link href={`/preview/products/${product.slug}`} className="block relative aspect-[4/3] sm:aspect-[3/4] bg-[#0A0A0A] rounded-lg overflow-hidden border border-[#1E1B18] mb-3">
+      <Link href={`/preview/products/${product.slug}`} className="block relative aspect-[4/3] sm:aspect-[3/4] bg-[#0A0A0A] rounded-xl overflow-hidden border border-[#1E1B18] mb-3">
         <img
           src={product.image}
           alt={product.name}
@@ -60,11 +60,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="pt-2 flex items-baseline justify-between border-t border-[#1F1C19] mt-2">
           <div>
             <span className="text-xs text-zinc-500 ml-1">100 مل:</span>
-            <span className="text-sm sm:text-base font-bold text-[#ECC480] font-mono">
+            <span className="text-sm sm:text-base font-bold text-[#ECC480] font-mono whitespace-nowrap">
               {formatPrice(defaultVariant.price)} ج.م
             </span>
           </div>
-          <span className="text-[10px] text-emerald-400">● متوفر</span>
+          <span className="text-[10px] text-emerald-400 font-medium">● متوفر</span>
         </div>
       </div>
 
@@ -72,13 +72,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="pt-3 grid grid-cols-2 gap-2 mt-2">
         <Link
           href={`/preview/products/${product.slug}`}
-          className="text-center py-2 px-2 rounded-lg border border-[#332E28] hover:border-[#C4A265] text-zinc-300 hover:text-white text-xs font-medium transition"
+          className="text-center py-2.5 px-2 rounded-xl border border-[#332E28] hover:border-[#C4A265] text-zinc-300 hover:text-white text-xs font-medium transition flex items-center justify-center min-h-[40px]"
         >
           التفاصيل
         </Link>
         <button
           onClick={() => addToCart(product, '100ml')}
-          className="py-2 px-2 rounded-lg gold-button text-xs font-bold transition flex items-center justify-center gap-1"
+          className="py-2.5 px-2 rounded-xl gold-button text-xs font-bold transition flex items-center justify-center gap-1 min-h-[40px]"
         >
           <span>شراء</span>
           <span className="text-[10px]">🛒</span>

@@ -16,52 +16,55 @@ export default function ConceptSwitcherBar() {
     return (
       <button
         onClick={() => setCollapsed(false)}
-        className="fixed bottom-4 left-4 z-40 bg-[#161412]/90 backdrop-blur-md border border-[#C4A265]/40 text-[#ECC480] text-[11px] px-3 py-1.5 rounded-full shadow-2xl flex items-center gap-1.5 hover:bg-[#221F1C]"
+        className="fixed bottom-4 left-4 z-40 bg-[#161412]/95 backdrop-blur-md border border-[#C4A265]/40 text-[#ECC480] text-xs px-3.5 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hover:bg-[#221F1C] min-h-[44px]"
+        aria-label="عرض شريط تبديل النماذج"
       >
-        <span>🎨 تبديل التصميم</span>
+        <span>🎨</span>
+        <span>النماذج (3)</span>
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#12100E]/95 backdrop-blur-md border border-[#332E27] rounded-full p-1 shadow-2xl flex items-center gap-1 text-[11px] max-w-[95vw]">
+    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 bg-[#12100E]/95 backdrop-blur-md border border-[#332E27] rounded-2xl sm:rounded-full p-1.5 shadow-2xl flex flex-wrap items-center justify-center gap-1 text-xs max-w-[calc(100vw-16px)]">
       <Link
         href="/preview/concept-1"
-        className={`px-3 py-1.5 rounded-full transition whitespace-nowrap ${
+        className={`px-3 py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
           isConcept1
             ? 'bg-[#C4A265] text-black font-bold'
             : 'text-zinc-400 hover:text-white'
         }`}
       >
-        النموذج 1: السينمائي
+        1. السينمائي
       </Link>
 
       <Link
         href="/preview/concept-2"
-        className={`px-3 py-1.5 rounded-full transition whitespace-nowrap ${
+        className={`px-3 py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
           isConcept2
             ? 'bg-[#C4A265] text-black font-bold'
             : 'text-zinc-400 hover:text-white'
         }`}
       >
-        النموذج 2: العصري
+        2. العصري
       </Link>
 
       <Link
         href="/preview/concept-3"
-        className={`px-3 py-1.5 rounded-full transition whitespace-nowrap ${
+        className={`px-3 py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
           isConcept3
             ? 'bg-[#C4A265] text-black font-bold'
             : 'text-zinc-400 hover:text-white'
         }`}
       >
-        النموذج 3: المعرض
+        3. المعرض
       </Link>
 
       <button
         onClick={() => setCollapsed(true)}
-        className="text-zinc-500 hover:text-zinc-300 px-1.5 text-xs"
-        title="إخفاء"
+        className="text-zinc-500 hover:text-zinc-300 px-2 py-2 text-sm rounded-lg min-w-[36px] min-h-[38px] flex items-center justify-center"
+        title="إخفاء شريط المقارنة"
+        aria-label="إخفاء شريط المقارنة"
       >
         ✕
       </button>

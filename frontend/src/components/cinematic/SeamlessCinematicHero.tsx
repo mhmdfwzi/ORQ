@@ -10,32 +10,25 @@ export default function SeamlessCinematicHero() {
   const heroProduct = PRODUCTS.find((p) => p.slug === 'royal-oud') || PRODUCTS[0];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // States for the seamless 3-stage flow
-  // stage 0: Smoke & Dark Void (دخول الدخان في الظلام)
-  // stage 1: Bottle Manifestation (تجسد الزجاجة المنحوتة)
-  // stage 2: Settle into Store (انسياب سلس ودخول المتجر بدون أي فواصل)
-  const [stage, setStage] = useState<number>(0);
+  // Non-blocking visual shimmer sweep
   const [isRevealing, setIsRevealing] = useState(false);
 
-  // Run the sequence smoothly on mount
+  // Play light sweep on mount with proper cleanup
   useEffect(() => {
-    runSequence();
+    return runSequence();
   }, []);
 
   const runSequence = () => {
-    setStage(0);
     setIsRevealing(false);
 
-    // After 600ms -> Bottle emerges
+    // Subtle light sweep across bottle
     const t1 = setTimeout(() => {
-      setStage(1);
       setIsRevealing(true);
-    }, 600);
+    }, 300);
 
-    // After 2200ms -> Silky smooth transition into store elements (No seams!)
     const t2 = setTimeout(() => {
-      setStage(2);
-    }, 2400);
+      setIsRevealing(false);
+    }, 2000);
 
     return () => {
       clearTimeout(t1);
@@ -49,6 +42,10 @@ export default function SeamlessCinematicHero() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Respect reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
 
     let animId: number;
     let width = (canvas.width = canvas.offsetWidth);
@@ -89,6 +86,12 @@ export default function SeamlessCinematicHero() {
     let timer = 0;
 
     const render = () => {
+      // Don't render if document is hidden
+      if (document.hidden) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       timer++;
 
@@ -96,38 +99,38 @@ export default function SeamlessCinematicHero() {
       const originY = width < 1024 ? height * 0.30 : height * 0.72;
 
       // Central Golden Ambient Glow
-      const ambient = ctx.createRadialGradient(originX, originY - 120, 20, originX, originY - 120, width * 0.4);
+      const ambient = ctx.createRadialGradient(originX, originY - 100, 20, originX, originY - 100, width * 0.4);
       ambient.addColorStop(0, 'rgba(196, 162, 101, 0.18)');
       ambient.addColorStop(0.5, 'rgba(196, 162, 101, 0.04)');
       ambient.addColorStop(1, 'rgba(7, 7, 7, 0)');
       ctx.fillStyle = ambient;
       ctx.beginPath();
-      ctx.arc(originX, originY - 120, width * 0.4, 0, Math.PI * 2);
+      ctx.arc(originX, originY - 100, width * 0.4, 0, Math.PI * 2);
       ctx.fill();
 
       // Spawn soft smoke around bottle base
-      if (timer % 8 === 0 && smokePuffs.length < 20) {
+      if (timer % 9 === 0 && smokePuffs.length < 18) {
         smokePuffs.push({
-          x: originX + (Math.random() - 0.5) * 100,
+          x: originX + (Math.random() - 0.5) * 80,
           y: originY + (Math.random() - 0.5) * 20,
           r: 25,
-          maxR: Math.random() * 110 + 90,
+          maxR: Math.random() * 100 + 80,
           alpha: 0.02,
-          maxAlpha: Math.random() * 0.22 + 0.08,
-          grow: Math.random() * 0.7 + 0.4,
-          vx: (Math.random() - 0.5) * 0.9,
-          vy: -(Math.random() * 1.2 + 0.4),
+          maxAlpha: Math.random() * 0.2 + 0.08,
+          grow: Math.random() * 0.6 + 0.4,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: -(Math.random() * 1.1 + 0.4),
         });
       }
 
       // Spawn gold embers
-      if (embers.length < 40 && Math.random() > 0.4) {
+      if (embers.length < 35 && Math.random() > 0.45) {
         embers.push({
-          x: originX + (Math.random() - 0.5) * 240,
-          y: originY + Math.random() * 40,
-          size: Math.random() * 2.2 + 0.6,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: -(Math.random() * 1.8 + 0.8),
+          x: originX + (Math.random() - 0.5) * 200,
+          y: originY + Math.random() * 30,
+          size: Math.random() * 2.0 + 0.6,
+          vx: (Math.random() - 0.5) * 0.7,
+          vy: -(Math.random() * 1.6 + 0.7),
           alpha: Math.random() * 0.8 + 0.2,
         });
       }
@@ -193,36 +196,30 @@ export default function SeamlessCinematicHero() {
   }, []);
 
   return (
-    <section className="relative min-h-[640px] sm:min-h-[740px] lg:min-h-[820px] bg-[#070707] overflow-hidden flex items-center justify-center border-b border-[#1E1B18] select-none py-10">
-      {/* Background Seamless Golden Smoke & Mist Canvas */}
+    <section className="relative min-h-[580px] sm:min-h-[680px] lg:min-h-[760px] bg-[#070707] overflow-hidden flex items-center justify-center border-b border-[#1E1B18] select-none py-6 sm:py-10">
+      {/* Background Golden Smoke & Mist Canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full pointer-events-none z-0"
       />
 
       {/* Atmospheric Vignette */}
-      <div className="absolute inset-0 bg-radial-vignette pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-radial-vignette pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
           
-          {/* 1. Photorealistic Luxury Bottle: STRICTLY ON TOP on Mobile (order-1), Left Column on Desktop (lg:order-2) */}
-          <div className="lg:col-span-7 flex justify-center items-center relative order-1 lg:order-2 py-2 sm:py-6">
+          {/* 1. Photorealistic Luxury Bottle: Strictly ON TOP on Mobile (order-1), Left Column on Desktop (lg:order-2) */}
+          <div className="lg:col-span-7 flex justify-center items-center relative order-1 lg:order-2 py-2 sm:py-4">
             
-            {/* Dynamic Golden Scent Aura Expanding */}
+            {/* Dynamic Golden Scent Aura */}
             <div
-              className={`absolute w-64 h-64 sm:w-[480px] sm:h-[480px] rounded-full bg-gradient-to-tr from-[#C4A265]/30 via-amber-600/15 to-transparent blur-3xl pointer-events-none transition-all duration-1000 ${
-                stage >= 1 ? 'scale-110 opacity-100' : 'scale-75 opacity-0'
-              }`}
+              className="absolute w-64 h-64 sm:w-[460px] sm:h-[460px] rounded-full bg-gradient-to-tr from-[#C4A265]/30 via-amber-600/15 to-transparent blur-3xl pointer-events-none"
             />
 
-            {/* Bottle Container with Ethereal Manifestation Transition */}
+            {/* Bottle Container */}
             <div
-              className={`relative w-64 sm:w-80 md:w-[390px] aspect-[3/4] transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                stage >= 1
-                  ? 'scale-100 opacity-100 blur-0 translate-y-0'
-                  : 'scale-90 opacity-0 blur-2xl translate-y-12'
-              }`}
+              className="relative w-64 sm:w-80 md:w-[380px] aspect-[3/4] transition-transform duration-700 hover:scale-102"
             >
               {/* Ultra-Photorealistic Luxury Flacon (Natural #000000 Black Background with Seamless Radial Dissolve) */}
               <img
@@ -235,76 +232,72 @@ export default function SeamlessCinematicHero() {
                 }}
               />
 
-              {/* Specular Light Reflection Sweep on glass */}
+              {/* Specular Light Reflection Sweep */}
               <div
-                className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none transition-transform duration-1000 delay-500 ${
+                className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none transition-transform duration-1000 ${
                   isRevealing ? 'translate-x-full opacity-100' : '-translate-x-full opacity-0'
                 }`}
               />
 
-              {/* Bottom Mist & Soft Shadow Pedestal */}
-              <div className="w-3/4 h-5 mx-auto -mt-5 bg-black/90 rounded-full blur-md pointer-events-none"></div>
+              {/* Soft Shadow Pedestal */}
+              <div className="w-3/4 h-5 mx-auto -mt-5 bg-black/90 rounded-full blur-md pointer-events-none" />
             </div>
 
           </div>
 
-          {/* 2. Clean Luxury Typography & Purchasing: BELOW Bottle on Mobile (order-2), Right Column on Desktop (lg:order-1) */}
+          {/* 2. Clean Luxury Typography & Purchasing: Immediately Visible (Zero Blank Wait) */}
           <div
-            className={`lg:col-span-5 space-y-5 text-center sm:text-right z-10 order-2 lg:order-1 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              stage >= 2
-                ? 'opacity-100 translate-y-0 filter-none'
-                : 'opacity-0 translate-y-8 blur-sm pointer-events-none'
-            }`}
+            className="lg:col-span-5 space-y-5 text-center sm:text-right z-10 order-2 lg:order-1"
           >
-            {/* Minimal Brand Tag */}
+            {/* Brand Tag & Title */}
             <div className="space-y-1.5">
               <span className="font-serif tracking-[0.3em] text-[#C4A265] text-xs font-bold uppercase block">
                 ORQ HAUTE PARFUMERIE
               </span>
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
                 {heroProduct.name}
-                {heroProduct.arabicName && (
+                {heroProduct.arabicName && heroProduct.arabicName !== heroProduct.name && (
                   <span className="text-xl sm:text-2xl text-[#ECC480] font-normal mr-2">
                     ({heroProduct.arabicName})
                   </span>
                 )}
               </h1>
-              <p className="font-serif tracking-widest text-[11px] sm:text-xs text-zinc-300 uppercase">
-                SOME SCENTS ARE FELT, NOT SEEN
+              <p className="text-xs sm:text-sm text-zinc-300">
+                حضورك له أثر لا يمحى من الذاكرة • تركيز نيش فاخر
               </p>
             </div>
 
             {/* Price & Status */}
             <div className="pt-1 flex items-baseline justify-center sm:justify-start gap-3">
-              <span className="text-2xl sm:text-4xl font-extrabold text-[#ECC480] font-mono">
+              <span className="text-2xl sm:text-4xl font-extrabold text-[#ECC480] font-mono whitespace-nowrap">
                 {formatPrice(heroProduct.variants[1].price)} ج.م
               </span>
               <span className="text-xs text-zinc-400 font-mono">100 ML • EDP</span>
               <span className="text-xs text-emerald-400 font-semibold">● متوفر بالمخزون</span>
             </div>
 
-            {/* Clean, Decisive Action Buttons */}
+            {/* Decisive Action Buttons */}
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
               <button
                 onClick={() => addToCart(heroProduct, '100ml')}
-                className="gold-button text-xs sm:text-sm px-7 py-3.5 rounded-full font-bold shadow-2xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2"
+                className="gold-button text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-2xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2 min-h-[44px]"
               >
                 <span>أضف للسلة الآن</span>
                 <span>🛒</span>
               </button>
 
-              {/* Replay Scene Button */}
+              {/* Replay Light Sweep */}
               <button
                 onClick={runSequence}
-                className="px-4 py-3.5 rounded-full border border-[#38332D] hover:border-[#C4A265] bg-[#141210]/90 text-[#ECC480] text-xs font-semibold transition hover:bg-[#201D1A] flex items-center gap-2"
-                title="إعادة تشغيل الدخلة السينمائية بدون مغادرة الصفحة"
+                className="px-4 py-3.5 rounded-full border border-[#38332D] hover:border-[#C4A265] bg-[#141210]/90 text-[#ECC480] text-xs font-semibold transition hover:bg-[#201D1A] flex items-center gap-1.5 min-h-[44px]"
+                title="إعادة وميض الضوء على الزجاجة"
               >
                 <span>↺</span>
-                <span>إعادة المشهد</span>
+                <span>وميض الضوء</span>
               </button>
             </div>
 
-            {/* Scent Pyramid Fast Badges */}
+            {/* Fast Notes Badges */}
             <div className="pt-4 border-t border-[#1E1B18] flex items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs text-zinc-400 flex-wrap">
               <span className="flex items-center gap-1.5">
                 <span className="text-[#C4A265]">✦</span>
@@ -325,16 +318,15 @@ export default function SeamlessCinematicHero() {
       </div>
 
       {/* Seamless Bottom Gradient to Connect with Next Section */}
-      <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-[#070707] to-transparent pointer-events-none z-10" />
+      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#070707] to-transparent pointer-events-none z-10" />
 
-      {/* Seamless Scroll Connection Indicator */}
+      {/* Seamless Scroll Connection Indicator (Pointing to #signature) */}
       <a
-        href="#notes"
-        className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-[11px] text-zinc-400 hover:text-[#ECC480] transition-all duration-700 cursor-pointer ${
-          stage >= 2 ? 'opacity-90 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
+        href="#signature"
+        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-[11px] text-zinc-400 hover:text-[#ECC480] transition-colors cursor-pointer"
+        aria-label="الانتقال إلى المجموعة العطرية"
       >
-        <span className="font-serif tracking-widest uppercase text-[10px] text-[#C4A265]/80">
+        <span className="font-serif tracking-widest uppercase text-[10px] text-[#C4A265]/90">
           اكتشف المجموعة
         </span>
         <span className="animate-scroll-pulse text-base text-[#ECC480]">↓</span>
@@ -342,4 +334,3 @@ export default function SeamlessCinematicHero() {
     </section>
   );
 }
-

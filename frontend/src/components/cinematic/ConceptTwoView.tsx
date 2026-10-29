@@ -7,7 +7,7 @@ import ProductCard from '@/components/catalog/ProductCard';
 import MoodFilterBar from '@/components/cinematic/MoodFilterBar';
 import CinematicAtomizerHero from '@/components/cinematic/CinematicAtomizerHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS, getProductsByMood } from '@/data/products';
+import { PRODUCTS, GIFT_BUNDLE, getProductsByMood } from '@/data/products';
 import { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 
@@ -117,17 +117,8 @@ export default function ConceptTwoView() {
                   </div>
 
                   <button
-                    onClick={() =>
-                      addToCart(
-                        {
-                          ...featuredHero,
-                          name: 'باقة الهدايا الملكية (50 مل + معطر + عينات)',
-                          slug: 'bundle-gift-box'
-                        },
-                        '50ml'
-                      )
-                    }
-                    className="gold-button py-3 px-6 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2"
+                    onClick={() => addToCart(GIFT_BUNDLE, '50ml')}
+                    className="gold-button py-3 px-6 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 min-h-[44px]"
                   >
                     <span>طلب الباقة الآن بـ 750 ج.م</span>
                     <span>←</span>

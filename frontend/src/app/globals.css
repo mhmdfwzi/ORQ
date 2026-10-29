@@ -97,11 +97,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-light-pulse,
-  .hover\:scale-105 {
+  *,
+  ::before,
+  ::after {
     animation: none !important;
     transition: none !important;
     transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
 }
 
