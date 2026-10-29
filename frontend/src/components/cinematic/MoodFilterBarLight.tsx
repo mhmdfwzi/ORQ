@@ -43,3 +43,4 @@ export default function MoodFilterBarLight({ currentMood, onSelectMood }: MoodFi
     </div>
   );
 }
+
