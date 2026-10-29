@@ -11,7 +11,11 @@ export default function Header() {
   const pathname = usePathname() || '/';
 
   // Determine current active base route
-  const currentBase = pathname.startsWith('/preview/concept-2')
+  const currentBase = pathname.startsWith('/preview/concept-4')
+    ? '/preview/concept-4'
+    : pathname.startsWith('/preview/concept-5')
+    ? '/preview/concept-5'
+    : pathname.startsWith('/preview/concept-2')
     ? '/preview/concept-2'
     : pathname.startsWith('/preview/concept-3')
     ? '/preview/concept-3'

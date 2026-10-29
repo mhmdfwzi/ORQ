@@ -11,6 +11,8 @@ export default function ConceptSwitcherBar() {
   const isConcept1 = pathname === '/preview/concept-1' || pathname === '/preview' || pathname === '/';
   const isConcept2 = pathname === '/preview/concept-2';
   const isConcept3 = pathname === '/preview/concept-3';
+  const isConcept4 = pathname === '/preview/concept-4';
+  const isConcept5 = pathname === '/preview/concept-5';
 
   if (collapsed) {
     return (
@@ -20,7 +22,7 @@ export default function ConceptSwitcherBar() {
         aria-label="عرض شريط تبديل النماذج"
       >
         <span>🎨</span>
-        <span>النماذج (3)</span>
+        <span>النماذج (5)</span>
       </button>
     );
   }
@@ -29,7 +31,7 @@ export default function ConceptSwitcherBar() {
     <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 bg-[#12100E]/95 backdrop-blur-md border border-[#332E27] rounded-2xl sm:rounded-full p-1.5 shadow-2xl flex flex-wrap items-center justify-center gap-1 text-xs max-w-[calc(100vw-16px)]">
       <Link
         href="/preview/concept-1"
-        className={`px-3 py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
+        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
           isConcept1
             ? 'bg-[#C4A265] text-black font-bold'
             : 'text-zinc-400 hover:text-white'
@@ -40,7 +42,7 @@ export default function ConceptSwitcherBar() {
 
       <Link
         href="/preview/concept-2"
-        className={`px-3 py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
+        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
           isConcept2
             ? 'bg-[#C4A265] text-black font-bold'
             : 'text-zinc-400 hover:text-white'
@@ -51,13 +53,37 @@ export default function ConceptSwitcherBar() {
 
       <Link
         href="/preview/concept-3"
-        className={`px-3 py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
+        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center ${
           isConcept3
             ? 'bg-[#C4A265] text-black font-bold'
             : 'text-zinc-400 hover:text-white'
         }`}
       >
         3. المعرض
+      </Link>
+
+      <Link
+        href="/preview/concept-4"
+        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center gap-1 ${
+          isConcept4
+            ? 'bg-[#C4A265] text-black font-bold ring-1 ring-white/50'
+            : 'text-[#ECC480] hover:text-white font-medium'
+        }`}
+      >
+        <span>4. المتكامل</span>
+        <span className="text-[10px]">✨</span>
+      </Link>
+
+      <Link
+        href="/preview/concept-5"
+        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center gap-1 ${
+          isConcept5
+            ? 'bg-[#FAF8F5] text-[#1C1917] font-extrabold ring-1 ring-[#C4A265]'
+            : 'text-zinc-300 hover:text-white'
+        }`}
+      >
+        <span>5. أبيض وذهبي</span>
+        <span className="text-[10px]">⚪</span>
       </Link>
 
       <button

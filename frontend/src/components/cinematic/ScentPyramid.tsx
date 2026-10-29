@@ -38,10 +38,10 @@ export default function ScentPyramid() {
             >
               <option value="royal-oud">عطر متمرد (Royal Oud)</option>
               <option value="oud-ambassador">عطر غرور (Oud Ambassador)</option>
-              <option value="chaos">عطر CHAOS (Sauvage DNA)</option>
-              <option value="alpha">عطر ALPHA (Invictus DNA)</option>
-              <option value="darknight">عطر DARKNIGHT (Bleu DNA)</option>
-              <option value="gigantic">عطر GIGANTIC (Vanilla DNA)</option>
+              <option value="chaos">عطر CHAOS (توابل منعشة وعنبر)</option>
+              <option value="alpha">عطر ALPHA (أروماتيك وبحري منعش)</option>
+              <option value="darknight">عطر DARKNIGHT (أخشاب وبخور مدخن)</option>
+              <option value="gigantic">عطر GIGANTIC (فانيلا وتبغ دافئ)</option>
             </select>
           </div>
         </div>
