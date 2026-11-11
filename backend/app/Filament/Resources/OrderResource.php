@@ -27,6 +27,19 @@ class OrderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
+    /** Pending-orders counter shown next to "Orders" in the sidebar. */
+    public static function getNavigationBadge(): ?string
+    {
+        $pending = Order::where('status', 'pending')->count();
+
+        return $pending > 0 ? (string) $pending : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return 'Sales';

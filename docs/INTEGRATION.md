@@ -32,3 +32,4 @@ cd frontend && npm install && npm run build && npm run start
 - Saving a product or variant in Filament calls `POST {FRONTEND_URL}/api/revalidate` (header `x-revalidate-token`), which revalidates the `products` cache tag. No rebuild needed.
 - Guest checkout: `POST /api/v1/orders` (COD, no account). Only `slug/size/quantity` are trusted from the client; prices and stock are resolved server-side in a transaction. Throttled to 10/min per IP.
 - Shipping fee: `ORQ_SHIPPING_COST` in backend `.env` (default 0 = free).
+
