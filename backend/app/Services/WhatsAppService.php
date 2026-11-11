@@ -83,12 +83,15 @@ class WhatsAppService
             return false;
         }
 
-        $fullAddress = $order->address ? $order->address->full_address : 'N/A';
+        $fullAddress = $order->shipping_address_text;
 
         $message = "🛒 *New Order Received!*\n\n";
         $message .= "📦 Order: #{$order->order_number}\n";
-        $message .= "👤 Customer: {$order->user->name}\n";
-        $message .= "📱 Phone: {$order->user->phone}\n";
+        $message .= "👤 Customer: {$order->customer_display_name}\n";
+        $message .= "📱 Phone: {$order->customer_display_phone}\n";
+        foreach ($order->items as $item) {
+            $message .= "🧴 {$item->product_name} {$item->size} × {$item->quantity}\n";
+        }
         $message .= "💰 Total: {$order->total} EGP\n";
         $message .= "💳 Payment: " . strtoupper($order->payment_method) . "\n";
         $message .= "📍 Address: {$fullAddress}\n\n";

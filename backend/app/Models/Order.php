@@ -12,6 +12,10 @@ class Order extends Model
 
     protected $fillable = [
         'order_number',
+        'customer_name',
+        'customer_phone',
+        'shipping_governorate',
+        'shipping_address',
         'user_id',
         'address_id',
         'subtotal',
@@ -70,10 +74,38 @@ class Order extends Model
     public static function generateOrderNumber(): string
     {
         do {
-            $number = 'MED-' . date('Y') . '-' . str_pad(random_int(1, 99999), 5, '0', STR_PAD_LEFT);
+            $number = config('orq.order_prefix', 'ORQ') . '-' . date('Y') . '-' . str_pad(random_int(1, 99999), 5, '0', STR_PAD_LEFT);
         } while (self::where('order_number', $number)->exists());
 
         return $number;
+    }
+
+    /**
+     * Customer name: guest field first, registered user as fallback.
+     */
+    public function getCustomerDisplayNameAttribute(): string
+    {
+        return $this->customer_name ?: ($this->user?->name ?? 'N/A');
+    }
+
+    /**
+     * Customer phone: guest field first, registered user as fallback.
+     */
+    public function getCustomerDisplayPhoneAttribute(): string
+    {
+        return $this->customer_phone ?: ($this->user?->phone ?? 'N/A');
+    }
+
+    /**
+     * Human readable shipping address for guest or registered orders.
+     */
+    public function getShippingAddressTextAttribute(): string
+    {
+        if ($this->shipping_address) {
+            return trim(($this->shipping_governorate ? $this->shipping_governorate . ' - ' : '') . $this->shipping_address);
+        }
+
+        return $this->address ? $this->address->full_address : 'N/A';
     }
 
     /**

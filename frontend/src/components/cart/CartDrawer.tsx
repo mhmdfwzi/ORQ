@@ -1,13 +1,20 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useCart } from './CartContext';
+import CheckoutForm from './CheckoutForm';
 import { formatPrice } from '@/lib/format';
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeFromCart, updateQuantity, totalAmount, totalItems } = useCart();
+  const [checkingOut, setCheckingOut] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+
+  // Always reopen on the cart view, never on a stale checkout step.
+  useEffect(() => {
+    if (!isOpen) setCheckingOut(false);
+  }, [isOpen]);
 
   // Manage focus trap and Escape key
   useEffect(() => {
@@ -138,7 +145,9 @@ export default function CartDrawer() {
           </div>
 
           {/* Footer Summary */}
-          {items.length > 0 && (
+          {checkingOut ? (
+            <CheckoutForm onBack={() => setCheckingOut(false)} />
+          ) : items.length > 0 && (
             <div className="p-5 border-t border-[#24201C] bg-[#100F0E] space-y-4">
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-[#A0988C]">
@@ -159,13 +168,13 @@ export default function CartDrawer() {
 
               <div className="space-y-2">
                 <button 
-                  onClick={() => alert('مرحباً بك! هذه معاينة تجريبية لواجهة المتجر (Preview Mode). شكراً لاختبارك متجر ORQ.')}
+                  onClick={() => setCheckingOut(true)}
                   className="w-full gold-button py-3.5 rounded-xl text-xs font-bold text-center block min-h-[44px]"
                 >
                   متابعة الطلب — الدفع كاش عند الاستلام
                 </button>
                 <div className="text-[10px] text-center text-zinc-500">
-                  معاينة تصميم محلية • جميع الأسعار والمنتجات لأغراض العرض والمراجعة
+                  الدفع كاش عند الاستلام • شحن مجاني لجميع المحافظات
                 </div>
               </div>
             </div>

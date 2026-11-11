@@ -76,7 +76,7 @@ class OrderResource extends Resource
                             ->disabled(),
                         
                         Placeholder::make('total')
-                            ->content(fn (Order $record): string => '$' . number_format($record->total, 2)),
+                            ->content(fn (Order $record): string => 'EGP ' . number_format($record->total, 2)),
 
                         Textarea::make('notes')
                             ->columnSpanFull(),
@@ -85,7 +85,7 @@ class OrderResource extends Resource
                 Section::make('Shipping Address')
                     ->schema([
                         Placeholder::make('address')
-                            ->content(fn (Order $record): string => $record->address ? $record->address->full_address : 'No address'),
+                            ->content(fn (Order $record): string => $record->shipping_address_text),
                     ]),
             ]);
     }
@@ -98,7 +98,9 @@ class OrderResource extends Resource
                     ->searchable()
                     ->sortable(),
                 
-                Tables\Columns\TextColumn::make('user.name')
+                Tables\Columns\TextColumn::make('customer_name')
+                    ->label('Customer')
+                    ->default(fn (Order $record) => $record->customer_display_name)
                     ->searchable()
                     ->sortable(),
                 
@@ -113,7 +115,7 @@ class OrderResource extends Resource
                     ->sortable(),
                 
                 Tables\Columns\TextColumn::make('total')
-                    ->money('USD')
+                    ->money('EGP')
                     ->sortable(),
                 
                 Tables\Columns\TextColumn::make('payment_status')

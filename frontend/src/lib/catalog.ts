@@ -24,3 +24,4 @@ export async function getCatalog(): Promise<Catalog> {
   }
   return { products: PRODUCTS, giftBundle: GIFT_BUNDLE };
 }
+

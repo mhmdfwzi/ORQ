@@ -11,6 +11,7 @@ interface CartContextType {
   addToCart: (product: Product, size: '50ml' | '100ml', quantity?: number) => void;
   removeFromCart: (slug: string, size: '50ml' | '100ml') => void;
   updateQuantity: (slug: string, size: '50ml' | '100ml', quantity: number) => void;
+  clearCart: () => void;
   totalAmount: number;
   totalItems: number;
 }
@@ -18,17 +19,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([
-    // Initial sample item for instant preview feel
-    {
-      slug: 'chaos',
-      name: 'CHAOS (100ml)',
-      size: '100ml',
-      price: 1290,
-      quantity: 1,
-      image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
-    }
-  ]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const openCart = () => setIsOpen(true);
@@ -76,6 +67,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const clearCart = () => setItems([]);
+
   const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -89,6 +82,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCart,
         totalAmount,
         totalItems
       }}

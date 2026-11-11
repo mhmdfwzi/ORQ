@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // Cap build parallelism: 11 default workers can exhaust memory on small machines.
+  experimental: {
+    cpus: 3,
+  },
   images: {
     // Images uploaded through the Laravel/Filament admin are served from /storage.
     remotePatterns: [
