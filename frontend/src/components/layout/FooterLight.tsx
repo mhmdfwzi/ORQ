@@ -66,6 +66,7 @@ export default function FooterLight() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-right">
           <div className="md:col-span-5 space-y-3">
             <div className="flex items-center gap-2">
+              <img src="/logo-mark.png" alt="" aria-hidden="true" width={30} height={35} className="h-9 w-auto brightness-[.62] saturate-150" />
               <span className="font-serif tracking-[0.25em] text-2xl font-bold bg-gradient-to-r from-[#80581B] to-[#B38734] bg-clip-text text-transparent">
                 ORQ
               </span>

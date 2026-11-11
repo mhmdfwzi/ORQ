@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\OrderApiController;
+use App\Http\Controllers\Api\BrandApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/best-sellers', [ProductApiController::class, 'bestSellers']);
     Route::get('/products/bundle', [ProductApiController::class, 'bundle']);
     Route::get('/products/{slug}', [ProductApiController::class, 'show']);
+
+    // Brand story ("شفرة ORQ")
+    Route::get('/brand', [BrandApiController::class, 'show']);
 
     // Guest checkout (cash on delivery). Throttled per IP to limit abuse.
     Route::post('/orders', [OrderApiController::class, 'store'])->middleware('throttle:10,1');

@@ -30,6 +30,10 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->databaseNotifications()
             ->databaseNotificationsPolling('15s')
+            ->brandName('ORQ')
+            ->brandLogo(asset('images/orq-logo-mark.png'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('images/orq-favicon.png'))
             ->colors([
                 'primary' => Color::Amber,
             ])

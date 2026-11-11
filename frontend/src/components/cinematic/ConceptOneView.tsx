@@ -3,6 +3,7 @@
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import BrandStory from '@/components/cinematic/BrandStory';
 import ProductCard from '@/components/catalog/ProductCard';
 import ScentPyramid from '@/components/cinematic/ScentPyramid';
 import SeamlessCinematicHero from '@/components/cinematic/SeamlessCinematicHero';
@@ -66,6 +67,9 @@ export default function ConceptOneView() {
           </p>
         </div>
       </section>
+
+      {/* Brand story: شفرة ORQ (O · R · Q) */}
+      <BrandStory />
 
       <Footer />
     </div>

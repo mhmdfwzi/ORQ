@@ -67,7 +67,10 @@ export default function Footer() {
         <ScrollReveal delay={120} direction="up">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-[#A0988C]">
             <div className="md:col-span-5 space-y-3">
-              <span className="font-serif tracking-[0.2em] text-xl font-bold gold-gradient-text block">ORQ</span>
+              <div className="flex items-center gap-3">
+                <img src="/logo-mark.png" alt="" aria-hidden="true" width={30} height={35} className="h-9 w-auto" />
+                <span className="font-serif tracking-[0.2em] text-xl font-bold gold-gradient-text block">ORQ</span>
+              </div>
               <p className="text-xs text-[#8E867B] leading-relaxed max-w-sm">
                 دار عطور رجالية متخصصة تصنع الحضور والهيبة من خلال خلاصات عطرية فاخرة. لأن العطر الحقيقي ليس مجرد رائحة.. بل بصمة تسبق كلماتك.
               </p>

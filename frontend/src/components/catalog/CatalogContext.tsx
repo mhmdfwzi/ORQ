@@ -2,10 +2,12 @@
 
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import type { Product } from '@/types/product';
+import type { BrandStory } from '@/types/brand';
 
 interface CatalogContextType {
   products: Product[];
   giftBundle: Product;
+  brand: BrandStory;
   getProductsByMood: (mood: string) => Product[];
 }
 
@@ -15,10 +17,12 @@ const CatalogContext = createContext<CatalogContextType | undefined>(undefined);
 export function CatalogProvider({
   products,
   giftBundle,
+  brand,
   children,
 }: {
   products: Product[];
   giftBundle: Product;
+  brand: BrandStory;
   children: React.ReactNode;
 }) {
   const getProductsByMood = useCallback(
@@ -27,8 +31,8 @@ export function CatalogProvider({
   );
 
   const value = useMemo(
-    () => ({ products, giftBundle, getProductsByMood }),
-    [products, giftBundle, getProductsByMood]
+    () => ({ products, giftBundle, brand, getProductsByMood }),
+    [products, giftBundle, brand, getProductsByMood]
   );
 
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;

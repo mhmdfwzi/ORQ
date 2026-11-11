@@ -27,6 +27,7 @@ export default function Header() {
         
         {/* Brand Logo */}
         <Link href={currentBase} className="flex items-center gap-3 group">
+          <img src="/logo-mark.png" alt="" aria-hidden="true" width={32} height={37} className="h-9 w-auto transition group-hover:brightness-110" />
           <div className="flex flex-col">
             <span className="font-serif tracking-[0.25em] text-2xl font-bold gold-gradient-text transition group-hover:brightness-110">
               ORQ

@@ -13,10 +13,11 @@ export default async function JsonLd() {
         '@id': `${baseUrl}/#organization`,
         name: 'ORQ Haute Parfumerie',
         alternateName: ['ORQ', 'دار عطور أو آر كيو'],
+        slogan: 'Original · Rare · Quality',
         url: baseUrl,
         logo: {
           '@type': 'ImageObject',
-          url: `${baseUrl}/icon.svg`,
+          url: `${baseUrl}/icon.png`,
           width: 512,
           height: 512,
         },

@@ -20,6 +20,7 @@ export default function HeaderLight() {
         
         {/* Brand Logo */}
         <Link href={currentBase} className="flex items-center gap-3 group">
+          <img src="/logo-mark.png" alt="" aria-hidden="true" width={32} height={37} className="h-9 w-auto brightness-[.62] saturate-150" />
           <div className="flex flex-col">
             <span className="font-serif tracking-[0.25em] text-2xl font-bold bg-gradient-to-r from-[#80581B] via-[#B38734] to-[#664614] bg-clip-text text-transparent transition group-hover:brightness-110">
               ORQ

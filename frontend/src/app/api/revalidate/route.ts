@@ -17,5 +17,6 @@ export async function POST(request: NextRequest) {
   }
 
   revalidateTag('products', 'max');
+  revalidateTag('brand', 'max');
   return NextResponse.json({ revalidated: true, now: Date.now() });
 }

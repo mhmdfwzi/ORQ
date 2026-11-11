@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Tajawal, Cinzel } from 'next/font/google';
+import { Cairo, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
@@ -8,22 +8,22 @@ import JsonLd from '@/components/seo/JsonLd';
 import { CatalogProvider } from '@/components/catalog/CatalogContext';
 import { getCatalog } from '@/lib/catalog';
 
-const tajawal = Tajawal({
-  subsets: ['arabic'],
-  weight: ['300', '400', '500', '700', '800'],
-  variable: '--font-tajawal',
+const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-cairo',
   display: 'swap',
 });
 
-const cinzel = Cinzel({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['500', '700'],
-  variable: '--font-cinzel',
+  weight: ['500', '600', '700'],
+  variable: '--font-display',
   display: 'swap',
 });
 
 export const viewport: Viewport = {
-  themeColor: '#070707',
+  themeColor: '#0A0908',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -98,7 +98,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon.png', sizes: '64x64', type: 'image/png' },
+      { url: '/icon.png', sizes: '512x512', type: 'image/png' },
     ],
     shortcut: '/icon.svg',
     apple: [
@@ -129,15 +129,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { products, giftBundle } = await getCatalog();
+  const { products, giftBundle, brand } = await getCatalog();
 
   return (
-    <html lang="ar" dir="rtl" className={`${tajawal.variable} ${cinzel.variable}`}>
+    <html lang="ar" dir="rtl" className={`${cairo.variable} ${cormorant.variable}`}>
       <head>
         <JsonLd />
       </head>
       <body className="bg-[#0B0B0B] text-[#F2EBDD] min-h-screen selection:bg-[#C4A265] selection:text-black">
-        <CatalogProvider products={products} giftBundle={giftBundle}>
+        <CatalogProvider products={products} giftBundle={giftBundle} brand={brand}>
           <CartProvider>
             {/* Top Sticky Bar to switch seamlessly between Design Concepts */}
             <ConceptSwitcherBar />

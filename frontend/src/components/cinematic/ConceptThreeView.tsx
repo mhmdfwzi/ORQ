@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import BrandStory from '@/components/cinematic/BrandStory';
 import ProductCard from '@/components/catalog/ProductCard';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import { useCatalog } from '@/components/catalog/CatalogContext';
@@ -193,6 +194,9 @@ export default function ConceptThreeView() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* Brand story: شفرة ORQ (O · R · Q) */}
+      <BrandStory />
 
       <Footer />
     </div>

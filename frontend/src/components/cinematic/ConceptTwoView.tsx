@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import BrandStory from '@/components/cinematic/BrandStory';
 import ProductCard from '@/components/catalog/ProductCard';
 import MoodFilterBar from '@/components/cinematic/MoodFilterBar';
 import CinematicAtomizerHero from '@/components/cinematic/CinematicAtomizerHero';
@@ -132,6 +133,9 @@ export default function ConceptTwoView() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* Brand story: شفرة ORQ (O · R · Q) */}
+      <BrandStory />
 
       <Footer />
     </div>

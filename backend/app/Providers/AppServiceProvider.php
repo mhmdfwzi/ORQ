@@ -18,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\Product::observe(\App\Observers\ProductObserver::class);
         \App\Models\ProductVariant::observe(\App\Observers\ProductObserver::class);
+        // Brand story lives in settings: saving it must refresh the storefront too.
+        \App\Models\Setting::observe(\App\Observers\ProductObserver::class);
 
         try {
             $settings = \App\Models\Setting::all()->pluck('value', 'key');

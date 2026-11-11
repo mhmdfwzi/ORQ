@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import BrandStory from '@/components/cinematic/BrandStory';
 import ProductCard from '@/components/catalog/ProductCard';
 import MoodFilterBar from '@/components/cinematic/MoodFilterBar';
 import ScentPyramid from '@/components/cinematic/ScentPyramid';
@@ -249,6 +250,9 @@ export default function ConceptFourView() {
           </p>
         </div>
       </section>
+
+      {/* Brand story: شفرة ORQ (O · R · Q) */}
+      <BrandStory />
 
       <Footer />
     </div>

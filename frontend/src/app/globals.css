@@ -3,9 +3,9 @@
 :root {
   --color-obsidian: #111111;
   --color-charcoal: #1C1A18;
-  --color-gold: #C4A265;
+  --color-gold: #C9A24B;
   --color-gold-light: #ECC480;
-  --color-gold-dark: #9B793A;
+  --color-gold-dark: #A8752B;
   --color-ivory: #F2EBDD;
   --color-smoked-brown: #292522;
   --color-text-muted-dark: #B9B1A5;
@@ -14,19 +14,23 @@
   --radius-lg: 20px;
   --content-max: 1280px;
 
-  --background: #0B0B0B;
+  --background: #0A0908;
   --foreground: #F2EBDD;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-tajawal), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-cairo), system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
 
+.font-serif {
+  font-family: var(--font-display), 'Cormorant Garamond', Cairo, Georgia, serif;
+}
+
 .gold-gradient-text {
-  background: linear-gradient(135deg, #ECC480 0%, #C4A265 50%, #9B793A 100%);
+  background: linear-gradient(135deg, #ECC480 0%, #C9A24B 50%, #A8752B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
