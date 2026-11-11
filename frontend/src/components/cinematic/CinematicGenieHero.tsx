@@ -317,7 +317,7 @@ export default function CinematicGenieHero() {
               >
                 {/* Image of the bottle emerging */}
                 <img
-                  src="/media/orq/11206483-815d-4610-a05d-b5d5fc2397db.jpg"
+                  src="/media/orq/hero-bottle.webp"
                   alt="ORQ Haute Parfumerie Genie Bottle"
                   className="w-full h-full object-cover object-center filter contrast-110 hover:scale-105 transition-transform duration-700"
                 />

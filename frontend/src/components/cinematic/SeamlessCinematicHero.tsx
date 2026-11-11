@@ -224,7 +224,7 @@ export default function SeamlessCinematicHero() {
             >
               {/* Ultra-Photorealistic Luxury Flacon (Natural #000000 Black Background with Seamless Radial Dissolve) */}
               <img
-                src="/media/orq/royal_oud_photoreal.jpg"
+                src="/media/orq/royal-oud.webp"
                 alt="ORQ Royal Oud Luxury Flacon"
                 className="w-full h-full object-contain filter contrast-110 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
                 style={{

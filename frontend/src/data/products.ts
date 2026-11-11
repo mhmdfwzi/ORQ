@@ -23,7 +23,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 1190, inStock: true },
       { size: '100ml', price: 1999, inStock: true }
     ],
-    image: '/media/orq/royal_oud_photoreal.jpg'
+    image: '/media/orq/royal-oud.webp'
   },
   {
     slug: 'chaos',
@@ -46,7 +46,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 790, inStock: true },
       { size: '100ml', price: 1290, inStock: true }
     ],
-    image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
+    image: '/media/orq/chaos.webp'
   },
   {
     slug: 'alpha',
@@ -69,7 +69,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 790, inStock: true },
       { size: '100ml', price: 1290, inStock: true }
     ],
-    image: '/media/orq/11206483-815d-4610-a05d-b5d5fc2397db.jpg'
+    image: '/media/orq/alpha.webp'
   },
   {
     slug: 'dom',
@@ -91,7 +91,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 790, inStock: true },
       { size: '100ml', price: 1290, inStock: true }
     ],
-    image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
+    image: '/media/orq/dom.webp'
   },
   {
     slug: 'pompous',
@@ -113,7 +113,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 820, inStock: true },
       { size: '100ml', price: 1350, inStock: true }
     ],
-    image: '/media/orq/ac8eac34-874a-49dc-8ecf-dd73aa4d4d22.jpg'
+    image: '/media/orq/pompous.webp'
   },
   {
     slug: 'electro',
@@ -135,7 +135,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 820, inStock: true },
       { size: '100ml', price: 1350, inStock: true }
     ],
-    image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
+    image: '/media/orq/electro.webp'
   },
   {
     slug: 'gigantic',
@@ -158,7 +158,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 890, inStock: true },
       { size: '100ml', price: 1490, inStock: true }
     ],
-    image: '/media/orq/royal_oud_photoreal.jpg'
+    image: '/media/orq/gigantic.webp'
   },
   {
     slug: 'darknight',
@@ -181,7 +181,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 890, inStock: true },
       { size: '100ml', price: 1490, inStock: true }
     ],
-    image: '/media/orq/aa51d35b-b89c-475b-9c4b-0e4e192d327c.jpg'
+    image: '/media/orq/darknight.webp'
   },
   {
     slug: 'vigorous',
@@ -203,7 +203,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 720, inStock: true },
       { size: '100ml', price: 1199, inStock: true }
     ],
-    image: '/media/orq/11206483-815d-4610-a05d-b5d5fc2397db.jpg'
+    image: '/media/orq/vigorous.webp'
   },
   {
     slug: 'saint',
@@ -225,7 +225,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 790, inStock: true },
       { size: '100ml', price: 1290, inStock: true }
     ],
-    image: '/media/orq/334ae943-c027-4d78-bba3-94c02df1ffdd.jpg'
+    image: '/media/orq/saint.webp'
   },
   {
     slug: 'oud-ambassador',
@@ -248,7 +248,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 1190, inStock: true },
       { size: '100ml', price: 1999, inStock: true }
     ],
-    image: '/media/orq/e15d2bf1-23e2-4bf9-9a8b-e8845ffd973d.jpg'
+    image: '/media/orq/oud-ambassador.webp'
   },
   {
     slug: 'oud-madawi',
@@ -270,7 +270,7 @@ export const PRODUCTS: Product[] = [
       { size: '50ml', price: 1190, inStock: true },
       { size: '100ml', price: 1999, inStock: true }
     ],
-    image: '/media/orq/ac8eac34-874a-49dc-8ecf-dd73aa4d4d22.jpg'
+    image: '/media/orq/oud-madawi.webp'
   }
 ];
 
@@ -295,7 +295,7 @@ export const GIFT_BUNDLE: Product = {
   variants: [
     { size: '50ml', price: 750, inStock: true }
   ],
-  image: '/media/orq/52adf269-3af1-47ab-9da9-af148cbd6349.jpg'
+  image: '/media/orq/bundle-gift-box.webp'
 };
 
 export function getProductBySlug(slug: string): Product | undefined {

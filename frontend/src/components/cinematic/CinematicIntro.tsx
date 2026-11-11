@@ -226,7 +226,7 @@ export default function CinematicIntro({ onComplete }: CinematicIntroProps) {
             }`}
           >
             <img
-              src="/media/orq/11206483-815d-4610-a05d-b5d5fc2397db.jpg"
+              src="/media/orq/hero-bottle.webp"
               alt="ORQ Signature"
               className="w-full h-full object-cover object-center filter contrast-110"
             />

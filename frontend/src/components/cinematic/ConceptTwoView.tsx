@@ -74,7 +74,7 @@ export default function ConceptTwoView() {
               
               <div className="lg:col-span-5 aspect-square rounded-xl bg-black border border-[#2B2723] overflow-hidden relative shadow-2xl">
                 <img
-                  src="/media/orq/52adf269-3af1-47ab-9da9-af148cbd6349.jpg"
+                  src="/media/orq/bundle-gift-box.webp"
                   alt="ORQ Gift Box Bundle"
                   className="w-full h-full object-cover"
                 />

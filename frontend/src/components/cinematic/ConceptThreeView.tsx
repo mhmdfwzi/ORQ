@@ -34,7 +34,7 @@ export default function ConceptThreeView() {
               {/* 1. The Panoramic Bottles Image: Strictly ON TOP on Mobile (order-1) */}
               <div className="w-full aspect-[16/10] sm:aspect-[16/8] md:aspect-[16/6] bg-black relative overflow-hidden order-1">
                 <img
-                  src="/media/orq/19558efb-3e5a-4c4e-9fc7-4e6a38d1425d.jpg"
+                  src="/media/orq/collection-panorama.webp"
                   alt="ORQ Complete Collection Panorama"
                   className={`w-full h-full object-cover transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                     heroMounted ? 'opacity-90 scale-100' : 'opacity-0 scale-105'

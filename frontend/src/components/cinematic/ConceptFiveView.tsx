@@ -106,7 +106,7 @@ export default function ConceptFiveView() {
               
               <div className="lg:col-span-5 aspect-square rounded-2xl bg-white border border-[#EAE4D8] overflow-hidden relative shadow-lg">
                 <img
-                  src="/media/orq/52adf269-3af1-47ab-9da9-af148cbd6349.jpg"
+                  src="/media/orq/bundle-gift-box.webp"
                   alt="صندوق باقة الهدايا والتجربة المتكاملة"
                   className="w-full h-full object-cover"
                 />

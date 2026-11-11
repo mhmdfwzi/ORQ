@@ -138,7 +138,7 @@ export default function SeamlessWhiteGoldHero() {
             >
               {/* Flacon with Soft Dissolve */}
               <img
-                src="/media/orq/royal_oud_photoreal.jpg"
+                src="/media/orq/royal-oud.webp"
                 alt="ORQ Royal Oud Luxury Flacon - White Edition"
                 className="w-full h-full object-contain filter contrast-105 drop-shadow-[0_20px_45px_rgba(140,105,45,0.25)] rounded-2xl"
                 style={{
