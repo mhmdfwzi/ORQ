@@ -1,3 +1,4 @@
+// LEGACY: Hardcoded data kept as fallback. Primary data source is now the Laravel API.
 import { Product } from '@/types/product';
 
 export const PRODUCTS: Product[] = [

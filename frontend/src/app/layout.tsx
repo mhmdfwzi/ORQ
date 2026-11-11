@@ -5,6 +5,8 @@ import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import ConceptSwitcherBar from '@/components/layout/ConceptSwitcherBar';
 import JsonLd from '@/components/seo/JsonLd';
+import { CatalogProvider } from '@/components/catalog/CatalogContext';
+import { getCatalog } from '@/lib/catalog';
 
 const tajawal = Tajawal({
   subsets: ['arabic'],
@@ -122,28 +124,32 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { products, giftBundle } = await getCatalog();
+
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} ${cinzel.variable}`}>
       <head>
         <JsonLd />
       </head>
       <body className="bg-[#0B0B0B] text-[#F2EBDD] min-h-screen selection:bg-[#C4A265] selection:text-black">
-        <CartProvider>
-          {/* Top Sticky Bar to switch seamlessly between Design Concepts */}
-          <ConceptSwitcherBar />
+        <CatalogProvider products={products} giftBundle={giftBundle}>
+          <CartProvider>
+            {/* Top Sticky Bar to switch seamlessly between Design Concepts */}
+            <ConceptSwitcherBar />
 
-          <main className="min-h-screen">
-            {children}
-          </main>
+            <main className="min-h-screen">
+              {children}
+            </main>
 
-          {/* Interactive Slide-over Cart Drawer */}
-          <CartDrawer />
-        </CartProvider>
+            {/* Interactive Slide-over Cart Drawer */}
+            <CartDrawer />
+          </CartProvider>
+        </CatalogProvider>
       </body>
     </html>
   );

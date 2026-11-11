@@ -1,7 +1,8 @@
 import React from 'react';
-import { PRODUCTS } from '@/data/products';
+import { getCatalog } from '@/lib/catalog';
 
-export default function JsonLd() {
+export default async function JsonLd() {
+  const { products: PRODUCTS } = await getCatalog();
   const baseUrl = 'https://orq.mhmdfwzi.com';
 
   const schemaData = {
@@ -95,3 +96,4 @@ export default function JsonLd() {
     />
   );
 }
+

@@ -8,12 +8,13 @@ import MoodFilterBar from '@/components/cinematic/MoodFilterBar';
 import ScentPyramid from '@/components/cinematic/ScentPyramid';
 import SeamlessCinematicHero from '@/components/cinematic/SeamlessCinematicHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS, GIFT_BUNDLE, getProductsByMood } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import { formatPrice } from '@/lib/format';
 
 export default function ConceptFourView() {
+  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood } = useCatalog();
   const { addToCart } = useCart();
   const [selectedMood, setSelectedMood] = useState<ScentMood>('all');
 

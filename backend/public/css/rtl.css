@@ -1,0 +1,453 @@
+/* ===================================
+   RTL (Right-to-Left) Styles for Arabic
+   =================================== */
+
+/* Base direction */
+html[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Flip margins and paddings */
+html[dir="rtl"] .ms-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+html[dir="rtl"] .me-auto {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+}
+
+html[dir="rtl"] .ms-1,
+html[dir="rtl"] .ms-2,
+html[dir="rtl"] .ms-3,
+html[dir="rtl"] .ms-4,
+html[dir="rtl"] .ms-5 {
+    margin-left: 0 !important;
+}
+
+html[dir="rtl"] .me-1,
+html[dir="rtl"] .me-2,
+html[dir="rtl"] .me-3,
+html[dir="rtl"] .me-4,
+html[dir="rtl"] .me-5 {
+    margin-right: 0 !important;
+}
+
+html[dir="rtl"] .ps-1,
+html[dir="rtl"] .ps-2,
+html[dir="rtl"] .ps-3,
+html[dir="rtl"] .ps-4,
+html[dir="rtl"] .ps-5 {
+    padding-left: 0 !important;
+}
+
+html[dir="rtl"] .pe-1,
+html[dir="rtl"] .pe-2,
+html[dir="rtl"] .pe-3,
+html[dir="rtl"] .pe-4,
+html[dir="rtl"] .pe-5 {
+    padding-right: 0 !important;
+}
+
+/* Text alignment */
+html[dir="rtl"] .text-start {
+    text-align: right !important;
+}
+
+html[dir="rtl"] .text-end {
+    text-align: left !important;
+}
+
+/* Flex direction */
+html[dir="rtl"] .flex-row {
+    flex-direction: row-reverse !important;
+}
+
+/* Header & Navigation */
+html[dir="rtl"] .navbar-nav {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .navbar-brand {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+html[dir="rtl"] .header-icons {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .nav-link i {
+    margin-left: 0.3rem;
+    margin-right: 0;
+}
+
+/* Mega Menu */
+html[dir="rtl"] .mega-menu-container {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .mega-menu-column h4 i {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+/* Mobile Menu */
+html[dir="rtl"] .mobile-menu {
+    right: auto;
+    left: 0;
+    transform: translateX(-100%);
+}
+
+html[dir="rtl"] .mobile-menu.active {
+    transform: translateX(0);
+}
+
+html[dir="rtl"] .mobile-menu-close {
+    left: auto;
+    right: 1rem;
+}
+
+html[dir="rtl"] .mobile-menu-link i {
+    margin-left: 0.75rem;
+    margin-right: 0;
+}
+
+/* Product Cards */
+html[dir="rtl"] .product-card .product-badges {
+    left: auto;
+    right: 0.75rem;
+}
+
+html[dir="rtl"] .product-card .product-actions {
+    left: auto;
+    right: 0.5rem;
+}
+
+/* Footer */
+html[dir="rtl"] .footer-links li::before {
+    content: "←";
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+html[dir="rtl"] .contact-info li i {
+    margin-left: 0.75rem;
+    margin-right: 0;
+}
+
+html[dir="rtl"] .social-links {
+    flex-direction: row-reverse;
+}
+
+/* Forms */
+html[dir="rtl"] .form-control,
+html[dir="rtl"] .form-select,
+html[dir="rtl"] input,
+html[dir="rtl"] textarea {
+    text-align: right;
+}
+
+html[dir="rtl"] .input-group>.form-control:not(:last-child) {
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+html[dir="rtl"] .input-group>.btn:not(:first-child) {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+/* Buttons with icons */
+html[dir="rtl"] .btn i {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+/* Cart */
+html[dir="rtl"] .cart-badge {
+    left: auto;
+    right: -8px;
+}
+
+/* Sticky Actions */
+html[dir="rtl"] .sticky-actions {
+    left: 1.5rem;
+    right: auto;
+}
+
+/* Blog */
+html[dir="rtl"] .article-excerpt {
+    border-left: none;
+    border-right: 4px solid var(--secondary-green);
+}
+
+html[dir="rtl"] .article-content blockquote {
+    border-right: none;
+    border-left: 4px solid var(--primary-blue);
+}
+
+html[dir="rtl"] .article-content ul,
+html[dir="rtl"] .article-content ol {
+    padding-right: 1.25rem;
+    padding-left: 0;
+}
+
+/* Back button */
+html[dir="rtl"] .back-btn i {
+    transform: rotate(180deg);
+}
+
+/* Breadcrumb */
+html[dir="rtl"] .breadcrumb {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+html[dir="rtl"] .breadcrumb li {
+    display: inline-flex !important;
+    white-space: nowrap;
+}
+
+html[dir="rtl"] .breadcrumb-item+.breadcrumb-item::before {
+    content: "\\";
+    float: right;
+    padding-left: 0.5rem;
+    padding-right: 0;
+}
+
+/* Alerts & Notifications */
+html[dir="rtl"] .alert {
+    text-align: right;
+}
+
+html[dir="rtl"] .alert i {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+/* Language Switcher Toggle */
+.lang-toggle {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    padding: 3px;
+    gap: 2px;
+    margin-right: 0.75rem;
+}
+
+.lang-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.lang-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, var(--secondary-green), #16a34a);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+}
+
+html[dir="rtl"] .lang-toggle {
+    margin-right: 0;
+    margin-left: 0.75rem;
+}
+
+/* Mobile menu adjustments for RTL */
+@media (max-width: 768px) {
+
+    /* Fix overflow issues */
+    html[dir="rtl"] body {
+        overflow-x: hidden;
+    }
+
+    html[dir="rtl"] .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Show hamburger button on mobile */
+    html[dir="rtl"] .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        color: #ffffff;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+        z-index: 1002;
+    }
+
+    html[dir="rtl"] .mobile-menu-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Navbar layout for mobile - RTL order: Menu (left) | Cart | Logo (right) */
+    html[dir="rtl"] .navbar {
+        flex-direction: row-reverse !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        padding: 0.8rem 0 !important;
+    }
+
+    /* In RTL: Logo first (appears on right), then cart, then menu button (appears on left) */
+    html[dir="rtl"] .navbar-brand {
+        order: 1;
+        flex-shrink: 0;
+    }
+
+    html[dir="rtl"] .header-icons {
+        order: 2;
+        flex-shrink: 0;
+    }
+
+    html[dir="rtl"] .mobile-menu-btn {
+        order: 3;
+        flex-shrink: 0;
+    }
+
+    /* Slide-in menu from RIGHT for RTL */
+    html[dir="rtl"] .navbar-nav {
+        position: fixed !important;
+        top: 0 !important;
+        right: -100% !important;
+        left: auto !important;
+        width: 80% !important;
+        max-width: 320px !important;
+        height: 100vh !important;
+        background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%) !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        align-items: stretch !important;
+        padding: 80px 20px 20px !important;
+        gap: 0 !important;
+        box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3) !important;
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        z-index: 1001 !important;
+        overflow-y: auto !important;
+        display: flex !important;
+    }
+
+    html[dir="rtl"] .navbar-nav.active {
+        right: 0 !important;
+    }
+
+    html[dir="rtl"] .navbar-nav li {
+        display: block !important;
+        width: 100% !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    html[dir="rtl"] .navbar-nav li:last-child {
+        border-bottom: none;
+    }
+
+    html[dir="rtl"] .nav-link {
+        display: block !important;
+        width: 100% !important;
+        padding: 1rem 0 !important;
+        font-size: 1.2rem !important;
+        text-align: right !important;
+    }
+
+    html[dir="rtl"] .nav-link:hover {
+        background: transparent !important;
+        padding-right: 15px !important;
+    }
+
+    /* Overlay when menu is open */
+    html[dir="rtl"] .navbar-nav.active::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+
+    /* Hero section fixes */
+    html[dir="rtl"] .hero-content-new {
+        text-align: center;
+        padding: 0 15px;
+    }
+
+    html[dir="rtl"] .hero-title-new,
+    html[dir="rtl"] .hero-subtitle-new {
+        text-align: center;
+    }
+
+    html[dir="rtl"] .hero-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    html[dir="rtl"] .hero-trust-badges {
+        justify-content: center;
+    }
+
+    /* Page header adjustments */
+    html[dir="rtl"] .page-header {
+        padding: 1.5rem 0 1rem;
+        text-align: center;
+    }
+
+    html[dir="rtl"] .page-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+    }
+
+    html[dir="rtl"] .breadcrumb {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    html[dir="rtl"] .breadcrumb li {
+        display: inline-flex !important;
+        white-space: nowrap;
+    }
+
+    /* Mobile Menu positioning for RTL */
+    html[dir="rtl"] .mobile-menu {
+        right: 0;
+        left: auto;
+        transform: translateX(100%);
+    }
+
+    html[dir="rtl"] .mobile-menu.active {
+        transform: translateX(0);
+    }
+
+    html[dir="rtl"] .mobile-menu-close {
+        right: 1rem;
+        left: auto;
+    }
+}

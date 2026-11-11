@@ -7,11 +7,12 @@ import ProductCardLight from '@/components/catalog/ProductCardLight';
 import MoodFilterBarLight from '@/components/cinematic/MoodFilterBarLight';
 import SeamlessWhiteGoldHero from '@/components/cinematic/SeamlessWhiteGoldHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS, GIFT_BUNDLE, getProductsByMood } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 
 export default function ConceptFiveView() {
+  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood } = useCatalog();
   const { addToCart } = useCart();
   const [selectedMood, setSelectedMood] = useState<ScentMood>('all');
 

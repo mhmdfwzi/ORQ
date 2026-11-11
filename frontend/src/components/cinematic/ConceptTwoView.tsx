@@ -7,11 +7,12 @@ import ProductCard from '@/components/catalog/ProductCard';
 import MoodFilterBar from '@/components/cinematic/MoodFilterBar';
 import CinematicAtomizerHero from '@/components/cinematic/CinematicAtomizerHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS, GIFT_BUNDLE, getProductsByMood } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 
 export default function ConceptTwoView() {
+  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood } = useCatalog();
   const { addToCart } = useCart();
   const [selectedMood, setSelectedMood] = useState<ScentMood>('all');
 

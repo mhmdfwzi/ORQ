@@ -3,10 +3,12 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ProductDetailClient from '@/components/catalog/ProductDetailClient';
-import { getProductBySlug, PRODUCTS } from '@/data/products';
+import { getProductBySlug } from '@/lib/api';
+import { getCatalog } from '@/lib/catalog';
 
-export function generateStaticParams() {
-  return PRODUCTS.map((product) => ({
+export async function generateStaticParams() {
+  const { products } = await getCatalog();
+  return products.map((product) => ({
     slug: product.slug,
   }));
 }
@@ -17,7 +19,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return (

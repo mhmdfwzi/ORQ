@@ -6,7 +6,7 @@ import { Product } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import ProductCard from '@/components/catalog/ProductCard';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
 
 interface ProductDetailClientProps {
@@ -14,6 +14,7 @@ interface ProductDetailClientProps {
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
   const [selectedSize, setSelectedSize] = useState<'50ml' | '100ml'>('100ml');
   const [quantity, setQuantity] = useState(1);

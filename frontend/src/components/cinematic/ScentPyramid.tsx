@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PRODUCTS } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 
 export default function ScentPyramid() {
+  const { products: PRODUCTS } = useCatalog();
   const [selectedSlug, setSelectedSlug] = useState('royal-oud');
   const [activeTier, setActiveTier] = useState<'all' | 'top' | 'heart' | 'base'>('all');
 

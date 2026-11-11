@@ -2,10 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useCart } from '@/components/cart/CartContext';
-import { PRODUCTS } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
 
 export default function CinematicAtomizerHero() {
+  const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
   const heroProduct = PRODUCTS.find((p) => p.slug === 'chaos') || PRODUCTS[1];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

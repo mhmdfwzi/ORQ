@@ -5,9 +5,10 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ProductCard from '@/components/catalog/ProductCard';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 
 export default function ConceptThreeView() {
+  const { products: PRODUCTS } = useCatalog();
   const oudLine = PRODUCTS.filter((p) => p.mood === 'royal_oud');
   const signatureLine = PRODUCTS.filter((p) => p.mood !== 'royal_oud');
 

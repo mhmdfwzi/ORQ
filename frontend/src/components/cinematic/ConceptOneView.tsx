@@ -7,9 +7,10 @@ import ProductCard from '@/components/catalog/ProductCard';
 import ScentPyramid from '@/components/cinematic/ScentPyramid';
 import SeamlessCinematicHero from '@/components/cinematic/SeamlessCinematicHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
-import { PRODUCTS } from '@/data/products';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 
 export default function ConceptOneView() {
+  const { products: PRODUCTS } = useCatalog();
   const curatedProducts = PRODUCTS.slice(0, 4);
 
   return (
