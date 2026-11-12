@@ -15,3 +15,6 @@ yarn-error.log*
 *.sln
 *.sw?
 
+
+# Production env files (secrets)
+.env.production
