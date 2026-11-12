@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ScentMood } from '@/types/product';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 
 interface MoodFilterBarProps {
   currentMood: ScentMood;
@@ -9,12 +10,11 @@ interface MoodFilterBarProps {
 }
 
 export default function MoodFilterBar({ currentMood, onSelectMood }: MoodFilterBarProps) {
+  const { site, products } = useCatalog();
+  // Filters (labels/icons) and the total count come from the database.
   const filters: { id: ScentMood; label: string; icon: string }[] = [
-    { id: 'all', label: 'جميع العطور (12)', icon: '✦' },
-    { id: 'royal_oud', label: 'عود وهيبة ملكية', icon: '👑' },
-    { id: 'night_allure', label: 'جذاب وسهرات', icon: '⚡' },
-    { id: 'sporty_fresh', label: 'منعش ورياضي', icon: '🌊' },
-    { id: 'warm_formal', label: 'رسمي ودافئ', icon: '💼' },
+    { id: 'all', label: `${site.moods.all_label} (${products.length})`, icon: '✦' },
+    ...site.moods.items.map((m) => ({ id: m.id as ScentMood, label: m.label, icon: m.icon })),
   ];
 
   return (

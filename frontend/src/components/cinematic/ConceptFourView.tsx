@@ -15,7 +15,13 @@ import { useCart } from '@/components/cart/CartContext';
 import { formatPrice } from '@/lib/format';
 
 export default function ConceptFourView() {
-  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood } = useCatalog();
+  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood, site } = useCatalog();
+  const bundleVariant = GIFT_BUNDLE.variants[0];
+  const bundlePrice = bundleVariant?.price ?? 0;
+  const bundleList = bundleVariant?.compareAtPrice ?? bundlePrice;
+  const bundleSaving = bundleList - bundlePrice;
+  const discount = bundleList > 0 ? Math.round((bundleSaving / bundleList) * 100) : 0;
+  const currency = site.commerce.currency;
   const { addToCart } = useCart();
   const [selectedMood, setSelectedMood] = useState<ScentMood>('all');
 
@@ -44,7 +50,7 @@ export default function ConceptFourView() {
                   أيقونات الحضور — العطور الأكثر طلباً
                 </h2>
               </div>
-              <span className="text-xs text-[#ECC480] font-mono">12 عطراً نيش معتقاً</span>
+              <span className="text-xs text-[#ECC480] font-mono">{PRODUCTS.length} عطراً نيش معتقاً</span>
             </div>
           </ScrollReveal>
 
@@ -173,38 +179,34 @@ export default function ConceptFourView() {
                   alt="صندوق باقة الهدايا الفاخرة من ORQ"
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow">
-                  توفير 45%
-                </span>
+                {discount > 0 && (
+                  <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow">
+                    توفير {discount}%
+                  </span>
+                )}
               </div>
 
               <div className="lg:col-span-7 space-y-4">
                 <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#C4A265]/20 text-[#ECC480] text-xs font-semibold border border-[#C4A265]/30">
                   <span>🎁</span>
-                  <span>باقة الهدايا والتجربة المتكاملة</span>
+                  <span>{site.bundle.badge}</span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  باقة ORQ الفاخرة: عطر 50 مل + معطر سيارة + 4 عينات نادرة
+                  {GIFT_BUNDLE.name}: {GIFT_BUNDLE.subtitle}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#B9B1A5] leading-relaxed">
-                  كل ما تحتاجه في صندوق هدايا فاخر واحد: اختر أي عطر مفضل لديك بحجم 50 مل، بالإضافة إلى معطر سيارة نيش فاخر من نفس الهوية، و 4 عينات عطرية لاكتشاف باقي تشكيلة ORQ.
+                  {GIFT_BUNDLE.description}
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 py-2 text-center text-xs">
-                  <div className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
-                    <span className="text-[#ECC480] font-bold block">زجاجة 50 مل</span>
-                    <span className="text-[10px] text-zinc-400">أي عطر من اختيارك</span>
-                  </div>
-                  <div className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
-                    <span className="text-[#ECC480] font-bold block">معطر سيارة</span>
-                    <span className="text-[10px] text-zinc-400">نفس الهوية العطرية</span>
-                  </div>
-                  <div className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
-                    <span className="text-[#ECC480] font-bold block">4 عينات</span>
-                    <span className="text-[10px] text-zinc-400">لتجربة باقي المجموعة</span>
-                  </div>
+                  {site.bundle.highlights.map((h) => (
+                    <div key={h.title} className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
+                      <span className="text-[#ECC480] font-bold block">{h.title}</span>
+                      <span className="text-[10px] text-zinc-400">{h.desc}</span>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="pt-3 flex flex-wrap items-center gap-4">
@@ -212,12 +214,16 @@ export default function ConceptFourView() {
                     onClick={() => addToCart(GIFT_BUNDLE, '50ml')}
                     className="gold-button text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2 min-h-[44px]"
                   >
-                    <span>طلب الباقة الآن بـ 750 ج.م فقط</span>
+                    <span>{site.bundle.cta} بـ {formatPrice(bundlePrice)} {currency}</span>
                     <span>🛒</span>
                   </button>
                   <div className="text-xs text-[#A0988C]">
-                    <span className="line-through ml-1.5 text-zinc-500 font-mono">1,350 ج.م</span>
-                    <span className="text-emerald-400 font-semibold font-mono">وفر 600 ج.م</span>
+                    {bundleSaving > 0 && (
+                      <span className="line-through ml-1.5 text-zinc-500 font-mono">{formatPrice(bundleList)} {currency}</span>
+                    )}
+                    {bundleSaving > 0 && (
+                      <span className="text-emerald-400 font-semibold font-mono">وفر {formatPrice(bundleSaving)} {currency}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -240,13 +246,13 @@ export default function ConceptFourView() {
       <section className="py-16 bg-gradient-to-b from-[#0E0C0A] to-[#070707] text-center border-b border-[#1E1B18]">
         <div className="max-w-3xl mx-auto px-4 space-y-4">
           <span className="font-serif tracking-[0.25em] text-xs text-[#C4A265] uppercase block">
-            ORQ HAUTE PARFUMERIE
+            {site.creed.eyebrow}
           </span>
           <h3 className="text-xl sm:text-2xl font-serif text-white leading-relaxed">
-            &ldquo;حضورك له أثر لا يمحى من الذاكرة&rdquo;
+            &ldquo;{site.creed.quote}&rdquo;
           </h3>
           <p className="text-xs text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            نصنع خلطاتنا من خلاصات الزيوت النادرة بتركيزات مكثفة تدوم لأكثر من 12 ساعة لتمنحك كاريزما واثقة وهادئة.
+            {site.creed.text}
           </p>
         </div>
       </section>

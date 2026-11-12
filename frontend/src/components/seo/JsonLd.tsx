@@ -2,8 +2,10 @@ import React from 'react';
 import { getCatalog } from '@/lib/catalog';
 
 export default async function JsonLd() {
-  const { products: PRODUCTS } = await getCatalog();
-  const baseUrl = 'https://orq.mhmdfwzi.com';
+  const { products: PRODUCTS, site } = await getCatalog();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://orq.mhmdfwzi.com';
+  const fullName = `${site.name} ${site.tagline}`;
+  const { minPrice, maxPrice } = site.stats;
 
   const schemaData = {
     '@context': 'https://schema.org',
@@ -11,8 +13,8 @@ export default async function JsonLd() {
       {
         '@type': 'Organization',
         '@id': `${baseUrl}/#organization`,
-        name: 'ORQ Haute Parfumerie',
-        alternateName: ['ORQ', 'دار عطور أو آر كيو'],
+        name: fullName,
+        alternateName: [site.name],
         slogan: 'Original · Rare · Quality',
         url: baseUrl,
         logo: {
@@ -21,8 +23,7 @@ export default async function JsonLd() {
           width: 512,
           height: 512,
         },
-        description:
-          'دار عطور نيش فاخرة متخصصة في أرقى العطور الرجالية المعتقة بتركيزات مكثفة تدوم لأكثر من 12 ساعة.',
+        description: site.seo.organization_description,
         address: {
           '@type': 'PostalAddress',
           addressLocality: 'Cairo',
@@ -40,8 +41,8 @@ export default async function JsonLd() {
         '@type': 'WebSite',
         '@id': `${baseUrl}/#website`,
         url: baseUrl,
-        name: 'ORQ Haute Parfumerie',
-        description: 'المتجر الرسمي لعطور ORQ الرجالية الفاخرة',
+        name: fullName,
+        description: site.seo.description,
         publisher: {
           '@id': `${baseUrl}/#organization`,
         },
@@ -50,10 +51,10 @@ export default async function JsonLd() {
       {
         '@type': 'Store',
         '@id': `${baseUrl}/#store`,
-        name: 'ORQ Haute Parfumerie Store',
+        name: `${fullName} Store`,
         url: baseUrl,
         image: `${baseUrl}/og-image.jpg`,
-        priceRange: '750 - 1290 EGP',
+        priceRange: minPrice !== null && maxPrice !== null ? `${minPrice} - ${maxPrice} EGP` : undefined,
         currenciesAccepted: 'EGP',
         paymentAccepted: 'Cash on Delivery, Credit Card',
         areaServed: {
@@ -62,7 +63,7 @@ export default async function JsonLd() {
         },
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
-          name: 'ORQ Signature Perfume Collection',
+          name: `${site.name} Signature Perfume Collection`,
           itemListElement: PRODUCTS.map((product, index) => ({
             '@type': 'Offer',
             itemOffered: {
@@ -73,11 +74,11 @@ export default async function JsonLd() {
               sku: product.slug,
               brand: {
                 '@type': 'Brand',
-                name: 'ORQ',
+                name: site.name,
               },
               offers: {
                 '@type': 'Offer',
-                price: product.variants[1]?.price || 1290,
+                price: product.variants[product.variants.length - 1]?.price,
                 priceCurrency: 'EGP',
                 availability: 'https://schema.org/InStock',
                 url: `${baseUrl}/preview/products/${product.slug}`,

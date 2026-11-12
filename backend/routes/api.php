@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\OrderApiController;
 use App\Http\Controllers\Api\BrandApiController;
+use App\Http\Controllers\Api\SiteApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,9 @@ Route::prefix('v1')->group(function () {
 
     // Brand story ("شفرة ORQ")
     Route::get('/brand', [BrandApiController::class, 'show']);
+
+    // Storefront-wide settings (identity, SEO, footer, moods, commerce, ...)
+    Route::get('/site', [SiteApiController::class, 'show']);
 
     // Guest checkout (cash on delivery). Throttled per IP to limit abuse.
     Route::post('/orders', [OrderApiController::class, 'store'])->middleware('throttle:10,1');

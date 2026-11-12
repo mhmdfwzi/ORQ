@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { useCart } from './CartContext';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
-import { GOVERNORATES, OrderError, placeOrder, type FieldErrors, type PlacedOrder } from '@/lib/orders';
+import { OrderError, placeOrder, type FieldErrors, type PlacedOrder } from '@/lib/orders';
 
 const inputClass =
   'w-full bg-[#100F0E] border border-[#332E28] rounded-lg px-3 py-2.5 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#C4A265] min-h-[44px]';
@@ -11,6 +12,8 @@ const inputClass =
 /** Guest checkout (cash on delivery) rendered inside the cart drawer footer. */
 export default function CheckoutForm({ onBack }: { onBack: () => void }) {
   const { items, totalAmount, clearCart } = useCart();
+  const { commerce } = useCatalog().site;
+  const shipping = commerce.shipping_cost;
   const [form, setForm] = useState({ name: '', phone: '', governorate: '', address: '', notes: '' });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -51,7 +54,7 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
           رقم الطلب: <span className="font-mono text-[#ECC480]">{placed.orderNumber}</span>
         </div>
         <div className="text-xs text-[#A0988C]">
-          الإجمالي: <span className="text-[#ECC480] font-bold">{formatPrice(placed.total)} ج.م</span> — الدفع كاش عند الاستلام
+          الإجمالي: <span className="text-[#ECC480] font-bold">{formatPrice(placed.total)} {commerce.currency}</span> — {commerce.payment_note}
         </div>
         <p className="text-[11px] text-zinc-500">سنتواصل معك على رقم الموبايل لتأكيد الطلب.</p>
       </div>
@@ -81,7 +84,7 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
       <div>
         <select className={inputClass} value={form.governorate} onChange={set('governorate')} required>
           <option value="">اختر المحافظة</option>
-          {GOVERNORATES.map((g) => (
+          {commerce.governorates.map((g) => (
             <option key={g} value={g}>{g}</option>
           ))}
         </select>
@@ -101,8 +104,8 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
       )}
 
       <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#221F1C]">
-        <span>الإجمالي (شحن مجاني)</span>
-        <span className="text-[#ECC480] font-mono whitespace-nowrap">{formatPrice(totalAmount)} ج.م</span>
+        <span>الإجمالي ({shipping === 0 ? commerce.shipping_free_label : `${commerce.shipping_note}: ${formatPrice(shipping)} ${commerce.currency}`})</span>
+        <span className="text-[#ECC480] font-mono whitespace-nowrap">{formatPrice(totalAmount + shipping)} {commerce.currency}</span>
       </div>
 
       <button
@@ -110,7 +113,7 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
         disabled={submitting}
         className="w-full gold-button py-3.5 rounded-xl text-xs font-bold text-center block min-h-[44px] disabled:opacity-60"
       >
-        {submitting ? 'جاري إرسال الطلب...' : 'تأكيد الطلب — الدفع كاش عند الاستلام'}
+        {submitting ? 'جاري إرسال الطلب...' : `تأكيد الطلب — ${commerce.payment_note}`}
       </button>
     </form>
   );

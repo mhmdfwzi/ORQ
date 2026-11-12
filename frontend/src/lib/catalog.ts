@@ -1,37 +1,33 @@
-import { getBrandStory, getGiftBundle, getProducts } from '@/lib/api';
-import { GIFT_BUNDLE, PRODUCTS } from '@/data/products';
-import { BRAND_STORY } from '@/data/brand';
+import { getBrandStory, getGiftBundle, getProducts, getSiteSettings } from '@/lib/api';
 import type { Product } from '@/types/product';
 import type { BrandStory } from '@/types/brand';
+import type { SiteSettings } from '@/types/site';
 
 export interface Catalog {
   products: Product[];
   giftBundle: Product;
   brand: BrandStory;
+  site: SiteSettings;
 }
 
 /**
- * Server-side catalogue loader: Laravel API first, legacy hardcoded data as a
- * safety net so the storefront never goes blank if the API is unreachable.
- * The fallback lives outside the cached functions, so it is never cached.
+ * Server-side loader: every piece of storefront data comes from the Laravel
+ * database through the API. There is intentionally no hardcoded fallback —
+ * if the API is unreachable the cached copy is served, and a cold start fails
+ * loudly instead of showing stale invented data.
  */
 export async function getCatalog(): Promise<Catalog> {
-  const [products, giftBundle, brand] = await Promise.allSettled([
+  const [products, giftBundle, brand, site] = await Promise.all([
     getProducts(),
     getGiftBundle(),
     getBrandStory(),
+    getSiteSettings(),
   ]);
 
-  const list = products.status === 'fulfilled' ? products.value : [];
-  if (products.status === 'rejected') {
-    console.error('[catalog] API unreachable, using legacy fallback', products.reason);
-  } else if (list.length === 0) {
-    console.error('[catalog] API returned no products, using legacy fallback');
-  }
+  if (products.length === 0) throw new Error('[catalog] API returned no products');
+  if (!giftBundle) throw new Error('[catalog] API returned no gift bundle');
+  if (!brand) throw new Error('[catalog] API returned no brand story');
+  if (!site) throw new Error('[catalog] API returned no site settings');
 
-  return {
-    products: list.length > 0 ? list : PRODUCTS,
-    giftBundle: (giftBundle.status === 'fulfilled' && giftBundle.value) || GIFT_BUNDLE,
-    brand: (brand.status === 'fulfilled' && brand.value) || BRAND_STORY,
-  };
+  return { products, giftBundle, brand, site };
 }

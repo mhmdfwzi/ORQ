@@ -64,7 +64,9 @@ class ORQProductSeeder extends Seeder
                     $product->variants()->updateOrCreate(
                         ['size' => $variant['size']],
                         [
-                            'price'          => $variant['price'],
+                            // compareAtPrice = list price; "price" is then the selling (sale) price.
+                            'price'          => $variant['compareAtPrice'] ?? $variant['price'],
+                            'sale_price'     => isset($variant['compareAtPrice']) ? $variant['price'] : null,
                             'stock_quantity' => ($variant['inStock'] ?? true) ? 100 : 0,
                             'sku'            => 'ORQ-' . strtoupper($item['slug']) . '-' . $variant['size'],
                             'is_active'      => true,

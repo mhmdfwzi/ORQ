@@ -11,7 +11,7 @@ import ScrollReveal from '@/components/ui/ScrollReveal';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 
 export default function ConceptOneView() {
-  const { products: PRODUCTS } = useCatalog();
+  const { products: PRODUCTS, site } = useCatalog();
   const curatedProducts = PRODUCTS.slice(0, 4);
 
   return (
@@ -30,7 +30,7 @@ export default function ConceptOneView() {
                 <h2 className="text-xl sm:text-2xl font-bold text-white">المجموعة العطرية المختارة</h2>
                 <p className="text-xs text-zinc-400">توقيعات عطرية استثنائية صُممت لتصنع حضورك</p>
               </div>
-              <span className="text-xs text-[#ECC480] font-mono">12 عطراً نادراً</span>
+              <span className="text-xs text-[#ECC480] font-mono">{PRODUCTS.length} عطراً نادراً</span>
             </div>
           </ScrollReveal>
 
@@ -57,13 +57,13 @@ export default function ConceptOneView() {
       <section className="py-16 bg-gradient-to-b from-[#0E0C0A] to-[#070707] text-center border-b border-[#1E1B18]">
         <div className="max-w-3xl mx-auto px-4 space-y-4">
           <span className="font-serif tracking-[0.25em] text-xs text-[#C4A265] uppercase block">
-            ORQ HAUTE PARFUMERIE
+            {site.creed.eyebrow}
           </span>
           <h3 className="text-xl sm:text-2xl font-serif text-white leading-relaxed">
-            &ldquo;حضورك له أثر لا يمحى من الذاكرة&rdquo;
+            &ldquo;{site.creed.quote}&rdquo;
           </h3>
           <p className="text-xs text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            نصنع خلطاتنا من خلاصات الزيوت النادرة بتركيزات مكثفة تدوم لأكثر من 12 ساعة لتمنحك كاريزما واثقة وهادئة.
+            {site.creed.text}
           </p>
         </div>
       </section>

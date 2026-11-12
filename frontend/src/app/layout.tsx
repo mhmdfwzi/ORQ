@@ -29,107 +29,79 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://orq.mhmdfwzi.com'),
-  title: {
-    default: 'ORQ Haute Parfumerie | عطور النيش الرجالية الفاخرة',
-    template: '%s | ORQ Haute Parfumerie',
-  },
-  description:
-    'دار عطور نيش فاخرة متخصصة في أرقى العطور الرجالية المعتقة بتركيزات Eau de Parfum تدوم لأكثر من 12 ساعة. استكشف تشكيلة 12 عطراً نادراً مع شحن سريع لجميع المحافظات والدفع عند الاستلام وعينة تجربة مجانية.',
-  keywords: [
-    'عطور رجالية',
-    'عطور نيش',
-    'عطور فاخرة',
-    'ORQ',
-    'عطور مصر',
-    'عطر رويال عود',
-    'عطور ثابتة',
-    'عطور فواحة',
-    'أفضل عطور رجالية',
-    'عطور شتوية',
-    'عطور صيفية',
-    'عطور رسمية',
-    'Haute Parfumerie Egypt',
-    'Luxury Men Fragrances Cairo',
-  ],
-  authors: [{ name: 'ORQ Haute Parfumerie', url: 'https://orq.mhmdfwzi.com' }],
-  creator: 'ORQ Haute Parfumerie',
-  publisher: 'ORQ Haute Parfumerie',
-  applicationName: 'ORQ Parfumerie',
-  category: 'ecommerce',
-  formatDetection: {
-    telephone: false,
-    email: false,
-    address: false,
-  },
-  alternates: {
-    canonical: 'https://orq.mhmdfwzi.com',
-    languages: {
-      'ar-EG': 'https://orq.mhmdfwzi.com',
-      ar: 'https://orq.mhmdfwzi.com',
+// Public site URL is deployment config (not business data).
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://orq.mhmdfwzi.com';
+
+/** All SEO text comes from the database (Filament → إعدادات الموقع). */
+export async function generateMetadata(): Promise<Metadata> {
+  const { site } = await getCatalog();
+  const { seo } = site;
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: seo.title_default, template: seo.title_template },
+    description: seo.description,
+    keywords: seo.keywords,
+    authors: [{ name: site.name, url: SITE_URL }],
+    creator: site.name,
+    publisher: site.name,
+    applicationName: site.name,
+    category: 'ecommerce',
+    formatDetection: { telephone: false, email: false, address: false },
+    alternates: {
+      canonical: SITE_URL,
+      languages: { 'ar-EG': SITE_URL, ar: SITE_URL },
     },
-  },
-  openGraph: {
-    title: 'ORQ Haute Parfumerie | عطور النيش الرجالية الفاخرة',
-    description:
-      'حضورك له أثر لا يمحى من الذاكرة • استكشف 12 عطراً نيش معتقاً بتركيزات تدوم لأكثر من 12 ساعة مع شحن سريع ودفع عند الاستلام وعينة تجربة مجانية.',
-    url: 'https://orq.mhmdfwzi.com',
-    siteName: 'ORQ Haute Parfumerie',
-    locale: 'ar_EG',
-    type: 'website',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'ORQ Haute Parfumerie Luxury Fragrances',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'ORQ Haute Parfumerie | عطور النيش الرجالية الفاخرة',
-    description:
-      'حضورك له أثر لا يمحى من الذاكرة • عطور رجالية بتركيز نيش مكثف وشحن سريع لكافة المحافظات.',
-    images: ['/og-image.jpg'],
-    creator: '@ORQperfumes',
-  },
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon.png', sizes: '512x512', type: 'image/png' },
-    ],
-    shortcut: '/icon.svg',
-    apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    openGraph: {
+      title: seo.title_default,
+      description: seo.og_description,
+      url: SITE_URL,
+      siteName: site.name,
+      locale: 'ar_EG',
+      type: 'website',
+      images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: `${site.name} ${site.tagline}` }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title_default,
+      description: seo.twitter_description,
+      images: ['/og-image.jpg'],
+      creator: seo.twitter_handle,
+    },
+    icons: {
+      icon: [
+        { url: '/icon.svg', type: 'image/svg+xml' },
+        { url: '/icon.png', sizes: '512x512', type: 'image/png' },
+      ],
+      shortcut: '/icon.svg',
+      apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+    },
+    robots: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
-  },
-  other: {
-    'geo.region': 'EG',
-    'geo.placename': 'Cairo, Egypt',
-    'geo.position': '30.0444;31.2357',
-    ICBM: '30.0444, 31.2357',
-  },
-};
+    other: {
+      'geo.region': 'EG',
+      'geo.placename': 'Cairo, Egypt',
+      'geo.position': '30.0444;31.2357',
+      ICBM: '30.0444, 31.2357',
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { products, giftBundle, brand } = await getCatalog();
+  const { products, giftBundle, brand, site } = await getCatalog();
 
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${cormorant.variable}`}>
@@ -137,7 +109,7 @@ export default async function RootLayout({
         <JsonLd />
       </head>
       <body className="bg-[#0B0B0B] text-[#F2EBDD] min-h-screen selection:bg-[#C4A265] selection:text-black">
-        <CatalogProvider products={products} giftBundle={giftBundle} brand={brand}>
+        <CatalogProvider products={products} giftBundle={giftBundle} brand={brand} site={site}>
           <CartProvider>
             {/* Top Sticky Bar to switch seamlessly between Design Concepts */}
             <ConceptSwitcherBar />

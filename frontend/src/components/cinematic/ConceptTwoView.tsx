@@ -9,16 +9,22 @@ import MoodFilterBar from '@/components/cinematic/MoodFilterBar';
 import CinematicAtomizerHero from '@/components/cinematic/CinematicAtomizerHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import { useCatalog } from '@/components/catalog/CatalogContext';
+import { formatPrice } from '@/lib/format';
 import { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 
 export default function ConceptTwoView() {
-  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood } = useCatalog();
+  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood, site } = useCatalog();
+  const bundleVariant = GIFT_BUNDLE.variants[0];
+  const bundlePrice = bundleVariant?.price ?? 0;
+  const bundleList = bundleVariant?.compareAtPrice ?? bundlePrice;
+  const bundleSaving = bundleList - bundlePrice;
+  const discount = bundleList > 0 ? Math.round((bundleSaving / bundleList) * 100) : 0;
+  const currency = site.commerce.currency;
   const { addToCart } = useCart();
   const [selectedMood, setSelectedMood] = useState<ScentMood>('all');
 
   const filteredProducts = getProductsByMood(selectedMood);
-  const featuredHero = PRODUCTS.find((p) => p.slug === 'alpha') || PRODUCTS[1];
 
   return (
     <div className="bg-[#070707] text-[#F2EBDD] min-h-screen">
@@ -78,51 +84,49 @@ export default function ConceptTwoView() {
                   alt="ORQ Gift Box Bundle"
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow">
-                  توفير 45%
-                </span>
+                {discount > 0 && (
+                  <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow">
+                    توفير {discount}%
+                  </span>
+                )}
               </div>
 
               <div className="lg:col-span-7 space-y-4">
                 <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#C4A265]/20 text-[#ECC480] text-xs font-semibold border border-[#C4A265]/30">
                   <span>🎁</span>
-                  <span>باقة الهدايا والتجربة المتكاملة</span>
+                  <span>{site.bundle.badge}</span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  باقة ORQ الفاخرة: عطر 50 مل + معطر سيارة + 4 عينات
+                  {GIFT_BUNDLE.name}: {GIFT_BUNDLE.subtitle}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#B9B1A5] leading-relaxed">
-                  كل ما تحتاجه في صندوق فاخر واحد: اختر أي عطر مفضل لديك بحجم 50 مل، بالإضافة إلى معطر سيارة فاخر من نفس الهوية، و 4 عينات عطرية لاكتشاف باقي المجموعة.
+                  {GIFT_BUNDLE.description}
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 py-2 text-center text-xs">
-                  <div className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
-                    <span className="text-[#ECC480] font-bold block">زجاجة 50 مل</span>
-                    <span className="text-[10px] text-zinc-400">عطرك المفضل</span>
-                  </div>
-                  <div className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
-                    <span className="text-[#ECC480] font-bold block">معطر سيارة</span>
-                    <span className="text-[10px] text-zinc-400">ثبات يدوم طويلاً</span>
-                  </div>
-                  <div className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
-                    <span className="text-[#ECC480] font-bold block">4 عينات مجانية</span>
-                    <span className="text-[10px] text-zinc-400">لاكتشاف التشكيلة</span>
-                  </div>
+                  {site.bundle.highlights.map((h) => (
+                    <div key={h.title} className="p-2.5 rounded bg-[#1A1815] border border-[#2C2723]">
+                      <span className="text-[#ECC480] font-bold block">{h.title}</span>
+                      <span className="text-[10px] text-zinc-400">{h.desc}</span>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex items-center gap-4 pt-3 border-t border-[#26221D]">
                   <div>
-                    <div className="text-[10px] text-zinc-400 line-through">1,350 ج.م</div>
-                    <div className="text-2xl font-bold text-[#ECC480] font-mono">750 ج.م</div>
+                    {bundleSaving > 0 && (
+                      <div className="text-[10px] text-zinc-400 line-through">{formatPrice(bundleList)} {currency}</div>
+                    )}
+                    <div className="text-2xl font-bold text-[#ECC480] font-mono">{formatPrice(bundlePrice)} {currency}</div>
                   </div>
 
                   <button
                     onClick={() => addToCart(GIFT_BUNDLE, '50ml')}
                     className="gold-button py-3 px-6 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 min-h-[44px]"
                   >
-                    <span>طلب الباقة الآن بـ 750 ج.م</span>
+                    <span>{site.bundle.cta} بـ {formatPrice(bundlePrice)} {currency}</span>
                     <span>←</span>
                   </button>
                 </div>

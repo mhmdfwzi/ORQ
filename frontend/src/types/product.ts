@@ -8,7 +8,8 @@ export interface PerfumeNotes {
 
 export interface ProductVariant {
   size: '50ml' | '100ml';
-  price: number; // in EGP
+  price: number; // selling price in EGP
+  compareAtPrice?: number | null; // struck-through list price when on sale
   inStock: boolean;
 }
 

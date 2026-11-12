@@ -18,9 +18,11 @@ class ProductVariantResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'size'    => $this->size,
-            'price'   => (float) $this->price,
-            'inStock' => $this->in_stock,
+            'size'           => $this->size,
+            // Effective (selling) price; compareAtPrice is the struck-through list price when on sale.
+            'price'          => (float) ($this->sale_price ?? $this->price),
+            'compareAtPrice' => ($this->sale_price !== null && (float) $this->sale_price < (float) $this->price) ? (float) $this->price : null,
+            'inStock'        => $this->in_stock,
         ];
     }
 }

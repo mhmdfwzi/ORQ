@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/components/cart/CartContext';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 
 export default function Header() {
   const { openCart, totalItems } = useCart();
+  const { site } = useCatalog();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname() || '/';
 
@@ -30,10 +32,10 @@ export default function Header() {
           <img src="/logo-mark.png" alt="" aria-hidden="true" width={32} height={37} className="h-9 w-auto transition group-hover:brightness-110" />
           <div className="flex flex-col">
             <span className="font-serif tracking-[0.25em] text-2xl font-bold gold-gradient-text transition group-hover:brightness-110">
-              ORQ
+              {site.name}
             </span>
             <span className="text-[9px] tracking-[0.2em] text-[#C4A265]/80 font-mono -mt-1">
-              HAUTE PARFUMERIE
+              {site.tagline}
             </span>
           </div>
         </Link>

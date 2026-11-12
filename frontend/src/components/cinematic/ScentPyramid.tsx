@@ -6,7 +6,7 @@ import ScrollReveal from '@/components/ui/ScrollReveal';
 
 export default function ScentPyramid() {
   const { products: PRODUCTS } = useCatalog();
-  const [selectedSlug, setSelectedSlug] = useState('royal-oud');
+  const [selectedSlug, setSelectedSlug] = useState(PRODUCTS[0]?.slug ?? '');
   const [activeTier, setActiveTier] = useState<'all' | 'top' | 'heart' | 'base'>('all');
 
   const currentProduct = PRODUCTS.find((p) => p.slug === selectedSlug) || PRODUCTS[0];
@@ -37,12 +37,11 @@ export default function ScentPyramid() {
               onChange={(e) => setSelectedSlug(e.target.value)}
               className="bg-[#1A1815] border border-[#38332D] text-[#ECC480] text-xs rounded-lg px-3 py-2 outline-none focus:border-[#C4A265]"
             >
-              <option value="royal-oud">عطر متمرد (Royal Oud)</option>
-              <option value="oud-ambassador">عطر غرور (Oud Ambassador)</option>
-              <option value="chaos">عطر CHAOS (توابل منعشة وعنبر)</option>
-              <option value="alpha">عطر ALPHA (أروماتيك وبحري منعش)</option>
-              <option value="darknight">عطر DARKNIGHT (أخشاب وبخور مدخن)</option>
-              <option value="gigantic">عطر GIGANTIC (فانيلا وتبغ دافئ)</option>
+              {PRODUCTS.map((p) => (
+                <option key={p.slug} value={p.slug}>
+                  {p.name} — {p.arabicName}
+                </option>
+              ))}
             </select>
           </div>
         </div>

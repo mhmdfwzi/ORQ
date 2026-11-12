@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Support\SiteSettings;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreOrderRequest extends FormRequest
 {
@@ -22,7 +24,8 @@ class StoreOrderRequest extends FormRequest
             'name'            => ['required', 'string', 'min:3', 'max:100'],
             // Egyptian mobile: 01[0125]xxxxxxxx (also accepts +20 / 0020 prefix)
             'phone'           => ['required', 'string', 'regex:/^(?:\+?20|0020|0)?1[0125][0-9]{8}$/'],
-            'governorate'     => ['required', 'string', 'max:100'],
+            // Must be one of the governorates configured in the database (site settings).
+            'governorate'     => ['required', 'string', Rule::in(SiteSettings::get()['commerce']['governorates'] ?? [])],
             'address'         => ['required', 'string', 'min:8', 'max:500'],
             'notes'           => ['nullable', 'string', 'max:500'],
             'items'           => ['required', 'array', 'min:1', 'max:20'],

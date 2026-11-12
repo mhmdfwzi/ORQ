@@ -534,7 +534,8 @@
                          {
                              "size":  "50ml",
                              "price":  750,
-                             "inStock":  true
+                             "inStock":  true,
+                             "compareAtPrice":  1350
                          }
                      ],
         "image":  "/media/orq/bundle-gift-box.webp",

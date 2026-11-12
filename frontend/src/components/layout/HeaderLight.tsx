@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/components/cart/CartContext';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 
 export default function HeaderLight() {
   const { openCart, totalItems } = useCart();
+  const { site } = useCatalog();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname() || '/preview/concept-5';
 
@@ -23,10 +25,10 @@ export default function HeaderLight() {
           <img src="/logo-mark.png" alt="" aria-hidden="true" width={32} height={37} className="h-9 w-auto brightness-[.62] saturate-150" />
           <div className="flex flex-col">
             <span className="font-serif tracking-[0.25em] text-2xl font-bold bg-gradient-to-r from-[#80581B] via-[#B38734] to-[#664614] bg-clip-text text-transparent transition group-hover:brightness-110">
-              ORQ
+              {site.name}
             </span>
             <span className="text-[9px] tracking-[0.2em] text-[#996515] font-mono -mt-1 font-semibold">
-              HAUTE PARFUMERIE • WHITE EDITION
+              {site.tagline} • WHITE EDITION
             </span>
           </div>
         </Link>

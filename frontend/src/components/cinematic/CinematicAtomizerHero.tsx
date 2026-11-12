@@ -8,7 +8,7 @@ import { formatPrice } from '@/lib/format';
 export default function CinematicAtomizerHero() {
   const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
-  const heroProduct = PRODUCTS.find((p) => p.slug === 'chaos') || PRODUCTS[1];
+  const heroProduct = (PRODUCTS.filter((p) => p.isBestSeller)[1] ?? PRODUCTS[1] ?? PRODUCTS[0]);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [sprayActive, setSprayActive] = useState(false);

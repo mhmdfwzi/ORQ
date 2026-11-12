@@ -8,11 +8,18 @@ import MoodFilterBarLight from '@/components/cinematic/MoodFilterBarLight';
 import SeamlessWhiteGoldHero from '@/components/cinematic/SeamlessWhiteGoldHero';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import { useCatalog } from '@/components/catalog/CatalogContext';
+import { formatPrice } from '@/lib/format';
 import { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 
 export default function ConceptFiveView() {
-  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood } = useCatalog();
+  const { products: PRODUCTS, giftBundle: GIFT_BUNDLE, getProductsByMood, site } = useCatalog();
+  const bundleVariant = GIFT_BUNDLE.variants[0];
+  const bundlePrice = bundleVariant?.price ?? 0;
+  const bundleList = bundleVariant?.compareAtPrice ?? bundlePrice;
+  const bundleSaving = bundleList - bundlePrice;
+  const discount = bundleList > 0 ? Math.round((bundleSaving / bundleList) * 100) : 0;
+  const currency = site.commerce.currency;
   const { addToCart } = useCart();
   const [selectedMood, setSelectedMood] = useState<ScentMood>('all');
 
@@ -43,7 +50,7 @@ export default function ConceptFiveView() {
                 </p>
               </div>
               <span className="text-xs text-[#80581B] font-mono font-bold bg-[#EFE9DD] px-3 py-1 rounded-full border border-[#DDD5C5]">
-                12 عطراً نيش معتقاً
+                {PRODUCTS.length} عطراً نيش معتقاً
               </span>
             </div>
           </ScrollReveal>
@@ -110,38 +117,34 @@ export default function ConceptFiveView() {
                   alt="صندوق باقة الهدايا والتجربة المتكاملة"
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-3 right-3 bg-red-600 text-white font-extrabold text-xs px-2.5 py-1 rounded shadow">
-                  توفير 45%
-                </span>
+                {discount > 0 && (
+                  <span className="absolute top-3 right-3 bg-red-600 text-white font-extrabold text-xs px-2.5 py-1 rounded shadow">
+                    توفير {discount}%
+                  </span>
+                )}
               </div>
 
               <div className="lg:col-span-7 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFE9DD] text-[#80581B] text-xs font-bold border border-[#DDD5C5]">
                   <span>🎁</span>
-                  <span>باقة الهدايا والتجربة الفاخرة</span>
+                  <span>{site.bundle.badge}</span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1C1917]">
-                  صندوق ORQ الأبيض الملكي: زجاجة 50 مل + معطر سيارة + 4 عينات نادرة
+                  {GIFT_BUNDLE.name}: {GIFT_BUNDLE.subtitle}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#575147] leading-relaxed">
-                  تجربة متكاملة في صندوق إهداء ملكي: اختر عطرك المفضل بحجم 50 مل، بالإضافة لمعطر سيارة فاخر بنفس الهوية، و 4 عينات نادرة لاستكشاف باقي تشكيلة الدار براحة تامة.
+                  {GIFT_BUNDLE.description}
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 py-2 text-center text-xs">
-                  <div className="p-3 rounded-xl bg-white border border-[#EAE4D8] shadow-xs">
-                    <span className="text-[#80581B] font-bold block">زجاجة 50 مل</span>
-                    <span className="text-[10px] text-[#7A7369]">العطر من اختيارك</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-white border border-[#EAE4D8] shadow-xs">
-                    <span className="text-[#80581B] font-bold block">معطر سيارة</span>
-                    <span className="text-[10px] text-[#7A7369]">فوحان نيش فندقي</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-white border border-[#EAE4D8] shadow-xs">
-                    <span className="text-[#80581B] font-bold block">4 عينات</span>
-                    <span className="text-[10px] text-[#7A7369]">لتجربة المجموعة</span>
-                  </div>
+                  {site.bundle.highlights.map((h) => (
+                    <div key={h.title} className="p-3 rounded-xl bg-white border border-[#EAE4D8] shadow-xs">
+                      <span className="text-[#80581B] font-bold block">{h.title}</span>
+                      <span className="text-[10px] text-[#7A7369]">{h.desc}</span>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="pt-3 flex flex-wrap items-center gap-4">
@@ -149,12 +152,16 @@ export default function ConceptFiveView() {
                     onClick={() => addToCart(GIFT_BUNDLE, '50ml')}
                     className="bg-gradient-to-r from-[#C4A265] via-[#B38734] to-[#996515] text-white text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-xl shadow-[#A37B34]/25 hover:brightness-105 hover:scale-103 transition-transform flex items-center gap-2 min-h-[44px]"
                   >
-                    <span>اطلب الصندوق الملكي الآن بـ 750 ج.م</span>
+                    <span>{site.bundle.cta} بـ {formatPrice(bundlePrice)} {currency}</span>
                     <span>🛒</span>
                   </button>
                   <div className="text-xs text-[#6B645A]">
-                    <span className="line-through ml-1.5 text-[#8C8478] font-mono">1,350 ج.م</span>
-                    <span className="text-emerald-700 font-bold font-mono">وفر 600 ج.م اليوم</span>
+                    {bundleSaving > 0 && (
+                      <span className="line-through ml-1.5 text-[#8C8478] font-mono">{formatPrice(bundleList)} {currency}</span>
+                    )}
+                    {bundleSaving > 0 && (
+                      <span className="text-emerald-700 font-bold font-mono">وفر {formatPrice(bundleSaving)} {currency}</span>
+                    )}
                   </div>
                 </div>
               </div>

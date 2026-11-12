@@ -3,10 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useCart } from './CartContext';
 import CheckoutForm from './CheckoutForm';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeFromCart, updateQuantity, totalAmount, totalItems } = useCart();
+  const { commerce } = useCatalog().site;
+  const shipping = commerce.shipping_cost;
   const [checkingOut, setCheckingOut] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -109,7 +112,7 @@ export default function CartDrawer() {
                     <h3 className="text-xs font-bold text-white truncate">{item.name}</h3>
                     <div className="text-[11px] text-[#A0988C]">الحجم: {item.size}</div>
                     <div className="text-xs font-bold text-[#ECC480] mt-1 whitespace-nowrap">
-                      {formatPrice(item.price * item.quantity)} ج.م
+                      {formatPrice(item.price * item.quantity)} {commerce.currency}
                     </div>
                   </div>
 
@@ -152,16 +155,18 @@ export default function CartDrawer() {
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-[#A0988C]">
                   <span>المجموع الفرعي</span>
-                  <span className="whitespace-nowrap">{formatPrice(totalAmount)} ج.م</span>
+                  <span className="whitespace-nowrap">{formatPrice(totalAmount)} {commerce.currency}</span>
                 </div>
                 <div className="flex justify-between text-[#A0988C]">
-                  <span>الشحن لجميع المحافظات</span>
-                  <span className="text-emerald-400 font-semibold">شحن مجاني</span>
+                  <span>{commerce.shipping_note}</span>
+                  <span className={`font-semibold ${shipping === 0 ? 'text-emerald-400' : ''}`}>
+                    {shipping === 0 ? commerce.shipping_free_label : `${formatPrice(shipping)} ${commerce.currency}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#221F1C]">
                   <span>الإجمالي النهائي</span>
                   <span className="text-[#ECC480] font-mono text-base whitespace-nowrap">
-                    {formatPrice(totalAmount)} ج.م
+                    {formatPrice(totalAmount + shipping)} {commerce.currency}
                   </span>
                 </div>
               </div>
@@ -171,10 +176,10 @@ export default function CartDrawer() {
                   onClick={() => setCheckingOut(true)}
                   className="w-full gold-button py-3.5 rounded-xl text-xs font-bold text-center block min-h-[44px]"
                 >
-                  متابعة الطلب — الدفع كاش عند الاستلام
+                  متابعة الطلب — {commerce.payment_note}
                 </button>
                 <div className="text-[10px] text-center text-zinc-500">
-                  الدفع كاش عند الاستلام • شحن مجاني لجميع المحافظات
+                  {commerce.payment_note} • {shipping === 0 ? commerce.shipping_free_label : commerce.shipping_note}
                 </div>
               </div>
             </div>

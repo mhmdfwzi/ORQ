@@ -8,7 +8,7 @@ import { formatPrice } from '@/lib/format';
 export default function SeamlessWhiteGoldHero() {
   const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
-  const heroProduct = PRODUCTS.find((p) => p.slug === 'royal-oud') || PRODUCTS[0];
+  const heroProduct = PRODUCTS.find((p) => p.isBestSeller) ?? PRODUCTS[0];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [isRevealing, setIsRevealing] = useState(false);
@@ -138,7 +138,7 @@ export default function SeamlessWhiteGoldHero() {
             >
               {/* Flacon with Soft Dissolve */}
               <img
-                src="/media/orq/royal-oud.webp"
+                src={heroProduct.image}
                 alt="ORQ Royal Oud Luxury Flacon - White Edition"
                 className="w-full h-full object-contain filter contrast-105 drop-shadow-[0_20px_45px_rgba(140,105,45,0.25)] rounded-2xl"
                 style={{

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\SiteSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -59,7 +60,7 @@ class OrderService
                 $resolved[] = compact('product', 'variant', 'unit', 'total') + ['quantity' => $line['quantity']];
             }
 
-            $shipping = (float) config('orq.shipping_cost', 0);
+            $shipping = SiteSettings::shippingCost();
 
             $order = Order::create([
                 'order_number'         => Order::generateOrderNumber(),

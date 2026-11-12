@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from 'next/cache';
 import type { Product } from '@/types/product';
 import type { BrandStory } from '@/types/brand';
+import type { SiteSettings } from '@/types/site';
 
 /**
  * Data layer for the ORQ Laravel API (server-side only).
@@ -60,4 +61,11 @@ export async function getBrandStory(): Promise<BrandStory | null> {
   cacheLife('hours');
   cacheTag('brand');
   return fetchJson<BrandStory>('/brand');
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('site');
+  return fetchJson<SiteSettings>('/site');
 }

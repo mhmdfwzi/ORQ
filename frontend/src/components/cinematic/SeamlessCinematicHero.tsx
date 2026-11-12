@@ -8,7 +8,7 @@ import { formatPrice } from '@/lib/format';
 export default function SeamlessCinematicHero() {
   const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
-  const heroProduct = PRODUCTS.find((p) => p.slug === 'royal-oud') || PRODUCTS[0];
+  const heroProduct = PRODUCTS.find((p) => p.isBestSeller) ?? PRODUCTS[0];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Non-blocking visual shimmer sweep
@@ -224,7 +224,7 @@ export default function SeamlessCinematicHero() {
             >
               {/* Ultra-Photorealistic Luxury Flacon (Natural #000000 Black Background with Seamless Radial Dissolve) */}
               <img
-                src="/media/orq/royal-oud.webp"
+                src={heroProduct.image}
                 alt="ORQ Royal Oud Luxury Flacon"
                 className="w-full h-full object-contain filter contrast-110 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
                 style={{
