@@ -13,6 +13,7 @@ export default function ConceptSwitcherBar() {
   const isConcept3 = pathname === '/preview/concept-3';
   const isConcept4 = pathname === '/preview/concept-4';
   const isConcept5 = pathname === '/preview/concept-5';
+  const isConcept6 = pathname === '/preview/concept-6';
 
   if (collapsed) {
     return (
@@ -22,7 +23,7 @@ export default function ConceptSwitcherBar() {
         aria-label="عرض شريط تبديل النماذج"
       >
         <span>🎨</span>
-        <span>النماذج (5)</span>
+        <span>النماذج (6)</span>
       </button>
     );
   }
@@ -84,6 +85,18 @@ export default function ConceptSwitcherBar() {
       >
         <span>5. أبيض وذهبي</span>
         <span className="text-[10px]">⚪</span>
+      </Link>
+
+      <Link
+        href="/preview/concept-6"
+        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-full transition whitespace-nowrap min-h-[38px] flex items-center gap-1 ${
+          isConcept6
+            ? 'bg-[#C4A265] text-black font-bold ring-1 ring-white/50'
+            : 'text-[#ECC480] hover:text-white font-medium'
+        }`}
+      >
+        <span>6. التحريري</span>
+        <span className="text-[10px]">📖</span>
       </Link>
 
       <button
