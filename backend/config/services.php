@@ -43,7 +43,7 @@ return [
     ],
 
     'ultramsg' => [
-        'instance' => env('ULTRAMSG_INSTANCE', 'instance56146'),
+        'instance' => env('ULTRAMSG_INSTANCE'),
         'token' => env('ULTRAMSG_TOKEN'),
         'admin_phone' => env('ADMIN_WHATSAPP'),
     ],

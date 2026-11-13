@@ -28,8 +28,11 @@ PHP_BIN="${PHP_BIN:-php}"
 COMPOSER_BIN="${COMPOSER_BIN:-composer}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 PM2_APP="${PM2_APP:-orq-frontend}"
-API_HEALTH_URL="${API_HEALTH_URL:-http://127.0.0.1:8001/api/v1/site}"
+# Web server user that must own storage/ and bootstrap/cache (aaPanel uses "www").
+WEB_USER="${WEB_USER:-$(id -u www >/dev/null 2>&1 && echo www || true)}"
 WEB_HEALTH_URL="${WEB_HEALTH_URL:-http://127.0.0.1:${FRONTEND_PORT}/}"
+# API_HEALTH_URL defaults to "<API_URL from the frontend env file>/site" (resolved after preflight).
+API_HEALTH_URL="${API_HEALTH_URL:-}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -77,8 +80,12 @@ if [[ $DO_FRONTEND -eq 1 ]]; then
   for key in API_URL NEXT_PUBLIC_API_URL REVALIDATE_SECRET; do
     grep -q "^${key}=.\+" "$FENV" || die "${key} is missing in $(basename "$FENV")"
   done
+  if [[ -z "$API_HEALTH_URL" ]]; then
+    API_HEALTH_URL="$(grep '^API_URL=' "$FENV" | head -1 | cut -d= -f2- | tr -d '"' | sed 's#/*$##')/site"
+  fi
 fi
-ok "environment looks sane"
+[[ -n "$API_HEALTH_URL" ]] || API_HEALTH_URL="http://127.0.0.1:8001/api/v1/site"
+ok "environment looks sane (API health: $API_HEALTH_URL)"
 
 # ---------------------------------------------------------------- code
 log "Pulling latest code ($BRANCH)"
@@ -113,6 +120,12 @@ if [[ $DO_BACKEND -eq 1 ]]; then
   "$PHP_BIN" artisan event:cache
   if "$PHP_BIN" artisan list --raw | grep -q '^filament:optimize '; then
     "$PHP_BIN" artisan filament:optimize
+  fi
+
+  # Artisan ran as the deploy user (often root): hand writable dirs back to the web user.
+  if [[ -n "$WEB_USER" && $(id -u) -eq 0 ]]; then
+    chown -R "$WEB_USER:$WEB_USER" storage bootstrap/cache
+    chmod -R ug+rwX storage bootstrap/cache
   fi
 
   "$PHP_BIN" artisan up >/dev/null 2>&1 && MAINTENANCE=0
@@ -154,3 +167,4 @@ if [[ $DO_FRONTEND -eq 1 ]]; then
 fi
 
 log "Deploy finished: $(cd "$ROOT" && git log --oneline -1)"
+

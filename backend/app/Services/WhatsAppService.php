@@ -11,12 +11,15 @@ class WhatsAppService
 {
     private string $apiUrl;
     private string $token;
+    private bool $configured;
 
     public function __construct()
     {
-        $instance = config('services.ultramsg.instance', 'instance56146');
+        // Credentials come from the environment only (never hardcode them).
+        $instance = (string) config('services.ultramsg.instance');
+        $this->token = (string) config('services.ultramsg.token');
+        $this->configured = $instance !== '' && $this->token !== '';
         $this->apiUrl = "https://api.ultramsg.com/{$instance}/messages/chat";
-        $this->token = config('services.ultramsg.token', '24ytu6qpg9s7hepi');
     }
 
     /**
@@ -24,6 +27,11 @@ class WhatsAppService
      */
     public function sendMessage(?string $phone, string $message): bool
     {
+        if (!$this->configured) {
+            Log::info('WhatsApp: ULTRAMSG_INSTANCE/ULTRAMSG_TOKEN not configured, message skipped');
+            return false;
+        }
+
         if (empty($phone)) {
             Log::warning('WhatsApp: Cannot send message, phone number is empty');
             return false;
