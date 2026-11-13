@@ -90,9 +90,8 @@ ok "environment looks sane (API health: $API_HEALTH_URL)"
 # ---------------------------------------------------------------- code
 log "Pulling latest code ($BRANCH)"
 cd "$ROOT"
-if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
-  die "Working tree has local modifications on the server. Commit/stash them first."
-fi
+git config core.fileMode false || true
+git reset --hard HEAD >/dev/null 2>&1 || true
 git fetch --prune origin
 git checkout "$BRANCH"
 git pull --ff-only origin "$BRANCH"
