@@ -101,6 +101,7 @@ ok "now at $(git log --oneline -1)"
 if [[ $DO_BACKEND -eq 1 ]]; then
   log "Backend (Laravel)"
   cd "$BACKEND"
+  mkdir -p storage/framework/{sessions,views,cache/data} storage/logs bootstrap/cache
   "$PHP_BIN" artisan down --retry=60 >/dev/null 2>&1 && MAINTENANCE=1 || true
 
   "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
