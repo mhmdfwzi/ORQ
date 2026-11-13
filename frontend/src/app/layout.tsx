@@ -3,7 +3,6 @@ import { Cairo, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
-import ConceptSwitcherBar from '@/components/layout/ConceptSwitcherBar';
 import JsonLd from '@/components/seo/JsonLd';
 import { CatalogProvider } from '@/components/catalog/CatalogContext';
 import { getCatalog } from '@/lib/catalog';
@@ -111,9 +110,6 @@ export default async function RootLayout({
       <body className="bg-[#0B0B0B] text-[#F2EBDD] min-h-screen selection:bg-[#C4A265] selection:text-black">
         <CatalogProvider products={products} giftBundle={giftBundle} brand={brand} site={site}>
           <CartProvider>
-            {/* Top Sticky Bar to switch seamlessly between Design Concepts */}
-            <ConceptSwitcherBar />
-
             <main className="min-h-screen">
               {children}
             </main>
