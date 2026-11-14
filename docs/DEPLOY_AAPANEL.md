@@ -75,7 +75,16 @@ cd backend && /www/server/php/84/bin/php artisan tinker --execute="App\Models\Us
 cd /www/wwwroot/orq && PHP_BIN=/www/server/php/84/bin/php bash scripts/deploy.sh
 ```
 
-لو التحديث للواجهة فقط، شغّل `bash scripts/deploy.sh --frontend-only`. السكريبت يتأكد إن الصفحة الرئيسية على الدومين العام بتعرض الإصدار الجديد.
+لو التحديث للواجهة فقط، شغّل `bash scripts/deploy.sh --frontend-only`. السكريبت يتأكد إن الصفحة الرئيسية على الدومين العام بتعرض الإصدار الجديد بطلب عادي وطلب يدعم ضغط المتصفح.
+
+بعد تعطيل كاش البروكسي، تقدر تتحقق من نسخة المتصفح من غير إعادة نشر:
+
+```bash
+curl -fsS --compressed -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+  https://orq.mhmdfwzi.com/ | grep -o 'data-dpl-id="[^"]*"'
+```
+
+رقم الإصدار لازم يطابق اللي ظهر في سطر `✔ Web` في آخر نشر.
 
 > **لا** تشغّل `--seed` على الموقع الحي بعد ما تعدّل المنتجات: بيرجّع الأسعار والصور للقيم الأصلية.
 

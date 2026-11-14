@@ -84,8 +84,15 @@ check_frontend_target() {
 }
 
 serves_deployment() {
-  local html
-  html=$(curl -fsS --max-time 6 "$1") && [[ $html == *"data-dpl-id=\"$NEXT_DEPLOYMENT_ID\""* ]]
+  local url=$1 html
+  shift
+  html=$(curl -fsS --max-time 6 "$@" "$url") && [[ $html == *"data-dpl-id=\"$NEXT_DEPLOYMENT_ID\""* ]]
+}
+
+serves_browser_deployment() {
+  serves_deployment "$1" --compressed \
+    -H 'Accept: text/html' \
+    -H 'Accept-Encoding: gzip, deflate, br, zstd'
 }
 
 MAINTENANCE=0
@@ -205,15 +212,15 @@ fi
 if [[ $DO_FRONTEND -eq 1 ]]; then
   ready=0
   for attempt in {1..8}; do
-    if serves_deployment "$WEB_HEALTH_URL"; then
+    if serves_deployment "$WEB_HEALTH_URL" && serves_browser_deployment "$WEB_HEALTH_URL"; then
       ready=1
       break
     fi
     sleep 2
   done
   if [[ $ready -eq 0 ]]; then
-    if serves_deployment "${WEB_HEALTH_URL}?orq_deployment=$NEXT_DEPLOYMENT_ID"; then
-      die "The new version responds with a query parameter, but $WEB_HEALTH_URL is stale. Check the ORQ reverse proxy HTML cache."
+    if serves_browser_deployment "${WEB_HEALTH_URL}?orq_deployment=$NEXT_DEPLOYMENT_ID"; then
+      die "A cached response is still being served on $WEB_HEALTH_URL. Check the ORQ reverse proxy HTML cache."
     fi
     die "$WEB_HEALTH_URL did not serve $NEXT_DEPLOYMENT_ID. Check pm2 logs $PM2_APP and the ORQ proxy target."
   fi
