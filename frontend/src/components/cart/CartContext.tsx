@@ -42,7 +42,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         ...prevItems,
         {
           slug: product.slug,
-          name: `${product.name} (${size})`,
+          name: product.name,
           size,
           price,
           quantity,

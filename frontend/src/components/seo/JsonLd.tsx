@@ -81,7 +81,7 @@ export default async function JsonLd() {
                 price: product.variants[product.variants.length - 1]?.price,
                 priceCurrency: 'EGP',
                 availability: 'https://schema.org/InStock',
-                url: `${baseUrl}/preview/products/${product.slug}`,
+                url: new URL(`/products/${product.slug}`, baseUrl).href,
               },
             },
             position: index + 1,

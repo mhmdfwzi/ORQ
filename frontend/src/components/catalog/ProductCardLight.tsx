@@ -19,7 +19,7 @@ export default function ProductCardLight({ product }: ProductCardProps) {
       
       {/* Clickable Image & Badges */}
       <Link
-        href={`/preview/products/${product.slug}`}
+        href={`/products/${product.slug}`}
         className="block relative aspect-[4/3] sm:aspect-[3/4] bg-[#F7F4EE] rounded-xl overflow-hidden border border-[#EFE9DF] mb-3"
       >
         <img
@@ -46,7 +46,7 @@ export default function ProductCardLight({ product }: ProductCardProps) {
           <span className="text-[#7A7369]">{product.brandFeel}</span>
         </div>
 
-        <Link href={`/preview/products/${product.slug}`} className="block">
+        <Link href={`/products/${product.slug}`} className="block">
           <h3 className="text-sm sm:text-base font-bold text-[#1C1917] group-hover:text-[#A67C37] transition">
             {product.name}
             {product.arabicName && product.arabicName !== product.name && (
@@ -74,7 +74,7 @@ export default function ProductCardLight({ product }: ProductCardProps) {
       {/* Action Buttons */}
       <div className="pt-3 grid grid-cols-2 gap-2 mt-2">
         <Link
-          href={`/preview/products/${product.slug}`}
+          href={`/products/${product.slug}`}
           className="text-center py-2.5 px-2 rounded-xl border border-[#DCD5C7] hover:border-[#A67C37] text-[#44403C] hover:text-[#1C1917] bg-[#FDFCFA] text-xs font-semibold transition flex items-center justify-center min-h-[40px]"
         >
           التفاصيل

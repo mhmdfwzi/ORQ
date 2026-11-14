@@ -1,41 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useCart } from '@/components/cart/CartContext';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
 
 export default function SeamlessCinematicHero() {
-  const { products: PRODUCTS } = useCatalog();
+  const { products, site } = useCatalog();
   const { addToCart } = useCart();
-  const heroProduct = PRODUCTS.find((p) => p.isBestSeller) ?? PRODUCTS[0];
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Non-blocking visual shimmer sweep
-  const [isRevealing, setIsRevealing] = useState(false);
-
-  // Play light sweep on mount with proper cleanup
-  useEffect(() => {
-    return runSequence();
-  }, []);
-
-  const runSequence = () => {
-    setIsRevealing(false);
-
-    // Subtle light sweep across bottle
-    const t1 = setTimeout(() => {
-      setIsRevealing(true);
-    }, 300);
-
-    const t2 = setTimeout(() => {
-      setIsRevealing(false);
-    }, 2000);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  };
+  const heroProduct = products.find((product) => product.isBestSeller) ?? products[0];
+  const variant = heroProduct?.variants.find((item) => item.size === '100ml' && item.inStock)
+    ?? heroProduct?.variants.find((item) => item.inStock)
+    ?? heroProduct?.variants[0];
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Ethereal Golden Smoke & Ember Canvas
   useEffect(() => {
@@ -44,9 +21,7 @@ export default function SeamlessCinematicHero() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Respect reduced motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (!window.matchMedia('(min-width: 64rem) and (prefers-reduced-motion: no-preference)').matches) return;
 
     let animId: number;
     let width = (canvas.width = canvas.offsetWidth);
@@ -96,8 +71,8 @@ export default function SeamlessCinematicHero() {
       ctx.clearRect(0, 0, width, height);
       timer++;
 
-      const originX = width < 1024 ? width * 0.5 : width * 0.65;
-      const originY = width < 1024 ? height * 0.30 : height * 0.72;
+      const originX = width * 0.28;
+      const originY = height * 0.72;
 
       // Central Golden Ambient Glow
       const ambient = ctx.createRadialGradient(originX, originY - 100, 20, originX, originY - 100, width * 0.4);
@@ -185,6 +160,7 @@ export default function SeamlessCinematicHero() {
         ctx.fill();
       }
 
+      ctx.shadowBlur = 0;
       animId = requestAnimationFrame(render);
     };
 
@@ -196,142 +172,52 @@ export default function SeamlessCinematicHero() {
     };
   }, []);
 
+  if (!heroProduct) return null;
+
   return (
-    <section className="relative min-h-[580px] sm:min-h-[680px] lg:min-h-[760px] bg-[#070707] overflow-hidden flex items-center justify-center border-b border-[#1E1B18] select-none py-6 sm:py-10">
-      {/* Background Golden Smoke & Mist Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
-      />
-
-      {/* Atmospheric Vignette */}
-      <div className="absolute inset-0 bg-radial-vignette pointer-events-none z-0" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
-          
-          {/* 1. Photorealistic Luxury Bottle: Strictly ON TOP on Mobile (order-1), Left Column on Desktop (lg:order-2) */}
-          <div className="lg:col-span-7 flex justify-center items-center relative order-1 lg:order-2 py-2 sm:py-4">
-            
-            {/* Dynamic Golden Scent Aura */}
-            <div
-              className="absolute w-64 h-64 sm:w-[460px] sm:h-[460px] rounded-full bg-gradient-to-tr from-[#C4A265]/30 via-amber-600/15 to-transparent blur-3xl pointer-events-none"
+    <section className="relative isolate overflow-hidden border-b border-[#221F1C] bg-[#070707]">
+      <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 hidden size-full lg:block" />
+      <div className="mx-auto grid max-w-7xl items-center gap-3 px-4 pt-5 pb-8 sm:px-6 lg:min-h-[600px] lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-10">
+        {heroProduct.image && (
+          <div className="relative mx-auto w-full max-w-[min(76vw,21rem)] lg:order-2 lg:max-w-[28rem]">
+            <div aria-hidden="true" className="absolute inset-[12%] -z-10 rounded-full bg-[#C4A265]/25 blur-3xl" />
+            {/* Admin-uploaded product images can use any host. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroProduct.image}
+              alt={heroProduct.name}
+              fetchPriority="high"
+              className="aspect-square w-full object-contain [mask-image:radial-gradient(ellipse,black_56%,transparent_76%)]"
             />
+          </div>
+        )}
 
-            {/* Bottle Container */}
-            <div
-              className="relative w-64 sm:w-80 md:w-[380px] aspect-[3/4] transition-transform duration-700 hover:scale-102"
+        <div className="space-y-3 text-center lg:order-1 lg:space-y-5 lg:text-start">
+          <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">{heroProduct.name}</h1>
+          {heroProduct.arabicName && heroProduct.arabicName !== heroProduct.name && (
+            <p className="text-sm font-medium text-[#D6C7B1] sm:text-lg">{heroProduct.arabicName}</p>
+          )}
+          {variant && (
+            <div className="flex flex-wrap items-baseline justify-center gap-2 lg:justify-start">
+              <span className="text-xl font-bold text-[#ECC480] sm:text-2xl">{formatPrice(variant.price)} {site.commerce.currency}</span>
+              <span className="text-sm text-[#B9B1A5]">{parseInt(variant.size, 10)} مل</span>
+            </div>
+          )}
+          <div className="mx-auto grid max-w-xs grid-cols-2 gap-2 pt-2 lg:mx-0 lg:max-w-sm">
+            <button
+              type="button"
+              disabled={!variant?.inStock}
+              onClick={() => variant && addToCart(heroProduct, variant.size)}
+              className="gold-button min-h-11 rounded-lg px-2 py-2 text-sm disabled:opacity-60"
             >
-              {/* Ultra-Photorealistic Luxury Flacon (Natural #000000 Black Background with Seamless Radial Dissolve) */}
-              <img
-                src={heroProduct.image}
-                alt="ORQ Royal Oud Luxury Flacon"
-                className="w-full h-full object-contain filter contrast-110 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
-                style={{
-                  maskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 75%, transparent 100%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 75%, transparent 100%)',
-                }}
-              />
-
-              {/* Specular Light Reflection Sweep */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none transition-transform duration-1000 ${
-                  isRevealing ? 'translate-x-full opacity-100' : '-translate-x-full opacity-0'
-                }`}
-              />
-
-              {/* Soft Shadow Pedestal */}
-              <div className="w-3/4 h-5 mx-auto -mt-5 bg-black/90 rounded-full blur-md pointer-events-none" />
-            </div>
-
+              {variant?.inStock ? 'أضف للسلة' : 'غير متوفر'}
+            </button>
+            <a href="#signature" className="flex min-h-11 items-center justify-center rounded-lg border border-[#44372A] px-2 py-2 text-sm font-semibold text-[#ECC480] hover:border-[#C4A265]">
+              تصفّح العطور
+            </a>
           </div>
-
-          {/* 2. Clean Luxury Typography & Purchasing: Immediately Visible (Zero Blank Wait) */}
-          <div
-            className="lg:col-span-5 space-y-5 text-center sm:text-right z-10 order-2 lg:order-1"
-          >
-            {/* Brand Tag & Title */}
-            <div className="space-y-1.5">
-              <span className="font-serif tracking-[0.3em] text-[#C4A265] text-xs font-bold uppercase block">
-                ORQ HAUTE PARFUMERIE
-              </span>
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
-                {heroProduct.name}
-                {heroProduct.arabicName && heroProduct.arabicName !== heroProduct.name && (
-                  <span className="text-xl sm:text-2xl text-[#ECC480] font-normal mr-2">
-                    ({heroProduct.arabicName})
-                  </span>
-                )}
-              </h1>
-              <p className="text-xs sm:text-sm text-zinc-300">
-                حضورك له أثر لا يمحى من الذاكرة • تركيز نيش فاخر
-              </p>
-            </div>
-
-            {/* Price & Status */}
-            <div className="pt-1 flex items-baseline justify-center sm:justify-start gap-3">
-              <span className="text-2xl sm:text-4xl font-extrabold text-[#ECC480] font-mono whitespace-nowrap">
-                {formatPrice(heroProduct.variants[1].price)} ج.م
-              </span>
-              <span className="text-xs text-zinc-400 font-mono">100 ML • EDP</span>
-              <span className="text-xs text-emerald-400 font-semibold">● متوفر بالمخزون</span>
-            </div>
-
-            {/* Decisive Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
-              <button
-                onClick={() => addToCart(heroProduct, '100ml')}
-                className="gold-button text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-2xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2 min-h-[44px]"
-              >
-                <span>أضف للسلة الآن</span>
-                <span>🛒</span>
-              </button>
-
-              {/* Replay Light Sweep */}
-              <button
-                onClick={runSequence}
-                className="px-4 py-3.5 rounded-full border border-[#38332D] hover:border-[#C4A265] bg-[#141210]/90 text-[#ECC480] text-xs font-semibold transition hover:bg-[#201D1A] flex items-center gap-1.5 min-h-[44px]"
-                title="إعادة وميض الضوء على الزجاجة"
-              >
-                <span>↺</span>
-                <span>وميض الضوء</span>
-              </button>
-            </div>
-
-            {/* Fast Notes Badges */}
-            <div className="pt-4 border-t border-[#1E1B18] flex items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs text-zinc-400 flex-wrap">
-              <span className="flex items-center gap-1.5">
-                <span className="text-[#C4A265]">✦</span>
-                <span>حمضيات إيطالية</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="text-[#C4A265]">✦</span>
-                <span>فلفل أسود وخشب الأرز</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="text-[#C4A265]">✦</span>
-                <span>العود الملكي الفاخر</span>
-              </span>
-            </div>
-          </div>
-
         </div>
       </div>
-
-      {/* Seamless Bottom Gradient to Connect with Next Section */}
-      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#070707] to-transparent pointer-events-none z-10" />
-
-      {/* Seamless Scroll Connection Indicator (Pointing to #signature) */}
-      <a
-        href="#signature"
-        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-[11px] text-zinc-400 hover:text-[#ECC480] transition-colors cursor-pointer"
-        aria-label="الانتقال إلى المجموعة العطرية"
-      >
-        <span className="font-serif tracking-widest uppercase text-[10px] text-[#C4A265]/90">
-          اكتشف المجموعة
-        </span>
-        <span className="animate-scroll-pulse text-base text-[#ECC480]">↓</span>
-      </a>
     </section>
   );
 }

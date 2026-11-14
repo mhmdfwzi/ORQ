@@ -25,6 +25,10 @@ body {
   overflow-x: hidden;
 }
 
+body:has(.cart-dialog[open]) {
+  overflow: hidden;
+}
+
 .font-serif {
   font-family: var(--font-display), 'Cormorant Garamond', Cairo, Georgia, serif;
 }

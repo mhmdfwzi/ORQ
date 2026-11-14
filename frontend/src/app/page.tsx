@@ -1,5 +1,5 @@
-import ConceptOneView from '@/components/cinematic/ConceptOneView';
+import ConceptFourView from '@/components/cinematic/ConceptFourView';
 
 export default function HomePage() {
-  return <ConceptOneView />;
+  return <ConceptFourView />;
 }

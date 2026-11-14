@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
-import { Product } from '@/types/product';
+import type { Product } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
+import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
 
 interface ProductCardProps {
@@ -12,79 +12,45 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
-  const defaultVariant = product.variants.find((v) => v.size === '100ml') || product.variants[0];
+  const { commerce } = useCatalog().site;
+  const variant = product.variants.find((v) => v.size === '100ml' && v.inStock)
+    ?? product.variants.find((v) => v.inStock)
+    ?? product.variants[0];
+  const href = `/products/${product.slug}`;
 
   return (
-    <div className="bg-[#12100E] border border-[#24211D] rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-[#C4A265]/70 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(196,162,101,0.18)]">
-      
-      {/* Clickable Image & Badges */}
-      <Link href={`/preview/products/${product.slug}`} className="block relative aspect-[4/3] sm:aspect-[3/4] bg-[#0A0A0A] rounded-xl overflow-hidden border border-[#1E1B18] mb-3">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
-        />
-
-        {product.isBestSeller && (
-          <span className="absolute top-2 right-2 bg-[#C4A265] text-black font-extrabold text-[10px] px-2 py-0.5 rounded shadow">
-            الأكثر طلباً
-          </span>
-        )}
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-          <span className="text-[11px] text-[#ECC480] font-medium">عرض كافة التفاصيل والنفحات ←</span>
+    <article className="group flex h-full min-w-0 flex-col rounded-xl border border-[#2B2723] bg-[#12100E] p-2 transition hover:border-[#C4A265]/60 sm:p-3">
+      <Link href={href} className="block flex-1 rounded-lg focus-visible:outline-[#ECC480]">
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-[#1A1714]">
+          {product.image && (
+            // Admin-uploaded product images can use any host.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.image} alt="" loading="lazy" className="size-full object-cover transition duration-500 motion-safe:group-hover:scale-105" />
+          )}
         </div>
+        <h3 className="mt-2 text-sm font-bold leading-snug break-words text-white group-hover:text-[#ECC480] sm:text-base">
+          <bdi>{product.name}</bdi>
+        </h3>
+        {product.arabicName && product.arabicName !== product.name && (
+          <p className="mt-0.5 text-xs text-[#B9B1A5]">{product.arabicName}</p>
+        )}
       </Link>
 
-      {/* Info */}
-      <div className="space-y-1.5 flex-1">
-        <div className="flex items-center justify-between text-[11px] text-[#C4A265]">
-          <span className="font-semibold uppercase tracking-wider">{product.category}</span>
-          <span className="text-zinc-400">{product.brandFeel}</span>
+      {variant && (
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 text-xs">
+          <span className="font-bold text-[#ECC480]">{formatPrice(variant.price)} {commerce.currency}</span>
+          <span className="text-[#B9B1A5]">{parseInt(variant.size, 10)} مل</span>
         </div>
-
-        <Link href={`/preview/products/${product.slug}`} className="block">
-          <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-[#ECC480] transition">
-            {product.name}
-            {product.arabicName && product.arabicName !== product.name && (
-              <span className="text-xs text-[#8E867B] font-normal mr-2">({product.arabicName})</span>
-            )}
-          </h3>
-        </Link>
-
-        <p className="text-[11px] text-[#8E867B] line-clamp-1">
-          {product.scentType}
-        </p>
-
-        {/* Pricing */}
-        <div className="pt-2 flex items-baseline justify-between border-t border-[#1F1C19] mt-2">
-          <div>
-            <span className="text-xs text-zinc-500 ml-1">100 مل:</span>
-            <span className="text-sm sm:text-base font-bold text-[#ECC480] font-mono whitespace-nowrap">
-              {formatPrice(defaultVariant.price)} ج.م
-            </span>
-          </div>
-          <span className="text-[10px] text-emerald-400 font-medium">● متوفر</span>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="pt-3 grid grid-cols-2 gap-2 mt-2">
-        <Link
-          href={`/preview/products/${product.slug}`}
-          className="text-center py-2.5 px-2 rounded-xl border border-[#332E28] hover:border-[#C4A265] text-zinc-300 hover:text-white text-xs font-medium transition flex items-center justify-center min-h-[40px]"
-        >
-          التفاصيل
-        </Link>
-        <button
-          onClick={() => addToCart(product, '100ml')}
-          className="py-2.5 px-2 rounded-xl gold-button text-xs font-bold transition flex items-center justify-center gap-1 min-h-[40px]"
-        >
-          <span>شراء</span>
-          <span className="text-[10px]">🛒</span>
-        </button>
-      </div>
-
-    </div>
+      )}
+      <button
+        type="button"
+        onClick={() => variant && addToCart(product, variant.size)}
+        disabled={!variant?.inStock}
+        aria-label={variant?.inStock ? `أضف ${product.name} للسلة` : undefined}
+        className="gold-button mt-2 min-h-11 w-full rounded-lg px-1 py-2 text-xs disabled:opacity-60 sm:text-sm"
+      >
+        {variant?.inStock ? 'أضف للسلة' : 'غير متوفر'}
+      </button>
+    </article>
   );
 }

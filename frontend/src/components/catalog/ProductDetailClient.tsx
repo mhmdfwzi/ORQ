@@ -1,232 +1,124 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Product } from '@/types/product';
+import type { Product, ProductVariant } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import ProductCard from '@/components/catalog/ProductCard';
-import ScrollReveal from '@/components/ui/ScrollReveal';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
 
-interface ProductDetailClientProps {
-  product: Product;
-}
-
-export default function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const { products: PRODUCTS } = useCatalog();
+export default function ProductDetailClient({ product }: { product: Product }) {
+  const { products, site } = useCatalog();
   const { addToCart } = useCart();
-  const [selectedSize, setSelectedSize] = useState<'50ml' | '100ml'>('100ml');
+  const defaultVariant = product.variants.find((variant) => variant.size === '100ml' && variant.inStock)
+    ?? product.variants.find((variant) => variant.inStock)
+    ?? product.variants[0];
+  const [selectedSize, setSelectedSize] = useState<ProductVariant['size'] | undefined>(defaultVariant?.size);
   const [quantity, setQuantity] = useState(1);
-
-  const selectedVariant = product.variants.find((v) => v.size === selectedSize) || product.variants[0];
-  const relatedProducts = PRODUCTS.filter((p) => p.slug !== product.slug).slice(0, 4);
+  const selectedVariant = product.variants.find((variant) => variant.size === selectedSize) ?? defaultVariant;
+  const relatedProducts = products.filter((item) => item.slug !== product.slug).slice(0, 4);
+  const { currency } = site.commerce;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-      
-      {/* Breadcrumb with valid working routes */}
-      <nav className="text-xs text-[#8E867B] flex items-center gap-2">
-        <Link href="/preview/concept-1" className="hover:text-white transition">الرئيسية</Link>
-        <span>/</span>
-        <Link href="/preview/concept-1#signature" className="hover:text-white transition">المجموعة العطرية</Link>
-        <span>/</span>
-        <span className="text-[#ECC480] font-semibold">{product.name}</span>
-      </nav>
+    <div className="mx-auto max-w-7xl space-y-7 px-4 pb-9 sm:px-6 lg:px-8">
+      <Link href="/#signature" className="inline-flex min-h-11 items-center gap-2 text-sm text-[#ECC480] hover:underline">
+        <span aria-hidden="true">→</span> العطور
+      </Link>
 
-      {/* Main PDP Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        
-        {/* Left Side: Product Gallery */}
-        <div className="lg:col-span-6 space-y-4">
-          <ScrollReveal direction="right" delay={50}>
-            <div className="aspect-[4/3] sm:aspect-square rounded-2xl bg-[#0A0A0A] border border-[#2B2723] overflow-hidden relative shadow-2xl group">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-95"
-              />
-              {product.isBestSeller && (
-                <span className="absolute top-4 right-4 bg-[#C4A265] text-black font-extrabold text-xs px-3 py-1 rounded shadow-lg">
-                  الأكثر طلباً
-                </span>
-              )}
-            </div>
+      <div className="grid items-start gap-5 lg:grid-cols-2 lg:gap-12">
+        {product.image && (
+          // Admin-uploaded product images can use any host.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={product.image} alt={product.name} fetchPriority="high" className="aspect-square w-full max-h-[26rem] rounded-2xl border border-[#2B2723] bg-[#14110E] object-contain lg:max-h-none" />
+        )}
 
-            <div className="p-4 rounded-xl bg-[#141210] border border-[#221F1C] flex items-center justify-between text-xs text-[#A0988C] mt-4">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                <span>●</span>
-                <span>متاح للشحن الفوري لكافة المحافظات</span>
-              </span>
-              <span className="font-mono text-[11px] text-[#C4A265]">EDP • تركيز نيش فاخر</span>
-            </div>
-          </ScrollReveal>
-        </div>
+        <div className="min-w-0 space-y-5">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold leading-tight text-white sm:text-4xl">{product.name}</h1>
+            {product.arabicName && product.arabicName !== product.name && <p className="text-sm text-[#E2D3BC]">{product.arabicName}</p>}
+          </div>
 
-        {/* Right Side: Product Details & Buying Controls */}
-        <div className="lg:col-span-6 space-y-6 text-right">
-          <ScrollReveal direction="left" delay={100}>
-            <div className="space-y-2 border-b border-[#221F1C] pb-5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#C4A265] tracking-widest uppercase">
-                  {product.category}
-                </span>
-                <span className="text-xs text-zinc-400">
-                  {product.brandFeel}
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white">
-                عطر {product.name}
-                {product.arabicName && product.arabicName !== product.name && (
-                  <span className="text-xl text-[#8E867B] font-normal mr-3">({product.arabicName})</span>
-                )}
-              </h1>
-
-              <p className="text-xs sm:text-sm text-[#ECC480] font-medium">
-                {product.subtitle}
-              </p>
-
-              <p className="text-xs sm:text-sm text-[#B9B1A5] leading-relaxed pt-2">
-                {product.description}
-              </p>
-
-              <div className="pt-2 text-xs text-zinc-400">
-                <span className="text-[#C4A265] font-semibold">الهوية العطرية: </span>
-                <span>{product.originalInspiration}</span>
-              </div>
-            </div>
-
-            {/* Size Variant Selector */}
-            <div className="space-y-3 pt-4">
-              <label className="text-xs font-bold text-white block">
-                اختر حجم الزجاجة:
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {product.variants.map((v) => (
+          {product.variants.length > 0 && (
+            <fieldset className="min-w-0 space-y-2">
+              <legend className="mb-2 text-sm font-bold text-white">الحجم</legend>
+              <div className="grid grid-cols-2 gap-2">
+                {product.variants.map((variant) => (
                   <button
-                    key={v.size}
-                    onClick={() => setSelectedSize(v.size)}
-                    className={`p-3.5 rounded-xl border text-right transition flex items-center justify-between min-h-[44px] ${
-                      selectedSize === v.size
-                        ? 'bg-[#1C1814] border-[#C4A265] text-[#ECC480] shadow-md'
-                        : 'bg-[#141210] border-[#2B2723] text-zinc-300 hover:border-[#3E3832]'
-                    }`}
+                    key={variant.size}
+                    type="button"
+                    onClick={() => setSelectedSize(variant.size)}
+                    aria-pressed={selectedVariant?.size === variant.size}
+                    className={`flex min-h-11 flex-wrap items-center justify-between gap-x-2 rounded-lg border px-3 py-2 text-sm ${selectedVariant?.size === variant.size
+                      ? 'border-[#C4A265] bg-[#211B14] text-[#ECC480]'
+                      : 'border-[#332E28] bg-[#141210] text-[#E2D3BC]'}`}
                   >
-                    <div>
-                      <div className="font-bold text-xs sm:text-sm">{v.size === '100ml' ? '100 مل (الحجم الكبير)' : '50 مل (حجم السفر)'}</div>
-                      <div className="text-[10px] text-zinc-400">Eau de Parfum مكثف</div>
-                    </div>
-                    <div className="font-mono font-bold text-sm text-[#ECC480] whitespace-nowrap mr-2">
-                      {formatPrice(v.price)} ج.م
-                    </div>
+                    <span>{parseInt(variant.size, 10)} مل</span>
+                    <span className="font-bold">{variant.inStock ? `${formatPrice(variant.price)} ${currency}` : 'نفد'}</span>
                   </button>
                 ))}
               </div>
+            </fieldset>
+          )}
+
+          <div className="space-y-3">
+            {selectedVariant && (
+              <div className="flex flex-wrap items-baseline gap-x-3">
+                <span className="text-2xl font-bold text-[#ECC480]">{formatPrice(selectedVariant.price * quantity)} {currency}</span>
+                {selectedVariant.compareAtPrice && selectedVariant.compareAtPrice > selectedVariant.price && (
+                  <del className="text-sm text-[#A0988C]">{formatPrice(selectedVariant.compareAtPrice * quantity)} {currency}</del>
+                )}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <div className="flex shrink-0 items-center rounded-lg border border-[#332E28] bg-[#141210]" role="group" aria-label="الكمية">
+                <button type="button" disabled={quantity <= 1} onClick={() => setQuantity((count) => count - 1)} className="size-11 disabled:opacity-50" aria-label="تقليل الكمية">−</button>
+                <span className="min-w-5 text-center text-sm font-bold">{quantity}</span>
+                <button type="button" onClick={() => setQuantity((count) => count + 1)} className="size-11" aria-label="زيادة الكمية">+</button>
+              </div>
+              <button
+                type="button"
+                disabled={!selectedVariant?.inStock}
+                onClick={() => selectedVariant && addToCart(product, selectedVariant.size, quantity)}
+                className="gold-button min-h-11 flex-1 rounded-lg px-2 text-sm disabled:opacity-60"
+              >
+                {selectedVariant?.inStock ? 'أضف للسلة' : 'غير متوفر'}
+              </button>
             </div>
-
-            {/* Price & Quantity & Add to Cart */}
-            <div className="space-y-4 pt-4">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <span className="text-xs text-zinc-400 ml-2">السعر الإجمالي:</span>
-                  <span className="text-2xl sm:text-3xl font-extrabold text-[#ECC480] font-mono whitespace-nowrap">
-                    {formatPrice(selectedVariant.price * quantity)} ج.م
-                  </span>
-                </div>
-                <span className="text-xs text-emerald-400 font-semibold">شامل الضريبة + عينة مجانية</span>
-              </div>
-
-              <div className="flex gap-3">
-                {/* Quantity selector */}
-                <div className="flex items-center border border-[#332E28] rounded-xl bg-[#141210] px-1 shrink-0">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-9 h-11 flex items-center justify-center text-zinc-400 hover:text-white text-base focus:outline-none"
-                    aria-label="تقليل الكمية"
-                  >
-                    -
-                  </button>
-                  <span className="px-2 text-white font-mono text-sm font-bold">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-9 h-11 flex items-center justify-center text-zinc-400 hover:text-white text-base focus:outline-none"
-                    aria-label="زيادة الكمية"
-                  >
-                    +
-                  </button>
-                </div>
-
-                {/* Add to Cart Button (Concise for 320px screens) */}
-                <button
-                  onClick={() => addToCart(product, selectedSize, quantity)}
-                  className="flex-1 gold-button py-3.5 px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xl min-h-[44px]"
-                >
-                  <span>أضف للسلة</span>
-                  <span>🛒</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Scent Notes Breakdown */}
-            <div className="p-4 rounded-xl bg-[#141210] border border-[#26221D] space-y-3 mt-6">
-              <h3 className="text-xs font-bold text-[#ECC480] flex items-center gap-2">
-                <span>✦</span>
-                <span>الهرم العطري والمكونات النادرة:</span>
-              </h3>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex gap-2">
-                  <span className="text-[#C4A265] font-bold min-w-16">القمة:</span>
-                  <span className="text-zinc-300">{product.notes.top.join(' • ')}</span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-[#C4A265] font-bold min-w-16">القلب:</span>
-                  <span className="text-zinc-300">{product.notes.heart.join(' • ')}</span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-[#C4A265] font-bold min-w-16">القاعدة:</span>
-                  <span className="text-zinc-300">{product.notes.base.join(' • ')}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Guarantees Box */}
-            <div className="grid grid-cols-2 gap-3 text-[11px] text-[#A0988C] pt-4">
-              <div className="p-2.5 rounded-lg bg-[#110F0E] border border-[#201D1A] flex items-center gap-2">
-                <span className="text-base">🛡️</span>
-                <span>عينة تجربة مجانية مرفقة</span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-[#110F0E] border border-[#201D1A] flex items-center gap-2">
-                <span className="text-base">💵</span>
-                <span>الدفع عند الاستلام نقداً</span>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-
-      </div>
-
-      {/* Related Perfumes */}
-      <div className="pt-16 border-t border-[#221F1C] space-y-6">
-        <ScrollReveal direction="up" delay={50}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white">عطور أخرى قد تناسب ذوقك</h2>
-            <Link href="/preview/concept-1#signature" className="text-xs text-[#C4A265] hover:underline">
-              عرض كل المجموعة ←
-            </Link>
           </div>
-        </ScrollReveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {relatedProducts.map((p, idx) => (
-            <ScrollReveal key={p.slug} delay={idx * 120} direction="up">
-              <ProductCard product={p} />
-            </ScrollReveal>
-          ))}
+          <div className="divide-y divide-[#302820] rounded-xl border border-[#302820] bg-[#141210] px-3">
+            <details>
+              <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold text-white">عن العطر</summary>
+              <div className="space-y-2 pb-3 text-sm leading-relaxed text-[#B9B1A5]">
+                {product.subtitle && <p className="font-semibold text-[#E2D3BC]">{product.subtitle}</p>}
+                <p>{product.description}</p>
+                {product.originalInspiration && <p>{product.originalInspiration}</p>}
+              </div>
+            </details>
+            <details>
+              <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold text-white">النفحات العطرية</summary>
+              <dl className="space-y-2 pb-3 text-sm text-[#B9B1A5]">
+                {([{ key: 'top', label: 'القمة' }, { key: 'heart', label: 'القلب' }, { key: 'base', label: 'القاعدة' }] as const).map(({ key, label }) => (
+                  <div key={key} className="grid grid-cols-[3.5rem_1fr] gap-2">
+                    <dt className="font-bold text-[#ECC480]">{label}</dt>
+                    <dd>{product.notes[key].join('، ') || '—'}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          </div>
         </div>
       </div>
 
+      {relatedProducts.length > 0 && (
+        <section className="space-y-4 border-t border-[#221F1C] pt-6">
+          <h2 className="text-lg font-bold text-white sm:text-2xl">عطور أخرى</h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            {relatedProducts.map((item) => <ProductCard key={item.slug} product={item} />)}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

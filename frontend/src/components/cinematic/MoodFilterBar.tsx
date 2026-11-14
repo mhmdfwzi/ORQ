@@ -10,36 +10,29 @@ interface MoodFilterBarProps {
 }
 
 export default function MoodFilterBar({ currentMood, onSelectMood }: MoodFilterBarProps) {
-  const { site, products } = useCatalog();
-  // Filters (labels/icons) and the total count come from the database.
-  const filters: { id: ScentMood; label: string; icon: string }[] = [
-    { id: 'all', label: `${site.moods.all_label} (${products.length})`, icon: '✦' },
-    ...site.moods.items.map((m) => ({ id: m.id as ScentMood, label: m.label, icon: m.icon })),
+  const { site } = useCatalog();
+  const filters: { id: ScentMood; label: string }[] = [
+    { id: 'all', label: site.moods.all_label },
+    ...site.moods.items.map(({ id, label }) => ({ id: id as ScentMood, label })),
   ];
 
   return (
-    <div className="space-y-2">
-      <div className="text-xs text-[#A0988C] font-semibold flex items-center justify-between">
-        <span>اختر طابع حضورك المفضل للتصفية الفورية:</span>
-        <span className="text-[10px] text-[#C4A265]">انقر لتحديث التشكيلة مباشرة</span>
-      </div>
-
-      <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1 text-xs">
-        {filters.map((f) => (
-          <button
-            key={f.id}
-            onClick={() => onSelectMood(f.id)}
-            className={`px-3.5 py-2 rounded-full transition-all whitespace-nowrap flex items-center gap-1.5 ${
-              currentMood === f.id
-                ? 'bg-[#C4A265] text-black font-bold shadow-md shadow-[#C4A265]/20'
-                : 'bg-[#181614] border border-[#2B2723] text-zinc-300 hover:border-[#C4A265] hover:text-white'
-            }`}
-          >
-            <span>{f.icon}</span>
-            <span>{f.label}</span>
-          </button>
-        ))}
-      </div>
+    <div role="group" aria-label="تصفية العطور حسب الطابع" className="flex flex-wrap items-center gap-2">
+      {filters.map((filter) => (
+        <button
+          key={filter.id}
+          type="button"
+          aria-pressed={currentMood === filter.id}
+          onClick={() => onSelectMood(filter.id)}
+          className={`min-h-11 rounded-full border px-3 text-xs font-medium transition sm:px-4 sm:text-sm ${
+            currentMood === filter.id
+              ? 'border-[#C4A265] bg-[#C4A265] text-black'
+              : 'border-[#2B2723] bg-[#181614] text-zinc-300 hover:border-[#C4A265] hover:text-white'
+          }`}
+        >
+          {filter.label}
+        </button>
+      ))}
     </div>
   );
 }
