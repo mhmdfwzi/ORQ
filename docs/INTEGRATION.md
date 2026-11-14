@@ -39,20 +39,19 @@ cd frontend && npm install && npm run build && npm run start
 One command, run on the server from the repo root:
 
 ```bash
-./scripts/deploy.sh                # git pull + backend + frontend + health checks
-./scripts/deploy.sh --seed         # FIRST deploy only: also seeds the catalogue
-./scripts/deploy.sh --backend-only # or --frontend-only
+bash scripts/deploy.sh                # git pull + backend + frontend + health checks
+bash scripts/deploy.sh --backend-only # or --frontend-only
 ```
 
 What it does: preflight (required env keys) ? `git pull --ff-only` ? backend: maintenance mode, `composer install --no-dev`,
 `migrate --force`, cache config/routes/views/events (+ `filament:optimize`) ? frontend: `npm ci`, `npm run build`,
-`pm2 reload orq-frontend` ? health checks on `/api/v1/site` and the storefront.
+`pm2 reload orq` ? health checks on `/api/v1/site` and the deployment ID on the public storefront.
 
 First-time server setup:
 1. `backend/.env` from `.env.example` (`APP_KEY`, DB, `APP_URL`, `FRONTEND_URL`, `REVALIDATE_SECRET`, mail/WhatsApp keys if used).
 2. `frontend/.env.production` from `frontend/.env.example` (same `REVALIDATE_SECRET`, real API/site URLs).
-3. Serve `backend/public` with nginx/Apache + PHP-FPM; keep Next.js on `FRONTEND_PORT` (default 3000) behind a reverse proxy. Needs `pm2` (`npm i -g pm2`).
-4. Create an admin user (`role = admin`) and run `./scripts/deploy.sh --seed` once.
+3. Serve `backend/public` with nginx/Apache + PHP-FPM. Choose a free port for Next.js, point the ORQ reverse proxy to it, and disable proxy caching for storefront HTML. Install `pm2` (`npm i -g pm2`).
+4. Set `FRONTEND_PORT` to that port and run `bash scripts/deploy.sh --seed` once. Create an admin user (`role = admin`).
 
 Notes: the frontend build prerenders from the API, so the backend must be reachable first (the script checks this).
 Never re-run `--seed` on a live shop: it resets seeded prices/images. Settings (site, brand story) and products are edited in Filament.

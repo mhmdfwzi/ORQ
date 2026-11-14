@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # ORQ one-command server update.
 #
-#   ./scripts/deploy.sh                 # pull + update backend + frontend
-#   ./scripts/deploy.sh --seed          # first deploy only: also seed the catalogue
-#   ./scripts/deploy.sh --backend-only
-#   ./scripts/deploy.sh --frontend-only
-#   ./scripts/deploy.sh --branch main
+#   bash scripts/deploy.sh                 # pull + update backend + frontend
+#   bash scripts/deploy.sh --seed          # first deploy only: also seed the catalogue
+#   bash scripts/deploy.sh --backend-only
+#   bash scripts/deploy.sh --frontend-only
+#   bash scripts/deploy.sh --branch main
 #
 # Run it from the repository root on the server (or from anywhere: it locates the root itself).
 # Config via environment variables:
-#   FRONTEND_PORT  (default 3000)      PM2_APP (default orq-frontend)
+#   FRONTEND_PORT  (required when creating a PM2 process)    PM2_APP (default orq)
 #   PHP_BIN        (default php)       COMPOSER_BIN (default composer)
 #   API_HEALTH_URL (default http://127.0.0.1:8001/api/v1/site)
-#   WEB_HEALTH_URL (default http://127.0.0.1:${FRONTEND_PORT}/)
+#   WEB_HEALTH_URL (default homepage on NEXT_PUBLIC_SITE_URL or FRONTEND_URL)
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -26,11 +26,11 @@ DO_SEED=0
 
 PHP_BIN="${PHP_BIN:-php}"
 COMPOSER_BIN="${COMPOSER_BIN:-composer}"
-FRONTEND_PORT="${FRONTEND_PORT:-3000}"
-PM2_APP="${PM2_APP:-orq-frontend}"
+FRONTEND_PORT="${FRONTEND_PORT:-}"
+PM2_APP="${PM2_APP:-orq}"
 # Web server user that must own storage/ and bootstrap/cache (aaPanel uses "www").
 WEB_USER="${WEB_USER:-$(id -u www >/dev/null 2>&1 && echo www || true)}"
-WEB_HEALTH_URL="${WEB_HEALTH_URL:-http://127.0.0.1:${FRONTEND_PORT}/}"
+WEB_HEALTH_URL="${WEB_HEALTH_URL:-}"
 # API_HEALTH_URL defaults to "<API_URL from the frontend env file>/site" (resolved after preflight).
 API_HEALTH_URL="${API_HEALTH_URL:-}"
 
@@ -51,6 +51,43 @@ ok()   { printf '\033[1;32m✔ %s\033[0m\n' "$*"; }
 die()  { printf '\033[1;31m✘ %s\033[0m\n' "$*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"; }
 
+env_value() {
+  sed -n "s/^$1=//p" "$2" | sed -n '1p' | tr -d '\r"'
+}
+
+check_frontend_target() {
+  local target
+  target=$(pm2 jlist | node -e '
+    const fs = require("node:fs");
+    const [name, directory] = process.argv.slice(1);
+    const matches = JSON.parse(fs.readFileSync(0, "utf8")).filter((process) => process.name === name);
+    if (matches.length === 0) {
+      console.log("missing");
+    } else {
+      const expected = fs.realpathSync(directory);
+      const matchesDirectory = matches.every(({ pm2_env }) =>
+        pm2_env?.pm_cwd && fs.realpathSync(pm2_env.pm_cwd) === expected);
+      if (!matchesDirectory) process.exit(1);
+      console.log("existing");
+    }
+  ' "$PM2_APP" "$FRONTEND") || die "Could not verify that PM2 app '$PM2_APP' runs from $FRONTEND."
+
+  if [[ $target == missing ]]; then
+    [[ $FRONTEND_PORT =~ ^[1-9][0-9]{0,4}$ ]] && (( FRONTEND_PORT <= 65535 )) \
+      || die "PM2 app '$PM2_APP' is missing. For a first deployment, set FRONTEND_PORT to the free port configured for the ORQ proxy."
+    need ss
+    local listeners
+    listeners=$(ss -H -ltn "sport = :$FRONTEND_PORT") || die "Could not check port $FRONTEND_PORT."
+    [[ -z $listeners ]] || die "Port $FRONTEND_PORT is already in use."
+  fi
+  FRONTEND_TARGET=$target
+}
+
+serves_deployment() {
+  local html
+  html=$(curl -fsS --max-time 6 "$1") && [[ $html == *"data-dpl-id=\"$NEXT_DEPLOYMENT_ID\""* ]]
+}
+
 MAINTENANCE=0
 cleanup() {
   local code=$?
@@ -65,9 +102,9 @@ trap cleanup EXIT
 
 # ---------------------------------------------------------------- preflight
 log "Preflight"
-need git; need "$PHP_BIN"; need curl
-[[ $DO_BACKEND -eq 1 ]] && need "$COMPOSER_BIN"
-[[ $DO_FRONTEND -eq 1 ]] && { need node; need npm; }
+need git; need curl
+[[ $DO_BACKEND -eq 1 ]] && { need "$PHP_BIN"; need "$COMPOSER_BIN"; }
+[[ $DO_FRONTEND -eq 1 ]] && { need node; need npm; need pm2; }
 
 [[ -f "$BACKEND/.env" ]] || die "backend/.env is missing (copy backend/.env.example and fill it in)."
 grep -q '^APP_KEY=.\+' "$BACKEND/.env" || die "APP_KEY is empty in backend/.env (run: php artisan key:generate)."
@@ -81,8 +118,16 @@ if [[ $DO_FRONTEND -eq 1 ]]; then
     grep -q "^${key}=.\+" "$FENV" || die "${key} is missing in $(basename "$FENV")"
   done
   if [[ -z "$API_HEALTH_URL" ]]; then
-    API_HEALTH_URL="$(grep '^API_URL=' "$FENV" | head -1 | cut -d= -f2- | tr -d '"' | sed 's#/*$##')/site"
+    API_HEALTH_URL="$(env_value API_URL "$FENV" | sed 's#/*$##')/site"
   fi
+  if [[ -z "$WEB_HEALTH_URL" ]]; then
+    SITE_URL=$(env_value NEXT_PUBLIC_SITE_URL "$FENV")
+    [[ -n "$SITE_URL" ]] || SITE_URL=$(env_value FRONTEND_URL "$BACKEND/.env")
+    WEB_HEALTH_URL="${SITE_URL%/}/"
+  fi
+  [[ $WEB_HEALTH_URL =~ ^https?://[^/[:space:]]+(/[^[:space:]]*)?$ && $WEB_HEALTH_URL != *[\?\#]* ]] \
+    || die "Set WEB_HEALTH_URL to the public ORQ homepage without query parameters."
+  check_frontend_target
 fi
 [[ -n "$API_HEALTH_URL" ]] || API_HEALTH_URL="http://127.0.0.1:8001/api/v1/site"
 ok "environment looks sane (API health: $API_HEALTH_URL)"
@@ -91,8 +136,6 @@ ok "environment looks sane (API health: $API_HEALTH_URL)"
 log "Pulling latest code ($BRANCH)"
 cd "$ROOT"
 git config core.fileMode false || true
-git reset --hard HEAD >/dev/null 2>&1 || true
-git fetch --prune origin
 git checkout "$BRANCH"
 git pull --ff-only origin "$BRANCH"
 ok "now at $(git log --oneline -1)"
@@ -141,19 +184,17 @@ if [[ $DO_FRONTEND -eq 1 ]]; then
 
   cd "$FRONTEND"
   npm ci --no-audit --no-fund
+  release_suffix=$(node -e 'console.log(require("node:crypto").randomBytes(6).toString("hex"))')
+  export NEXT_DEPLOYMENT_ID="orq-$(git rev-parse --short HEAD)-$release_suffix"
   npm run build
 
-  if command -v pm2 >/dev/null 2>&1; then
-    if pm2 describe "$PM2_APP" >/dev/null 2>&1; then
-      pm2 reload "$PM2_APP" --update-env
-    else
-      pm2 start npm --name "$PM2_APP" -- start -- -p "$FRONTEND_PORT"
-    fi
-    pm2 save >/dev/null 2>&1 || true
-    ok "frontend restarted via pm2 ($PM2_APP)"
+  check_frontend_target
+  if [[ $FRONTEND_TARGET == existing ]]; then
+    pm2 reload "$PM2_APP" --update-env
   else
-    echo "pm2 not found — restart the Next.js process yourself (npm run start -- -p $FRONTEND_PORT)."
+    pm2 start npm --name "$PM2_APP" -- start -- -p "$FRONTEND_PORT"
   fi
+  ok "frontend restarted via pm2 ($PM2_APP)"
 fi
 
 # ---------------------------------------------------------------- health
@@ -162,8 +203,22 @@ if [[ $DO_BACKEND -eq 1 ]]; then
   curl -fsS --max-time 20 "$API_HEALTH_URL" >/dev/null && ok "API   $API_HEALTH_URL" || die "API health check failed"
 fi
 if [[ $DO_FRONTEND -eq 1 ]]; then
-  sleep 3
-  curl -fsS --max-time 30 "$WEB_HEALTH_URL" >/dev/null && ok "Web   $WEB_HEALTH_URL" || die "Frontend health check failed"
+  ready=0
+  for attempt in {1..8}; do
+    if serves_deployment "$WEB_HEALTH_URL"; then
+      ready=1
+      break
+    fi
+    sleep 2
+  done
+  if [[ $ready -eq 0 ]]; then
+    if serves_deployment "${WEB_HEALTH_URL}?orq_deployment=$NEXT_DEPLOYMENT_ID"; then
+      die "The new version responds with a query parameter, but $WEB_HEALTH_URL is stale. Check the ORQ reverse proxy HTML cache."
+    fi
+    die "$WEB_HEALTH_URL did not serve $NEXT_DEPLOYMENT_ID. Check pm2 logs $PM2_APP and the ORQ proxy target."
+  fi
+  pm2 save >/dev/null 2>&1 || true
+  ok "Web   $WEB_HEALTH_URL ($NEXT_DEPLOYMENT_ID)"
 fi
 
 log "Deploy finished: $(cd "$ROOT" && git log --oneline -1)"

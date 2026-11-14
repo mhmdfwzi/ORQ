@@ -1,7 +1,7 @@
 # نشر ORQ على سيرفر aaPanel (Ubuntu 22)
 
 > الدومينات هنا أمثلة: الموقع `orq.mhmdfwzi.com` والـ API `api.orq.mhmdfwzi.com`. غيّرها بدوميناتك.
-> السيرفر فيه مواقع تانية، فبورت **3000 ممكن يكون مشغول**: السكريبت بيستخدم `FRONTEND_PORT` (نستخدم 3011 تحت).
+> لو ORQ شغّال بالفعل، التحديث يستخدم عملية PM2 باسم `orq` وإعداداتها الحالية. في أول نشر فقط، اختار بورت داخلي فاضي مخصص لـ ORQ.
 
 ## 1) من لوحة aaPanel (مرة واحدة)
 
@@ -21,7 +21,8 @@
 - *SSL* ← Let's Encrypt ← فعّل Force HTTPS.
 
 **Website ← Add site** (للموقع): الدومين `orq.mhmdfwzi.com` (PHP: Static) ثم:
-- *Reverse proxy* ← Add: الهدف `http://127.0.0.1:3011` (نفس `FRONTEND_PORT`). 
+- *Reverse proxy* ← Add: الهدف `http://127.0.0.1:<بورت ORQ>` (نفس `FRONTEND_PORT` عند إنشاء العملية).
+- اقفل **Cache** لبروكسي ORQ فقط علشان الزوار يشوفوا الـ HTML الجديد بعد النشر. لو بتعدّل إعداد Nginx مباشرة، استخدم `proxy_cache off;` في الـ `location` اللي بيخدم واجهة ORQ.
 - *SSL* ← Let's Encrypt ← Force HTTPS.
 
 ## 2) على السيرفر (SSH كـ root)
@@ -54,7 +55,8 @@ nano frontend/.env.production
 
 ```bash
 cd /www/wwwroot/orq
-PHP_BIN=/www/server/php/84/bin/php FRONTEND_PORT=3011 ./scripts/deploy.sh --seed
+read -r -p 'ORQ frontend port: ' FRONTEND_PORT
+PHP_BIN=/www/server/php/84/bin/php FRONTEND_PORT="$FRONTEND_PORT" bash scripts/deploy.sh --seed
 ```
 
 بعده أنشئ حساب الأدمن (غيّر الإيميل والباسورد):
@@ -70,13 +72,15 @@ cd backend && /www/server/php/84/bin/php artisan tinker --execute="App\Models\Us
 ## 4) كل تحديث بعد كده
 
 ```bash
-cd /www/wwwroot/orq && PHP_BIN=/www/server/php/84/bin/php FRONTEND_PORT=3011 ./scripts/deploy.sh
+cd /www/wwwroot/orq && PHP_BIN=/www/server/php/84/bin/php bash scripts/deploy.sh
 ```
+
+لو التحديث للواجهة فقط، شغّل `bash scripts/deploy.sh --frontend-only`. السكريبت يتأكد إن الصفحة الرئيسية على الدومين العام بتعرض الإصدار الجديد.
 
 > **لا** تشغّل `--seed` على الموقع الحي بعد ما تعدّل المنتجات: بيرجّع الأسعار والصور للقيم الأصلية.
 
 ## ملاحظات أمان
 - خلي `APP_DEBUG=false` و`APP_ENV=production` (القالب جاهز كده).
-- افتح من الـ Firewall بورتات 80/443 بس. بورت الموقع (3011) يفضل داخلي.
+- افتح من الـ Firewall بورتات 80/443 بس. بورت عملية ORQ يفضل داخلي.
 - مفاتيح UltraMsg القديمة (من مشروع Medicamo) اتشالت من الكود. لو استخدمتها في أي مكان قبل كده اعتبرها مكشوفة وغيّرها. واتساب الأدمن اختياري (اتركه فاضي).
 - اعمل نسخة احتياطية دورية لقاعدة `orq` من aaPanel (Database ← Backup) ولمجلد `backend/storage/app/public` (صور المنتجات المرفوعة).
