@@ -1,0 +1,43 @@
+body:has(.store-mobile-menu[open]) {
+  overflow: hidden;
+}
+
+.store-mobile-menu {
+  position: fixed;
+  inset: 0 0 auto auto;
+  width: 80vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  overflow: hidden;
+  border-left: 1px solid #65452e;
+  border-radius: 1rem 0 0 1rem;
+  background: radial-gradient(ellipse at 100% 0%, #302016 0%, #17110e 45%, #100d0b 84%);
+  box-shadow: -1rem 0 3.5rem #0008;
+  transform: translateX(100%);
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), display 300ms allow-discrete, overlay 300ms allow-discrete;
+}
+
+.store-mobile-menu[open] {
+  transform: translateX(0);
+}
+
+.store-mobile-menu::backdrop {
+  background-color: transparent;
+  transition: background-color 300ms ease, display 300ms allow-discrete, overlay 300ms allow-discrete;
+}
+
+.store-mobile-menu[open]::backdrop {
+  background-color: #000b;
+}
+
+@starting-style {
+  .store-mobile-menu[open] {
+    transform: translateX(100%);
+  }
+
+  .store-mobile-menu[open]::backdrop {
+    background-color: transparent;
+  }
+}

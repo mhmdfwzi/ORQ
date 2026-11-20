@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Places guest (account-less) cash-on-delivery orders.
+ * Places guest (account-less) orders and reserves their stock.
  *
  * Never trusts client data for money: prices and availability are resolved
  * from the database inside a transaction with row locks on stock.
@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 class OrderService
 {
     /**
-     * @param  array{name:string,phone:string,governorate:string,address:string,notes?:?string,items:array<int,array{slug:string,size:string,quantity:int}>}  $data
+     * @param  array{name:string,phone:string,governorate:string,address:string,notes?:?string,payment_method?:string,whatsapp_confirmation_requested?:bool,items:array<int,array{slug:string,size:string,quantity:int}>}  $data
      *
      * @throws ValidationException when an item is unavailable or out of stock
      */
@@ -27,6 +27,7 @@ class OrderService
         $lines = $this->mergeLines($data['items']);
 
         return DB::transaction(function () use ($data, $lines) {
+            $paymentMethod = $data['payment_method'] ?? 'cod';
             $subtotal = 0;
             $resolved = [];
 
@@ -73,9 +74,10 @@ class OrderService
                 'discount'             => 0,
                 'total'                => $subtotal + $shipping,
                 'status'               => 'pending',
-                'payment_method'       => 'cod',
+                'payment_method'       => $paymentMethod,
                 'payment_status'       => 'pending',
                 'notes'                => $data['notes'] ?? null,
+                'whatsapp_confirmation_requested' => $paymentMethod === 'cod' && (bool) ($data['whatsapp_confirmation_requested'] ?? false),
             ]);
 
             foreach ($resolved as $row) {
@@ -91,7 +93,9 @@ class OrderService
                 ]);
 
                 $row['variant']->decrement('stock_quantity', $row['quantity']);
-                $row['product']->increment('orders_count', $row['quantity']);
+                if ($paymentMethod === 'cod') {
+                    $row['product']->increment('orders_count', $row['quantity']);
+                }
             }
 
             return $order->load('items');
@@ -116,6 +120,8 @@ class OrderService
                 'quantity' => ($merged[$key]['quantity'] ?? 0) + (int) $item['quantity'],
             ];
         }
+
+        ksort($merged);
 
         return array_values($merged);
     }

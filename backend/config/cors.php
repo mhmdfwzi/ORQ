@@ -16,10 +16,12 @@ return [
 
     'allowed_methods' => ['GET', 'POST'],
 
-    'allowed_origins' => [
+    'allowed_origins' => array_values(array_unique([
         'http://localhost:3000',
-        env('FRONTEND_URL', 'https://orq-perfume.com'),
-    ],
+        'https://orqperfume.com',
+        'https://www.orqperfume.com',
+        env('FRONTEND_URL', 'https://orqperfume.com'),
+    ])),
 
     'allowed_origins_patterns' => [],
 

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { redirects } from './src/data/store-editorial.json';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -9,6 +10,11 @@ const nextConfig: NextConfig = {
       { source: '/preview', destination: '/', permanent: true },
       { source: '/preview/concept-4', destination: '/', permanent: true },
       { source: '/preview/products/:slug', destination: '/products/:slug', permanent: true },
+      { source: '/about', destination: '/pages/our-story', permanent: true },
+      { source: '/contact', destination: '/pages/contact', permanent: true },
+      { source: '/privacy', destination: '/pages/privacy-policy', permanent: true },
+      { source: '/terms', destination: '/pages/terms', permanent: true },
+      ...redirects.map(({ from, to }) => ({ source: from, destination: to, permanent: true })),
     ];
   },
   // Cap build parallelism: 11 default workers can exhaust memory on small machines.

@@ -6,13 +6,14 @@ import Footer from '@/components/layout/Footer';
 import ProductDetailClient from '@/components/catalog/ProductDetailClient';
 import { getProductBySlug } from '@/lib/api';
 import { getCatalog } from '@/lib/catalog';
+import { getProductEditorial } from '@/lib/product-editorial';
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
   const { products } = await getCatalog();
   return products.map((product) => ({
-    slug: product.slug,
+    slug: product.pageSlug ?? product.slug,
   }));
 }
 
@@ -21,11 +22,18 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getProductBySlug(slug);
   if (!product) return { robots: { index: false } };
 
-  const path = `/products/${product.slug}`;
+  const path = '/products/' + (product.pageSlug ?? product.slug);
+  const editorial = getProductEditorial(product.slug);
   return {
-    title: product.name,
-    description: product.description,
+    title: editorial ? { absolute: editorial.meta_title } : product.name,
+    description: editorial?.meta_description ?? product.description,
     alternates: { canonical: path, languages: { 'ar-EG': path, ar: path } },
+    openGraph: {
+      title: editorial?.meta_title ?? product.name,
+      description: editorial?.meta_description ?? product.description,
+      url: path,
+      images: product.image ? [product.image] : undefined,
+    },
   };
 }
 
@@ -56,5 +64,5 @@ async function ProductContent({ params }: ProductPageProps) {
     );
   }
 
-  return <ProductDetailClient key={product.slug} product={product} />;
+  return <ProductDetailClient key={product.slug} product={product} editorial={getProductEditorial(product.slug)} />;
 }

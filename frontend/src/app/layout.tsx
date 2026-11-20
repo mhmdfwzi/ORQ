@@ -6,6 +6,7 @@ import CartDrawer from '@/components/cart/CartDrawer';
 import JsonLd from '@/components/seo/JsonLd';
 import { CatalogProvider } from '@/components/catalog/CatalogContext';
 import { getCatalog } from '@/lib/catalog';
+import { SITE_SHARE_IMAGE, SITE_URL } from '@/lib/site-url';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -27,9 +28,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
 };
-
-// Public site URL is deployment config (not business data).
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://orq.mhmdfwzi.com';
 
 /** All SEO text comes from the database (Filament → إعدادات الموقع). */
 export async function generateMetadata(): Promise<Metadata> {
@@ -58,13 +56,13 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: site.name,
       locale: 'ar_EG',
       type: 'website',
-      images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: `${site.name} ${site.tagline}` }],
+      images: [SITE_SHARE_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
       title: seo.title_default,
       description: seo.twitter_description,
-      images: ['/og-image.jpg'],
+      images: [SITE_SHARE_IMAGE],
       creator: seo.twitter_handle,
     },
     icons: {

@@ -10,17 +10,12 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ForgotPasswordController;
-use App\Http\Controllers\PaymobController;
 
 
 // Access Destinations API
 Route::get('/api/destinations/{parent}/children', function (\App\Models\Destination $parent) {
     return $parent->children()->where('rank', '>=', '2')->orderBy('name')->get(['id', 'name', 'price']);
 })->name('api.destinations.children');
-
-// Paymob Routes
-Route::get('/paymob/callback', [PaymobController::class, 'processedCallback'])->name('paymob.callback');
-Route::post('/paymob/webhook', [PaymobController::class, 'transactionCallback'])->name('paymob.webhook');
 
 /*
 |--------------------------------------------------------------------------

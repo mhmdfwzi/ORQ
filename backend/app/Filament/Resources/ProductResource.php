@@ -244,7 +244,21 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
                     ->label('Image')
-                    ->limit(1)
+                    ->disk('public')
+                    ->visibility('public')
+                    ->state(function (Product $record): ?string {
+                        $path = $record->images[0] ?? null;
+
+                        if (! is_string($path) || $path === '') {
+                            return null;
+                        }
+
+                        if (str_starts_with($path, '/media/')) {
+                            return rtrim(config('app.frontend_url'), '/') . $path;
+                        }
+
+                        return $path;
+                    })
                     ->circular(),
                 
                 Tables\Columns\TextColumn::make('name')

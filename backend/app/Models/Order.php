@@ -14,6 +14,7 @@ class Order extends Model
         'order_number',
         'customer_name',
         'customer_phone',
+        'whatsapp_confirmation_requested',
         'shipping_governorate',
         'shipping_address',
         'user_id',
@@ -34,7 +35,14 @@ class Order extends Model
         'delivered_at',
     ];
 
+    protected $hidden = ['payment_checkout_key', 'payment_request_hash', 'paymob_checkout_url'];
+
     protected $casts = [
+        'whatsapp_confirmation_requested' => 'boolean',
+        'paymob_checkout_url' => 'encrypted',
+        'paymob_expires_at' => 'datetime',
+        'paymob_released_at' => 'datetime',
+        'paymob_declined' => 'boolean',
         'subtotal' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'discount' => 'decimal:2',

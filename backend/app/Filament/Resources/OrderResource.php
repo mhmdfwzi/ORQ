@@ -73,6 +73,7 @@ class OrderResource extends Resource
                                 'delivered' => 'Delivered',
                                 'cancelled' => 'Cancelled',
                             ])
+                            ->disabled(fn (Order $record): bool => $record->paymob_order_id && $record->payment_status === 'pending')
                             ->required()
                             ->native(false),
                         
@@ -80,13 +81,18 @@ class OrderResource extends Resource
                             ->options([
                                 'pending' => 'Pending',
                                 'paid' => 'Paid',
-                                'failed' => 'Failed',
                                 'refunded' => 'Refunded',
                             ])
+                            ->disabled(fn (Order $record): bool => $record->paymob_order_id && $record->payment_status === 'pending')
                             ->required(),
                         
                         TextInput::make('payment_method')
                             ->disabled(),
+
+                        Placeholder::make('paymob_reference')
+                            ->label('Paymob transaction')
+                            ->content(fn (Order $record): ?string => $record->paymob_transaction_id)
+                            ->visible(fn (Order $record): bool => filled($record->paymob_transaction_id)),
                         
                         Placeholder::make('total')
                             ->content(fn (Order $record): string => 'EGP ' . number_format($record->total, 2)),
@@ -125,6 +131,7 @@ class OrderResource extends Resource
                         'delivered' => 'Delivered',
                         'cancelled' => 'Cancelled',
                     ])
+                    ->disabled(fn (Order $record): bool => $record->paymob_order_id && $record->payment_status === 'pending')
                     ->sortable(),
                 
                 Tables\Columns\TextColumn::make('total')
@@ -159,7 +166,7 @@ class OrderResource extends Resource
                     ->options([
                         'pending' => 'Pending',
                         'paid' => 'Paid',
-                        'failed' => 'Failed',
+                        'refunded' => 'Refunded',
                     ]),
             ])
             ->actions([

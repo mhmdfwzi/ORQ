@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import type { Product } from '@/types/product';
 import type { BrandStory } from '@/types/brand';
 import type { SiteSettings } from '@/types/site';
+import { getProductEditorial, withProductEditorial } from '@/lib/product-editorial';
 
 /**
  * Data layer for the ORQ Laravel API (server-side only).
@@ -25,35 +26,40 @@ export async function getProducts(): Promise<Product[]> {
   'use cache';
   cacheLife('hours');
   cacheTag('products');
-  return (await fetchJson<Product[]>('/products')) ?? [];
+  return ((await fetchJson<Product[]>('/products')) ?? []).map(withProductEditorial);
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   'use cache';
   cacheLife('hours');
   cacheTag('products');
-  return fetchJson<Product>(`/products/${encodeURIComponent(slug)}`);
+  const path = '/products/' + encodeURIComponent(slug);
+  const alternate = getProductEditorial(slug)?.old_slug;
+  const product = (await fetchJson<Product>(path))
+    ?? (alternate && alternate !== slug ? await fetchJson<Product>('/products/' + encodeURIComponent(alternate)) : null);
+  return product ? withProductEditorial(product) : null;
 }
 
 export async function getProductsByMood(mood: string): Promise<Product[]> {
   'use cache';
   cacheLife('hours');
   cacheTag('products');
-  return (await fetchJson<Product[]>(`/products/mood/${encodeURIComponent(mood)}`)) ?? [];
+  return ((await fetchJson<Product[]>('/products/mood/' + encodeURIComponent(mood))) ?? []).map(withProductEditorial);
 }
 
 export async function getGiftBundle(): Promise<Product | null> {
   'use cache';
   cacheLife('hours');
   cacheTag('products');
-  return fetchJson<Product>('/products/bundle');
+  const product = await fetchJson<Product>('/products/bundle');
+  return product ? withProductEditorial(product) : null;
 }
 
 export async function getBestSellers(): Promise<Product[]> {
   'use cache';
   cacheLife('hours');
   cacheTag('products');
-  return (await fetchJson<Product[]>('/products/best-sellers')) ?? [];
+  return ((await fetchJson<Product[]>('/products/best-sellers')) ?? []).map(withProductEditorial);
 }
 
 export async function getBrandStory(): Promise<BrandStory | null> {

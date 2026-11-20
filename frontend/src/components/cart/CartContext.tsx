@@ -12,6 +12,7 @@ interface CartContextType {
   removeFromCart: (slug: string, size: '50ml' | '100ml') => void;
   updateQuantity: (slug: string, size: '50ml' | '100ml', quantity: number) => void;
   clearCart: () => void;
+  restoreCart: (savedItems: CartItem[]) => void;
   totalAmount: number;
   totalItems: number;
 }
@@ -83,6 +84,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
+        restoreCart: (savedItems) => {
+          setItems((current) => current.length ? current : savedItems);
+          openCart();
+        },
         totalAmount,
         totalItems
       }}

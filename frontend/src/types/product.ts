@@ -15,6 +15,7 @@ export interface ProductVariant {
 
 export interface Product {
   slug: string;
+  pageSlug?: string;
   name: string;
   arabicName: string;
   subtitle: string;
@@ -27,6 +28,7 @@ export interface Product {
   notes: PerfumeNotes;
   variants: ProductVariant[];
   image: string;
+  gallery?: string[];
   isBestSeller?: boolean;
   isNew?: boolean;
 }

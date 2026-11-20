@@ -71,7 +71,7 @@ class CheckoutController extends Controller
             'street_address' => 'required|string|max:255',
             'governorate_id' => 'required|exists:destinations,id',
             'city_id' => 'required|exists:destinations,id',
-            'payment_method' => 'required|in:cod,card',
+            'payment_method' => 'required|in:cod',
         ]);
         
         $user = auth()->user();
@@ -168,60 +168,6 @@ class CheckoutController extends Controller
             
             DB::commit();
             
-            // Handle Payment Methods
-            if ($request->payment_method == 'card') {
-                // Temporary: Show "Coming Soon" message
-                // When Paymob keys are available, remove this block and uncomment the code below
-                return redirect()->route('checkout.index')->with('error', 'Credit Card payment service will be available soon. Please choose Cash on Delivery.');
-                
-                /* 
-                // Paymob Integration Logic (Ready for enablement)
-                try {
-                    $paymob = new \App\Services\PaymobService();
-                    
-                    // 1. Authentication
-                    $token = $paymob->getAuthToken();
-                    
-                    // 2. Register Order
-                    $paymobOrderId = $paymob->createOrder(
-                        $token, 
-                        $order->order_number, 
-                        $order->total * 100 // Amount in cents
-                    );
-                    
-                    // 3. Get Payment Key
-                    $billingData = [
-                        "apartement" => "NA", 
-                        "email" => $user->email, 
-                        "floor" => "NA", 
-                        "first_name" => $request->first_name, 
-                        "street" => $request->street_address, 
-                        "building" => "NA", 
-                        "phone_number" => $request->phone, 
-                        "shipping_method" => "NA", 
-                        "postal_code" => "NA", 
-                        "city" => $address->city, 
-                        "country" => "EG", 
-                        "last_name" => $request->last_name, 
-                        "state" => $address->state ?? "NA"
-                    ];
-                    
-                    $paymentKey = $paymob->getPaymentKey(
-                        $token, 
-                        $paymobOrderId, 
-                        $order->total * 100, 
-                        $billingData
-                    );
-                    
-                    // 4. Redirect to Payment Page (iframe or direct link)
-                    return redirect()->away("https://accept.paymobsolutions.com/api/acceptance/iframes/" . config('services.paymob.iframe_id') . "?payment_token=" . $paymentKey);
-                    
-                } catch (\Exception $e) {
-                    \Log::error('Paymob Init Error: ' . $e->getMessage());
-                    return redirect()->route('checkout.index')->with('error', 'Online payment is currently unavailable. Please try again or use Cash on Delivery.');
-                }
-                */
-            }
             
             // Send notifications (WhatsApp/Email based on admin settings)
             try {

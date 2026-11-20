@@ -28,6 +28,10 @@ class StoreOrderRequest extends FormRequest
             'governorate'     => ['required', 'string', Rule::in(SiteSettings::get()['commerce']['governorates'] ?? [])],
             'address'         => ['required', 'string', 'min:8', 'max:500'],
             'notes'           => ['nullable', 'string', 'max:500'],
+            'payment_method'  => ['sometimes', 'string', Rule::in(['cod', 'card'])],
+            'checkout_key'    => ['exclude_unless:payment_method,card', 'required', 'uuid'],
+            'billing_email'   => ['exclude_unless:payment_method,card', 'required', 'email', 'max:254'],
+            'whatsapp_confirmation_requested' => ['sometimes', 'boolean'],
             'items'           => ['required', 'array', 'min:1', 'max:20'],
             'items.*.slug'    => ['required', 'string', 'max:255'],
             'items.*.size'    => ['required', 'string', 'in:50ml,100ml'],
@@ -39,6 +43,8 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'phone.regex' => 'رقم الموبايل غير صحيح. مثال: 01012345678',
+            'billing_email.required' => 'أدخل البريد الإلكتروني لإتمام الدفع الإلكتروني.',
+            'billing_email.email' => 'أدخل بريداً إلكترونياً صحيحاً.',
         ];
     }
 }

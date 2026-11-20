@@ -1,25 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import Link from 'next/link';
 import { useCart } from './CartContext';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
-import { OrderError, placeOrder, type FieldErrors, type PlacedOrder } from '@/lib/orders';
+import { OrderError, placeOrder, saveCheckoutSession, type FieldErrors, type PlacedOrder } from '@/lib/orders';
 
 const inputClass =
   'min-h-11 w-full rounded-lg border border-[#40382F] bg-[#100F0E] px-3 py-2 text-base text-white placeholder:text-[#A0988C] focus:outline-none focus:border-[#C4A265]';
 const labelClass = 'mb-1 block text-sm font-medium text-[#E2D3BC]';
 
-/** Guest checkout (cash on delivery) rendered inside the cart drawer footer. */
+/** Guest checkout rendered inside the cart drawer. */
 export default function CheckoutForm({ onBack }: { onBack: () => void }) {
   const { items, totalAmount, clearCart } = useCart();
-  const { commerce } = useCatalog().site;
+  const { commerce, whatsapp_order_confirmation_available: whatsappAvailable, online_payment_available: cardAvailable } = useCatalog().site;
   const shipping = commerce.shipping_cost;
   const [form, setForm] = useState({ name: '', phone: '', governorate: '', address: '', notes: '' });
+  const [whatsappRequested, setWhatsappRequested] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
+  const [method, setMethod] = useState<'cod' | 'card'>('cod');
+  const [email, setEmail] = useState('');
+  const attempt = useRef<{ fingerprint: string; key: string } | null>(null);
+  const useCard = cardAvailable && method === 'card';
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -31,7 +37,30 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
     setErrors({});
     setFormError(null);
     try {
-      const order = await placeOrder({ ...form, notes: form.notes || undefined }, items);
+      const details = {
+        ...form,
+        notes: form.notes || undefined,
+        whatsapp_confirmation_requested: !useCard && whatsappAvailable && whatsappRequested,
+      };
+
+      if (useCard) {
+        const fingerprint = JSON.stringify([details, email, items]);
+        if (attempt.current?.fingerprint !== fingerprint) {
+          attempt.current = { fingerprint, key: crypto.randomUUID() };
+        }
+        const order = await placeOrder({
+          ...details,
+          payment_method: 'card',
+          billing_email: email,
+          checkout_key: attempt.current.key,
+        }, items);
+        const key = order.checkoutKey ?? attempt.current.key;
+        saveCheckoutSession(key, { items, url: order.checkoutUrl ?? null });
+        window.location.assign(order.checkoutUrl ?? '/payment/result?token=' + key);
+        return;
+      }
+
+      const order = await placeOrder(details, items);
       clearCart();
       setPlaced(order);
     } catch (err) {
@@ -64,12 +93,12 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
   const fieldError = (key: string) =>
     errors[key]?.[0] ? <div id={`checkout-error-${key}`} className="mt-1 text-sm text-red-400">{errors[key][0]}</div> : null;
   const itemError = Object.entries(errors).find(([key]) => key === 'items' || key.startsWith('items.'))?.[1][0];
-  const hasDeliveryError = Object.keys(form).some((key) => errors[key]?.length);
+  const hasFieldError = [...Object.keys(form), 'billing_email'].some((key) => errors[key]?.length);
 
   return (
     <form onSubmit={submit} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))]" noValidate>
-      <button type="button" onClick={onBack} className="min-h-11 text-sm text-[#ECC480] hover:underline">
-        ← رجوع للسلة
+      <button type="button" onClick={onBack} disabled={submitting} className="min-h-11 text-sm text-[#ECC480] hover:underline">
+        رجوع للسلة
       </button>
 
       <div>
@@ -81,6 +110,17 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
         <label className={labelClass} htmlFor="checkout-phone">رقم الموبايل</label>
         <input id="checkout-phone" className={inputClass} type="tel" autoComplete="tel" dir="ltr" value={form.phone} onChange={set('phone')} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? 'checkout-error-phone' : undefined} required />
         {fieldError('phone')}
+        {whatsappAvailable && !useCard && (
+          <label className="mt-1 flex min-h-11 items-center gap-2 text-sm text-[#E2D3BC]">
+            <input
+              type="checkbox"
+              className="size-4 shrink-0 accent-[#C4A265]"
+              checked={whatsappRequested}
+              onChange={(e) => setWhatsappRequested(e.target.checked)}
+            />
+            أوافق على استلام تأكيد الطلب من ORQ على واتساب
+          </label>
+        )}
       </div>
       <div>
         <label className={labelClass} htmlFor="checkout-governorate">المحافظة</label>
@@ -103,8 +143,29 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
         {fieldError('notes')}
       </div>
 
+      {cardAvailable && (
+        <fieldset className="space-y-2">
+          <legend className={labelClass}>طريقة الدفع</legend>
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-[#40382F] px-3 text-sm">
+            <input className="accent-[#C4A265]" type="radio" name="payment-method" checked={method === 'cod'} onChange={() => setMethod('cod')} />
+            الدفع عند الاستلام
+          </label>
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-[#40382F] px-3 text-sm">
+            <input className="accent-[#C4A265]" type="radio" name="payment-method" checked={method === 'card'} onChange={() => setMethod('card')} />
+            الدفع الإلكتروني بالبطاقة عبر Paymob
+          </label>
+        </fieldset>
+      )}
+      {useCard && (
+        <div>
+          <label className={labelClass} htmlFor="checkout-email">البريد الإلكتروني للفوترة</label>
+          <input id="checkout-email" className={inputClass} type="email" dir="ltr" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} aria-invalid={!!errors.billing_email} aria-describedby={errors.billing_email ? 'checkout-error-billing_email' : undefined} required />
+          {fieldError('billing_email')}
+        </div>
+      )}
+
       <div role="alert" className="text-sm text-red-400 empty:hidden">
-        {itemError ?? (hasDeliveryError ? 'راجع البيانات الموضّحة في الحقول.' : formError)}
+        {itemError ?? (hasFieldError ? 'راجع البيانات الموضّحة في الحقول.' : formError)}
       </div>
 
       <div className="space-y-2 border-t border-[#221F1C] pt-3">
@@ -112,7 +173,10 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
           <span>الإجمالي</span>
           <span className="text-[#ECC480]">{formatPrice(totalAmount + shipping)} {commerce.currency}</span>
         </div>
-        <p className="text-xs text-[#B9B1A5]">{commerce.payment_note} · {shipping === 0 ? commerce.shipping_free_label : `الشحن ${formatPrice(shipping)} ${commerce.currency}`}</p>
+        <p className="text-sm text-[#B9B1A5]">{useCard ? 'هتكمل الدفع على صفحة Paymob.' : commerce.payment_note} · {shipping === 0 ? commerce.shipping_free_label : 'الشحن ' + formatPrice(shipping) + ' ' + commerce.currency}</p>
+        <p className="text-sm leading-6 text-[#B9B1A5]">
+          بإتمام الطلب توافق على <Link className="text-[#ECC480] underline" href="/pages/terms" target="_blank">الشروط والأحكام</Link>. اطّلع على <Link className="text-[#ECC480] underline" href="/pages/privacy-policy" target="_blank">سياسة الخصوصية</Link>.
+        </p>
       </div>
 
       <button
@@ -120,7 +184,7 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
         disabled={submitting}
         className="gold-button block min-h-11 w-full rounded-lg px-3 py-2 text-sm disabled:opacity-60"
       >
-        {submitting ? 'جاري إرسال الطلب…' : 'تأكيد الطلب'}
+        {submitting ? 'جاري إرسال الطلب…' : useCard ? 'متابعة إلى الدفع' : 'تأكيد الطلب'}
       </button>
     </form>
   );

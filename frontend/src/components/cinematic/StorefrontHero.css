@@ -1,0 +1,322 @@
+.orq-hero {
+  isolation: isolate;
+  border-bottom: 1px solid #3d2a1e;
+  background: radial-gradient(ellipse at 23% 38%, #332015 0%, #17100c 43%, #0a0807 82%);
+}
+
+.orq-hero-layout {
+  display: grid;
+  grid-template-areas: "headline" "stage" "details";
+  gap: 1rem;
+  padding-block: 1.35rem 1.75rem;
+}
+
+.orq-hero-headline {
+  grid-area: headline;
+  text-align: center;
+}
+
+.orq-hero-tagline {
+  color: #d7af76;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.orq-hero-title {
+  margin-block-start: 0.35rem;
+  color: #f5e8d2;
+  font-size: clamp(2rem, 6.2vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.orq-hero-intro {
+  max-width: 32rem;
+  margin: 0.5rem auto 0;
+  color: #d3c1ac;
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+
+.orq-hero-stage {
+  grid-area: stage;
+  min-width: 0;
+  width: 100%;
+  max-width: 30rem;
+  justify-self: center;
+}
+
+.orq-hero-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid #66472f;
+  border-radius: 1rem;
+  background: #0d0a09;
+  box-shadow: 0 1rem 3rem #0005;
+  touch-action: pan-y pinch-zoom;
+}
+
+.orq-hero-frame::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(180deg, transparent 72%, #090705a6);
+}
+
+.orq-hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.orq-hero-slide[data-active="true"] {
+  opacity: 1;
+}
+
+.orq-hero-bottle {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.orq-hero-spray-panel {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 0.7rem;
+  bottom: 0.7rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.orq-hero-control {
+  min-height: 2.75rem;
+  padding-inline: 0.45rem;
+  border: 1px solid #795637;
+  border-radius: 0.45rem;
+  background: #17100c;
+  color: #f2dec2;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.orq-hero-control:hover,
+.orq-hero-control[aria-expanded="true"] {
+  border-color: #d7ad74;
+  background: #332219;
+}
+
+.orq-hero-control:focus-visible,
+.orq-hero-indicator:focus-visible {
+  outline: 2px solid #ecc480;
+  outline-offset: 2px;
+}
+
+.orq-hero-spray-button {
+  flex: none;
+  background: #14100eed;
+}
+
+.orq-hero-spray-button span {
+  color: #ecc480;
+}
+
+.orq-hero-opening {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #765335;
+  border-radius: 0.45rem;
+  background: #140f0ef5;
+  color: #f5e8d2;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.orq-hero-spray {
+  position: absolute;
+  z-index: 2;
+  inset: 10% 12% 30%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 59% 58%, #fff1ce88, transparent 18%),
+    radial-gradient(ellipse at 46% 45%, #f5ca8066, transparent 33%),
+    radial-gradient(ellipse at 67% 31%, #efb66c88, transparent 36%);
+}
+
+.orq-hero-selector {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.35rem;
+  margin-block-start: 0.65rem;
+}
+
+.orq-hero-indicators {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.orq-hero-indicator {
+  display: grid;
+  flex: 1;
+  max-width: 2.75rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  place-items: center;
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+
+.orq-hero-indicator::before {
+  width: 67%;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: #74583e;
+  content: "";
+  transition: background-color 180ms ease;
+}
+
+.orq-hero-indicator:hover::before,
+.orq-hero-indicator[aria-pressed="true"]::before {
+  background: #ecc480;
+}
+
+.orq-hero-rotation {
+  display: grid;
+  width: 2.75rem;
+  padding: 0;
+  place-items: center;
+}
+
+.orq-hero-pause-icon {
+  width: 0.7rem;
+  height: 0.85rem;
+  border-inline: 0.19rem solid currentColor;
+}
+
+.orq-hero-play-icon {
+  width: 0;
+  height: 0;
+  margin-left: 0.15rem;
+  border-block: 0.43rem solid transparent;
+  border-left: 0.7rem solid currentColor;
+}
+
+.orq-hero-details {
+  grid-area: details;
+  min-width: 0;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid #63462f;
+  border-radius: 0.85rem;
+  background: linear-gradient(140deg, #20150f, #130e0c);
+}
+
+.orq-hero-name {
+  color: #f5e8d2;
+  font-family: var(--font-display), Cairo, Georgia, serif;
+  font-size: clamp(2.125rem, 4.3vw, 3.15rem);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.orq-hero-discover {
+  border: 1px solid #795637;
+  color: #f5e8d2;
+  white-space: nowrap;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.orq-hero-discover:hover {
+  border-color: #d7af76;
+  background: #332219;
+}
+
+@media (min-width: 56rem) {
+  .orq-hero-layout {
+    grid-template-areas: "headline stage" "details stage";
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    grid-template-rows: 1fr 1fr;
+    align-items: start;
+    gap: 1.25rem clamp(1.75rem, 4.7vw, 4.25rem);
+    padding-block: clamp(1.85rem, 4.1vw, 4rem);
+  }
+
+  .orq-hero-headline {
+    align-self: end;
+    text-align: start;
+  }
+
+  .orq-hero-tagline {
+    text-align: right;
+  }
+
+  .orq-hero-title {
+    margin-block-start: 0.55rem;
+    font-size: clamp(2.65rem, 4.2vw, 3.95rem);
+    line-height: 1.22;
+  }
+
+  .orq-hero-intro {
+    margin-inline: 0;
+  }
+
+  .orq-hero-details {
+    padding: 1.15rem 1.25rem 1.25rem;
+  }
+
+  .orq-hero-control {
+    padding-inline: 0.8rem;
+  }
+
+  .orq-hero-rotation {
+    padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .orq-hero-slide {
+    transform: scale(1.04);
+    transition: opacity 640ms ease, transform 920ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .orq-hero-slide[data-active="true"] {
+    transform: scale(1);
+  }
+
+  .orq-hero-product {
+    animation: orq-product-reveal 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .orq-hero-spray {
+    animation: orq-spray-mist 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orq-hero-slide[data-active="false"],
+  .orq-hero-spray {
+    visibility: hidden;
+  }
+}
+
+@keyframes orq-product-reveal {
+  from { opacity: 0.35; transform: translateY(0.45rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orq-spray-mist {
+  0% { opacity: 0; transform: translate(12%, 13%) scale(0.4); }
+  23% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-15%, -18%) scale(1.6); }
+}

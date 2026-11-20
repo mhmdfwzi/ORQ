@@ -127,3 +127,18 @@ body:has(.cart-dialog[open]) {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .storefront-card-enter {
+    animation: storefront-card-enter 360ms ease-out both;
+  }
+
+  .storefront-card-enter:nth-child(even) {
+    animation-delay: 55ms;
+  }
+
+  @keyframes storefront-card-enter {
+    from { opacity: 0.55; translate: 0 0.4rem; }
+    to { opacity: 1; translate: 0 0; }
+  }
+}

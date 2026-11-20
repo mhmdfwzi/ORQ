@@ -11,6 +11,17 @@ export interface SiteSettings {
   name: string;
   tagline: string;
   motto: string;
+  whatsapp_order_confirmation_available?: boolean;
+  online_payment_available?: boolean;
+  contact?: {
+    contact_phone?: string;
+    contact_phone_2?: string;
+    whatsapp_number?: string;
+    contact_email?: string;
+    contact_email_2?: string;
+    contact_address?: string;
+    working_hours?: string;
+  };
   seo: {
     title_default: string;
     title_template: string;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { getCatalog } from '@/lib/catalog';
+import { SITE_SHARE_IMAGE, SITE_URL as baseUrl } from '@/lib/site-url';
 
 export default async function JsonLd() {
   const { products: PRODUCTS, site } = await getCatalog();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://orq.mhmdfwzi.com';
   const fullName = `${site.name} ${site.tagline}`;
   const { minPrice, maxPrice } = site.stats;
 
@@ -53,7 +53,7 @@ export default async function JsonLd() {
         '@id': `${baseUrl}/#store`,
         name: `${fullName} Store`,
         url: baseUrl,
-        image: `${baseUrl}/og-image.jpg`,
+        image: new URL(SITE_SHARE_IMAGE, baseUrl).href,
         priceRange: minPrice !== null && maxPrice !== null ? `${minPrice} - ${maxPrice} EGP` : undefined,
         currenciesAccepted: 'EGP',
         paymentAccepted: 'Cash on Delivery, Credit Card',
@@ -70,7 +70,7 @@ export default async function JsonLd() {
               '@type': 'Product',
               name: `${product.name} (${product.arabicName})`,
               description: product.description,
-              image: `${baseUrl}${product.image}`,
+              image: product.image ? new URL(product.image, baseUrl).href : undefined,
               sku: product.slug,
               brand: {
                 '@type': 'Brand',
@@ -81,7 +81,7 @@ export default async function JsonLd() {
                 price: product.variants[product.variants.length - 1]?.price,
                 priceCurrency: 'EGP',
                 availability: 'https://schema.org/InStock',
-                url: new URL(`/products/${product.slug}`, baseUrl).href,
+                url: new URL('/products/' + (product.pageSlug ?? product.slug), baseUrl).href,
               },
             },
             position: index + 1,

@@ -29,9 +29,10 @@ return [
     ],
     
     'paymob' => [
-        'api_key' => env('PAYMOB_API_KEY'),
+        'enabled' => env('PAYMOB_ENABLED', false),
+        'secret_key' => env('PAYMOB_SECRET_KEY'),
+        'public_key' => env('PAYMOB_PUBLIC_KEY'),
         'integration_id' => env('PAYMOB_INTEGRATION_ID'),
-        'iframe_id' => env('PAYMOB_IFRAME_ID'),
         'hmac_secret' => env('PAYMOB_HMAC_SECRET'),
     ],
 
@@ -46,6 +47,13 @@ return [
         'instance' => env('ULTRAMSG_INSTANCE'),
         'token' => env('ULTRAMSG_TOKEN'),
         'admin_phone' => env('ADMIN_WHATSAPP'),
+    ],
+
+    'whatsapp' => [
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'access_token' => env('WHATSAPP_ACCESS_TOKEN'),
+        'graph_version' => env('WHATSAPP_GRAPH_VERSION', 'v27.0'),
+        'order_template' => env('WHATSAPP_ORDER_TEMPLATE', 'orq_order_received'),
     ],
 
     // Social Login - Google

@@ -8,18 +8,19 @@ import { formatPrice } from '@/lib/format';
 
 interface ProductCardProps {
   product: Product;
+  showScentType?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, showScentType = false }: ProductCardProps) {
   const { addToCart } = useCart();
   const { commerce } = useCatalog().site;
   const variant = product.variants.find((v) => v.size === '100ml' && v.inStock)
     ?? product.variants.find((v) => v.inStock)
     ?? product.variants[0];
-  const href = `/products/${product.slug}`;
+  const href = '/products/' + (product.pageSlug ?? product.slug);
 
   return (
-    <article className="group flex h-full min-w-0 flex-col rounded-xl border border-[#2B2723] bg-[#12100E] p-2 transition hover:border-[#C4A265]/60 sm:p-3">
+    <article className={`group flex h-full min-w-0 flex-col rounded-xl border border-[#35291E] bg-[#16110E] p-2 transition hover:border-[#C4A265]/60 motion-safe:hover:-translate-y-1 sm:p-3 ${showScentType ? 'storefront-card-enter' : ''}`}>
       <Link href={href} className="block flex-1 rounded-lg focus-visible:outline-[#ECC480]">
         <div className="relative aspect-square overflow-hidden rounded-lg bg-[#1A1714]">
           {product.image && (
@@ -31,7 +32,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h3 className="mt-2 text-sm font-bold leading-snug break-words text-white group-hover:text-[#ECC480] sm:text-base">
           <bdi>{product.name}</bdi>
         </h3>
-        {product.arabicName && product.arabicName !== product.name && (
+        {showScentType && product.scentType ? (
+          <p className="mt-1 text-xs leading-relaxed text-[#CDBA9F]">{product.scentType}</p>
+        ) : product.arabicName && product.arabicName !== product.name && (
           <p className="mt-0.5 text-xs text-[#B9B1A5]">{product.arabicName}</p>
         )}
       </Link>
