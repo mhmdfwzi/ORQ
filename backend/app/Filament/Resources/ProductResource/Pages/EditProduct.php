@@ -10,6 +10,13 @@ class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['images'] = $this->getRecord()->galleryPaths();
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

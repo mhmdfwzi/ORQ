@@ -20,6 +20,8 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $gallery = array_map($this->imageUrl(...), $this->resource->galleryPaths());
+
         return [
             'slug'                => $this->slug,
             'name'                => $this->name,
@@ -39,7 +41,8 @@ class ProductResource extends JsonResource
             'variants'            => ProductVariantResource::collection(
                 $this->whenLoaded('variants')
             ),
-            'image'               => $this->resolveImage(),
+            'image'               => $gallery[0] ?? null,
+            'gallery'             => $gallery,
             'isBestSeller'        => (bool) $this->is_best_seller,
             'isNew'               => (bool) $this->is_new,
         ];
@@ -52,15 +55,8 @@ class ProductResource extends JsonResource
      * unchanged; files uploaded via Filament (storage paths) become absolute
      * URLs on the public disk.
      */
-    private function resolveImage(): ?string
+    private function imageUrl(string $path): string
     {
-        $path = $this->primaryImage?->image_path
-            ?? (is_array($this->images) ? ($this->images[0] ?? null) : null);
-
-        if (!$path) {
-            return null;
-        }
-
         if (str_starts_with($path, '/') || preg_match('#^https?://#i', $path)) {
             return $path;
         }

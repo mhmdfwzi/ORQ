@@ -10,10 +10,15 @@ export function getProductEditorial(slug: string) {
 export function withProductEditorial(product: Product): Product {
   const editorial = getProductEditorial(product.slug);
   const sourcePhotos = editorial?.photos ?? (product.slug === 'bundle-gift-box' ? ['/media/orq/catalog/bundle-gift-box-1.webp'] : []);
-  const legacyImage = !product.image || product.image === '/media/orq/' + product.slug + '.webp'
-    || (editorial?.old_slug && product.image === '/media/orq/' + editorial.old_slug + '.webp');
-  const image = legacyImage ? sourcePhotos[0] ?? product.image : product.image;
-  const gallery = [...new Set([image, ...sourcePhotos].filter(Boolean))];
+  const isLegacyImage = (photo: string) => photo === `/media/orq/${product.slug}.webp`
+    || (editorial?.old_slug && photo === `/media/orq/${editorial.old_slug}.webp`);
+  const useSourcePhotos = !product.image || isLegacyImage(product.image);
+  const image = useSourcePhotos ? sourcePhotos[0] ?? product.image : product.image;
+  const gallery = [...new Set([
+    image,
+    ...(product.gallery ?? []).map((photo) => isLegacyImage(photo) ? sourcePhotos[0] ?? photo : photo),
+    ...(useSourcePhotos ? sourcePhotos : []),
+  ].filter(Boolean))];
 
   if (!editorial) return { ...product, image, gallery };
 

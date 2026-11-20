@@ -25,6 +25,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -93,6 +94,8 @@ class ProductResource extends Resource
                         Section::make('Gallery')
                             ->schema([
                                 FileUpload::make('images')
+                                    ->label('صور المنتج')
+                                    ->helperText('اسحب الصور لتغيير ترتيبها. الصورة الأولى هي اللي بتظهر في كارت المنتج.')
                                     ->multiple()
                                     ->disk('public')
                                     ->directory('products')
@@ -103,7 +106,23 @@ class ProductResource extends Resource
                                     ->visibility('public')
                                     ->openable()
                                     ->downloadable()
-                                    ->previewable(false),
+                                    // Bundled storefront images are outside the upload disk.
+                                    ->fetchFileInformation(false)
+                                    ->getUploadedFileUsing(static function (FileUpload $component, string $file): ?array {
+                                        $disk = $component->getDisk();
+                                        $uploaded = ! str_starts_with($file, '/') && ! preg_match('#^https?://#i', $file);
+
+                                        if ($uploaded && ! $disk->exists($file)) {
+                                            return null;
+                                        }
+
+                                        return [
+                                            'name' => basename(parse_url($file, PHP_URL_PATH) ?: $file),
+                                            'size' => $uploaded ? $disk->size($file) : 0,
+                                            'type' => $uploaded ? $disk->mimeType($file) : 'application/octet-stream',
+                                            'url' => static::dashboardImageUrl($file),
+                                        ];
+                                    }),
                             ]),
                         
                         Section::make('تفاصيل العطر')
@@ -247,17 +266,9 @@ class ProductResource extends Resource
                     ->disk('public')
                     ->visibility('public')
                     ->state(function (Product $record): ?string {
-                        $path = $record->images[0] ?? null;
+                        $path = $record->galleryPaths()[0] ?? null;
 
-                        if (! is_string($path) || $path === '') {
-                            return null;
-                        }
-
-                        if (str_starts_with($path, '/media/')) {
-                            return rtrim(config('app.frontend_url'), '/') . $path;
-                        }
-
-                        return $path;
+                        return $path === null ? null : static::dashboardImageUrl($path);
                     })
                     ->circular(),
                 
@@ -337,6 +348,19 @@ class ProductResource extends Resource
         return [
             VariantsRelationManager::class,
         ];
+    }
+
+    private static function dashboardImageUrl(string $path): string
+    {
+        if (str_starts_with($path, '/media/')) {
+            return rtrim(config('app.frontend_url'), '/') . $path;
+        }
+
+        if (preg_match('#^https?://#i', $path)) {
+            return $path;
+        }
+
+        return str_starts_with($path, '/') ? url($path) : Storage::disk('public')->url($path);
     }
 
     public static function getPages(): array

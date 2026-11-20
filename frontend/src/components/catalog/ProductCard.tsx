@@ -39,21 +39,28 @@ export default function ProductCard({ product, showScentType = false }: ProductC
         )}
       </Link>
 
-      {variant && (
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 text-xs">
-          <span className="font-bold text-[#ECC480]">{formatPrice(variant.price)} {commerce.currency}</span>
-          <span className="text-[#B9B1A5]">{parseInt(variant.size, 10)} مل</span>
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={() => variant && addToCart(product, variant.size)}
-        disabled={!variant?.inStock}
-        aria-label={variant?.inStock ? `أضف ${product.name} للسلة` : undefined}
-        className="gold-button mt-2 min-h-11 w-full rounded-lg px-1 py-2 text-xs disabled:opacity-60 sm:text-sm"
-      >
-        {variant?.inStock ? 'أضف للسلة' : 'غير متوفر'}
-      </button>
+      <div className="mt-2 flex min-h-11 items-center justify-between gap-1.5">
+        {variant && (
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs">
+            <span className="font-bold text-[#ECC480]">{formatPrice(variant.price)} {commerce.currency}</span>
+            <span className="whitespace-nowrap text-[#B9B1A5]">{parseInt(variant.size, 10)} مل</span>
+          </div>
+        )}
+        {variant?.inStock ? (
+          <button
+            type="button"
+            onClick={() => addToCart(product, variant.size)}
+            aria-label={`أضف ${product.name} للسلة`}
+            className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-[#C4A265]/45 bg-[#C4A265]/10 text-[#ECC480] transition-colors hover:border-[#ECC480] hover:bg-[#ECC480] hover:text-[#16110E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ECC480] active:bg-[#C4A265] active:text-[#16110E]"
+          >
+            <svg aria-hidden="true" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14l2 13H3L5 8Zm4 2V6a3 3 0 0 1 6 0v4m-5 5h4m-2-2v4" />
+            </svg>
+          </button>
+        ) : (
+          <span className="ms-auto text-end text-[11px] text-[#B9B1A5]">غير متوفر</span>
+        )}
+      </div>
     </article>
   );
 }

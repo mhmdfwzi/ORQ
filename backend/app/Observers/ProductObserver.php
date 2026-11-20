@@ -24,10 +24,13 @@ class ProductObserver
     private function revalidate(): void
     {
         try {
-            $url = config('app.frontend_url', 'http://localhost:3000') . '/api/revalidate';
-            Http::timeout(3)->withHeaders([
+            $url = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/') . '/api/revalidate';
+            $response = Http::timeout(3)->withHeaders([
                 'x-revalidate-token' => config('app.revalidate_secret'),
             ])->post($url);
+            if ($response->failed()) {
+                Log::warning('Frontend revalidation failed', ['status' => $response->status()]);
+            }
         } catch (\Exception $e) {
             Log::warning('Frontend revalidation failed: ' . $e->getMessage());
         }

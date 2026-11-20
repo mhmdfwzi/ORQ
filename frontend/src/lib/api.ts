@@ -9,7 +9,7 @@ import { getProductEditorial, withProductEditorial } from '@/lib/product-editori
  *
  * Every function uses the Next 16 `'use cache'` directive and the shared
  * `products` tag. Filament triggers `POST /api/revalidate` after any product
- * change, which calls `revalidateTag('products', 'max')` so edits go live
+ * change, which expires the `products` tag so edits go live
  * without a rebuild.
  */
 const API_URL = process.env.API_URL ?? 'http://127.0.0.1:8001/api/v1';

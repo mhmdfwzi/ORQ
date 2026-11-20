@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
   }
 
-  revalidateTag('products', 'max');
+  revalidateTag('products', { expire: 0 });
   revalidateTag('brand', 'max');
   revalidateTag('site', 'max');
   return NextResponse.json({ revalidated: true, now: Date.now() });

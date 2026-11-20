@@ -108,6 +108,18 @@ class Product extends Model
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
 
+    /** @return list<string> */
+    public function galleryPaths(): array
+    {
+        if (is_array($this->images)) {
+            return array_values(array_filter($this->images, fn ($path) => is_string($path) && filled($path)));
+        }
+
+        $primary = $this->primaryImage?->image_path;
+
+        return filled($primary) ? [$primary] : [];
+    }
+
     /**
      * Get reviews
      */
