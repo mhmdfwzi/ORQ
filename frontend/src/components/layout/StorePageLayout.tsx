@@ -3,19 +3,28 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
-export default function StorePageLayout({ title, intro, sidebar, children }: {
+const articleDate = new Intl.DateTimeFormat('ar-EG', { dateStyle: 'long', timeZone: 'Africa/Cairo' });
+
+export default function StorePageLayout({ title, intro, sidebar, children, publishedOn, loading = false }: {
   title: string;
   intro?: string;
   sidebar?: ReactNode;
   children: ReactNode;
+  publishedOn?: string;
+  loading?: boolean;
 }) {
+  const Heading = loading ? 'p' : 'h1';
+
   return (
     <div id="top">
       <Header />
       <div className="border-b border-[#493321] bg-[radial-gradient(ellipse_at_top_right,#352218,#15100d_59%,#0b0908)]">
         <div className="mx-auto max-w-6xl px-5 pt-5 pb-10 sm:px-8 sm:pb-14 sm:pt-8">
           <Link href="/" className="inline-flex min-h-11 items-center text-sm text-[#D7AF76] hover:underline">الرئيسية</Link>
-          <h1 className="mt-3 text-3xl font-bold leading-tight text-[#F4E7D5] sm:text-5xl">{title}</h1>
+          <Heading className="mt-3 text-3xl font-bold leading-tight text-[#F4E7D5] sm:text-5xl">{title}</Heading>
+          {publishedOn && (
+            <time dateTime={publishedOn} className="mt-3 block text-sm text-[#D7AF76]">{articleDate.format(new Date(publishedOn))}</time>
+          )}
           {intro && <p className="mt-4 max-w-2xl text-base leading-8 text-[#D2C3AF] sm:text-lg">{intro}</p>}
         </div>
       </div>

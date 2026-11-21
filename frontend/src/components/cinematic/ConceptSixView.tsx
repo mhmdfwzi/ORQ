@@ -9,7 +9,7 @@ import ScentPyramid from '@/components/cinematic/ScentPyramid';
 import BrandStory from '@/components/cinematic/BrandStory';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import { useCatalog } from '@/components/catalog/CatalogContext';
-import { ScentMood } from '@/types/product';
+import type { Product, ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import { formatPrice } from '@/lib/format';
 
@@ -28,6 +28,7 @@ function HeroSection() {
   const [activeHero, setActiveHero] = useState(0);
   const heroes = [heroProduct, secondHero].filter(Boolean);
   const current = heroes[activeHero] ?? heroProduct;
+  const currentVariant = current.variants.find((item) => item.size === '50ml');
 
   // Auto-rotate hero products
   useEffect(() => {
@@ -91,7 +92,8 @@ function HeroSection() {
 
             <div className="flex items-center gap-6 pt-2">
               <button
-                onClick={() => addToCart(current, '100ml')}
+                disabled={!currentVariant?.inStock}
+                onClick={() => addToCart(current, '50ml')}
                 className="gold-button px-8 py-4 rounded-full text-sm font-bold flex items-center gap-2 min-h-[48px]"
               >
                 <span>اطلب الآن</span>
@@ -99,9 +101,9 @@ function HeroSection() {
               </button>
               <div className="text-right">
                 <span className="block text-2xl font-bold text-[#ECC480] font-mono">
-                  {formatPrice(current.variants[1]?.price ?? current.variants[0]?.price ?? 0)} ج.م
+                  {currentVariant ? `${formatPrice(currentVariant.price)} ج.م` : 'غير متوفر'}
                 </span>
-                <span className="text-xs text-zinc-500">100 ML • EDP</span>
+                <span className="text-xs text-zinc-500">50 ML • EDP</span>
               </div>
             </div>
 
@@ -257,9 +259,9 @@ function EditorialGrid() {
   );
 }
 
-function EditorialCard({ product, variant }: { product: any; variant: 'large' | 'compact' }) {
+function EditorialCard({ product, variant }: { product: Product; variant: 'large' | 'compact' }) {
   const { addToCart } = useCart();
-  const defaultVariant = product.variants.find((v: any) => v.size === '100ml') || product.variants[0];
+  const defaultVariant = product.variants.find((item) => item.size === '50ml');
 
   if (variant === 'large') {
     return (
@@ -277,10 +279,11 @@ function EditorialCard({ product, variant }: { product: any; variant: 'large' | 
           <p className="text-xs text-zinc-400 line-clamp-2">{product.description}</p>
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-[#ECC480] font-mono">
-              {formatPrice(defaultVariant.price)} ج.م
+              {defaultVariant ? `${formatPrice(defaultVariant.price)} ج.م` : 'غير متوفر'}
             </span>
             <button
-              onClick={() => addToCart(product, '100ml')}
+              disabled={!defaultVariant?.inStock}
+              onClick={() => addToCart(product, '50ml')}
               className="gold-button px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 min-h-[40px]"
             >
               <span>اطلب</span>
@@ -306,10 +309,11 @@ function EditorialCard({ product, variant }: { product: any; variant: 'large' | 
         <p className="text-[11px] text-zinc-500">{product.scentType}</p>
         <div className="flex items-center justify-between pt-1">
           <span className="text-sm font-bold text-[#ECC480] font-mono">
-            {formatPrice(defaultVariant.price)} ج.م
+            {defaultVariant ? `${formatPrice(defaultVariant.price)} ج.م` : 'غير متوفر'}
           </span>
           <button
-            onClick={() => addToCart(product, '100ml')}
+            disabled={!defaultVariant?.inStock}
+            onClick={() => addToCart(product, '50ml')}
             className="text-xs text-[#C4A265] hover:text-white transition font-medium"
           >
             أضف للسلة ←

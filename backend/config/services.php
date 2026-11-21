@@ -60,7 +60,7 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('APP_URL') . '/auth/google/callback',
+        'redirect' => env('GOOGLE_REDIRECT_URI') ?: rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/') . '/api/v1/account/google/callback',
     ],
 
     // Social Login - Facebook

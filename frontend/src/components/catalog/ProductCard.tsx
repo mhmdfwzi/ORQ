@@ -14,9 +14,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, showScentType = false }: ProductCardProps) {
   const { addToCart } = useCart();
   const { commerce } = useCatalog().site;
-  const variant = product.variants.find((v) => v.size === '100ml' && v.inStock)
-    ?? product.variants.find((v) => v.inStock)
-    ?? product.variants[0];
+  const variant = product.variants.find((item) => item.size === '50ml');
   const href = '/products/' + (product.pageSlug ?? product.slug);
 
   return (

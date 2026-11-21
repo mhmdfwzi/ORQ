@@ -37,7 +37,7 @@ class OrderService
                 $variant = $product
                     ? ProductVariant::where('product_id', $product->id)
                         ->where('size', $line['size'])
-                        ->where('is_active', true)
+                        ->forSale()
                         ->lockForUpdate()
                         ->first()
                     : null;

@@ -61,9 +61,7 @@ export default function SeamlessCinematicHero() {
   const product = slides[activeIndex];
   if (!product) return null;
 
-  const variant = product.variants.find((item) => item.size === '100ml' && item.inStock)
-    ?? product.variants.find((item) => item.inStock)
-    ?? product.variants[0];
+  const variant = product.variants.find((item) => item.size === '50ml');
 
   function selectSlide(index: number) {
     setRotation(false);

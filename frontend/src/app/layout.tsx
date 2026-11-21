@@ -7,6 +7,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import { CatalogProvider } from '@/components/catalog/CatalogContext';
 import { getCatalog } from '@/lib/catalog';
 import { SITE_SHARE_IMAGE, SITE_URL } from '@/lib/site-url';
+import { siteGraph } from '@/lib/structured-data';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -38,7 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     title: { default: seo.title_default, template: seo.title_template },
     description: seo.description,
-    keywords: seo.keywords,
     authors: [{ name: site.name, url: SITE_URL }],
     creator: site.name,
     publisher: site.name,
@@ -103,7 +103,7 @@ export default async function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${cormorant.variable}`}>
       <head>
-        <JsonLd />
+        <JsonLd data={siteGraph(site)} />
       </head>
       <body className="bg-[#0B0B0B] text-[#F2EBDD] min-h-screen selection:bg-[#C4A265] selection:text-black">
         <CatalogProvider products={products} giftBundle={giftBundle} brand={brand} site={site}>

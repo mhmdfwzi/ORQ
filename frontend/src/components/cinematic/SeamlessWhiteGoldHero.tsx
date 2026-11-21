@@ -9,6 +9,7 @@ export default function SeamlessWhiteGoldHero() {
   const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
   const heroProduct = PRODUCTS.find((p) => p.isBestSeller) ?? PRODUCTS[0];
+  const variant = heroProduct.variants.find((item) => item.size === '50ml');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [isRevealing, setIsRevealing] = useState(false);
@@ -139,7 +140,7 @@ export default function SeamlessWhiteGoldHero() {
               {/* Flacon with Soft Dissolve */}
               <img
                 src={heroProduct.image}
-                alt="ORQ Royal Oud Luxury Flacon - White Edition"
+                alt={`عطر ${heroProduct.name} من ORQ`}
                 className="w-full h-full object-contain filter contrast-105 drop-shadow-[0_20px_45px_rgba(140,105,45,0.25)] rounded-2xl"
                 style={{
                   maskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 80%, transparent 100%)',
@@ -180,25 +181,26 @@ export default function SeamlessWhiteGoldHero() {
                 )}
               </h1>
               <p className="text-xs sm:text-sm text-[#575147] font-medium leading-relaxed">
-                حضورك له أثر لا يمحى من الذاكرة • خلاصة العود الكمبودي والجلود الإيطالية بتركيز نيش مكثف
+                حضورك له أثر لا يمحى من الذاكرة • خلاصات منتقاة بعناية
               </p>
             </div>
 
             {/* Price & Stock Status */}
             <div className="pt-1 flex items-baseline justify-center sm:justify-start gap-3">
               <span className="text-2xl sm:text-4xl font-extrabold text-[#80581B] font-mono whitespace-nowrap">
-                {formatPrice(heroProduct.variants[1].price)} ج.م
+                {variant ? `${formatPrice(variant.price)} ج.م` : 'غير متوفر'}
               </span>
-              <span className="text-xs text-[#7A7369] font-mono font-semibold">100 ML • EDP</span>
-              <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="text-xs text-[#7A7369] font-mono font-semibold">50 ML • EDP</span>
+              {variant?.inStock && <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 ● متوفر بالمخزون
-              </span>
+              </span>}
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
               <button
-                onClick={() => addToCart(heroProduct, '100ml')}
+                disabled={!variant?.inStock}
+                onClick={() => addToCart(heroProduct, '50ml')}
                 className="bg-gradient-to-r from-[#C4A265] via-[#B38734] to-[#996515] text-white text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-xl shadow-[#A37B34]/25 hover:brightness-105 hover:scale-103 transition-transform flex items-center gap-2 min-h-[44px]"
               >
                 <span>أضف للسلة الآن</span>

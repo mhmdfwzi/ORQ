@@ -3,12 +3,16 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import StorePageLayout from '@/components/layout/StorePageLayout';
 import articles from '@/data/blog-articles.json';
+import { sharingMetadata } from '@/lib/sharing';
+
+const title = 'مدونة ORQ';
+const description = 'دليلك لاختيار العطر الرجالي ودمج العطور واستخدامها في مختلف المناسبات.';
 
 export const metadata: Metadata = {
-  title: 'مدونة ORQ',
-  description: 'دليلك لاختيار العطر الرجالي ودمج العطور واستخدامها في مختلف المناسبات.',
+  title: { absolute: title },
+  description,
   alternates: { canonical: '/blog' },
-  openGraph: { title: 'مدونة ORQ', url: '/blog' },
+  ...sharingMetadata({ title, description, url: '/blog' }),
 };
 
 export default function BlogPage() {

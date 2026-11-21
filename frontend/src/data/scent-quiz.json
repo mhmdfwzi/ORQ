@@ -1,0 +1,61 @@
+{
+  "title": "اختار شفرتك",
+  "intro": "4 أسئلة سريعة، ونرشحلك عطر ORQ اللي يشبهك.",
+  "weights": {"occasion": 2, "taste": 3, "season": 1, "intensity": 1.5},
+  "questions": [
+    {
+      "id": "occasion",
+      "q": "هتستخدم العطر ده في إيه أكتر؟",
+      "options": [
+        {"id": "daily", "label": "اليوم العادي والشغل"},
+        {"id": "night", "label": "السهرات والخروجات"},
+        {"id": "events", "label": "المناسبات والأعياد"},
+        {"id": "sport", "label": "الرياضة والحركة"},
+        {"id": "date", "label": "المواعيد واللقاءات الخاصة"}
+      ]
+    },
+    {
+      "id": "taste",
+      "q": "أنهي ريحة بتشدك أكتر؟",
+      "options": [
+        {"id": "fresh", "label": "منعشة وباردة"},
+        {"id": "clean", "label": "نظيفة ومسكية"},
+        {"id": "woody", "label": "خشبية وأنيقة"},
+        {"id": "sweet", "label": "دافية وحلوة"},
+        {"id": "oud", "label": "عود شرقي"}
+      ]
+    },
+    {
+      "id": "season",
+      "q": "هتستخدمه في أنهي موسم أكتر؟",
+      "options": [
+        {"id": "summer", "label": "الصيف"},
+        {"id": "winter", "label": "الشتا"},
+        {"id": "all", "label": "طول السنة"}
+      ]
+    },
+    {
+      "id": "intensity",
+      "q": "تحب عطرك يكون قوي قد إيه؟",
+      "options": [
+        {"id": "soft", "label": "هادي، يتشم من قريب"},
+        {"id": "medium", "label": "متوسط ومتوازن"},
+        {"id": "strong", "label": "قوي، يتشم من بعيد"}
+      ]
+    }
+  ],
+  "profiles": {
+    "chaos":     {"occasion": {"daily": 3, "night": 2, "events": 1, "sport": 1, "date": 1}, "taste": {"fresh": 2, "woody": 3, "clean": 1}, "season": {"all": 3, "summer": 2, "winter": 2}, "intensity": {"strong": 3, "medium": 2}},
+    "alpha":     {"occasion": {"daily": 3, "sport": 2, "night": 1, "date": 1}, "taste": {"fresh": 3, "sweet": 1, "woody": 1, "clean": 1}, "season": {"summer": 3, "all": 2}, "intensity": {"medium": 3, "soft": 1, "strong": 1}},
+    "dom":       {"occasion": {"night": 3, "date": 2, "events": 1}, "taste": {"sweet": 3}, "season": {"winter": 3, "all": 1}, "intensity": {"strong": 3, "medium": 1}},
+    "pompous":   {"occasion": {"night": 3, "events": 2, "date": 1, "daily": 1}, "taste": {"sweet": 3, "fresh": 1, "clean": 1}, "season": {"all": 3, "winter": 2, "summer": 1}, "intensity": {"strong": 3}},
+    "electro":   {"occasion": {"daily": 3, "sport": 3, "night": 1, "date": 1}, "taste": {"fresh": 3, "clean": 2, "sweet": 1}, "season": {"summer": 3, "all": 2}, "intensity": {"medium": 3, "soft": 1}},
+    "gigantic":  {"occasion": {"date": 3, "night": 2, "events": 1}, "taste": {"sweet": 3, "woody": 1}, "season": {"winter": 3}, "intensity": {"strong": 3, "medium": 1}},
+    "darknight": {"occasion": {"daily": 3, "events": 2, "night": 2, "date": 2}, "taste": {"woody": 3, "fresh": 2, "clean": 1}, "season": {"all": 3, "winter": 2, "summer": 1}, "intensity": {"medium": 3, "soft": 1, "strong": 1}},
+    "vigorous":  {"occasion": {"sport": 3, "daily": 3}, "taste": {"fresh": 3, "clean": 2}, "season": {"summer": 3, "all": 1}, "intensity": {"soft": 2, "medium": 2}},
+    "saint":     {"occasion": {"daily": 3, "sport": 1, "date": 1}, "taste": {"clean": 3, "fresh": 1}, "season": {"all": 3, "summer": 2, "winter": 1}, "intensity": {"soft": 3, "medium": 1}},
+    "motamared": {"occasion": {"events": 3, "daily": 2, "night": 1, "date": 1}, "taste": {"oud": 3, "woody": 2, "fresh": 1}, "season": {"all": 3, "winter": 2, "summer": 1}, "intensity": {"medium": 3, "strong": 2}},
+    "ghoroor":   {"occasion": {"events": 3, "date": 2, "night": 1}, "taste": {"oud": 3, "sweet": 2, "woody": 1}, "season": {"winter": 3, "all": 1}, "intensity": {"medium": 3, "soft": 1, "strong": 1}},
+    "kaseh":     {"occasion": {"events": 3, "night": 2, "date": 1}, "taste": {"oud": 3, "sweet": 2}, "season": {"winter": 3, "all": 1}, "intensity": {"strong": 3}}
+  }
+}

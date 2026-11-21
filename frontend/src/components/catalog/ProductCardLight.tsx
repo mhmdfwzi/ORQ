@@ -12,7 +12,7 @@ interface ProductCardProps {
 
 export default function ProductCardLight({ product }: ProductCardProps) {
   const { addToCart } = useCart();
-  const defaultVariant = product.variants.find((v) => v.size === '100ml') || product.variants[0];
+  const defaultVariant = product.variants.find((variant) => variant.size === '50ml');
 
   return (
     <div className="bg-[#FFFFFF] border border-[#EAE4D8] rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-[#C4A265] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group hover:-translate-y-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_45px_rgba(180,140,70,0.15)]">
@@ -62,12 +62,9 @@ export default function ProductCardLight({ product }: ProductCardProps) {
         {/* Pricing */}
         <div className="pt-2 flex items-baseline justify-between border-t border-[#F0ECE2] mt-2">
           <div>
-            <span className="text-xs text-[#8C8478] ml-1">100 مل:</span>
-            <span className="text-sm sm:text-base font-extrabold text-[#996515] font-mono whitespace-nowrap">
-              {formatPrice(defaultVariant.price)} ج.م
-            </span>
+            {defaultVariant && <span className="text-sm sm:text-base font-extrabold text-[#996515] font-mono whitespace-nowrap">{formatPrice(defaultVariant.price)} ج.م · 50 مل</span>}
           </div>
-          <span className="text-[10px] text-emerald-600 font-semibold">● متوفر بالمخزون</span>
+          <span className="text-[10px] text-[#7A7369] font-semibold">{defaultVariant?.inStock ? 'متوفر بالمخزون' : 'غير متوفر'}</span>
         </div>
       </div>
 
@@ -80,7 +77,8 @@ export default function ProductCardLight({ product }: ProductCardProps) {
           التفاصيل
         </Link>
         <button
-          onClick={() => addToCart(product, '100ml')}
+          disabled={!defaultVariant?.inStock}
+          onClick={() => addToCart(product, '50ml')}
           className="py-2.5 px-2 rounded-xl bg-gradient-to-r from-[#C4A265] via-[#B38734] to-[#996515] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md shadow-[#B38734]/20 hover:brightness-105 min-h-[40px]"
         >
           <span>شراء</span>

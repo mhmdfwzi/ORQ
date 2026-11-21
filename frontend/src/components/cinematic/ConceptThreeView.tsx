@@ -186,7 +186,7 @@ export default function ConceptThreeView() {
               بل ليُحفر في الوجدان كبصمة تسبق حضورك&rdquo;
             </h2>
             <p className="text-xs sm:text-sm text-[#A0988C] leading-relaxed max-w-xl mx-auto mt-4">
-              في ORQ Haute Parfumerie نؤمن أن كاريزما الرجل تبدأ من رائحته. نصنع خلطاتنا من أنقى الخلاصات العطرية لتعكس التميز والرجولة الواثقة التي لا تحتاج إلى صخب لتثبت وجودها.
+              في ORQ نؤمن أن كاريزما الرجل تبدأ من رائحته. نصنع خلطاتنا من أنقى الخلاصات العطرية لتعكس التميز والرجولة الواثقة التي لا تحتاج إلى صخب لتثبت وجودها.
             </p>
             <div className="pt-4">
               <span className="font-serif text-lg text-[#ECC480] tracking-widest">ORQ PERFUME</span>

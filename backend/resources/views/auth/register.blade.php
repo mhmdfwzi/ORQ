@@ -87,7 +87,7 @@ $pageDescription = app()->getLocale() == 'ar' ? 'إنشاء حساب جديد ف
             </div>
 
             <div class="social-login">
-                <a href="{{ route('social.redirect', 'google') }}" class="social-btn google">
+                <a href="{{ route('social.google') }}" class="social-btn google">
                     <i class="fab fa-google"></i> Google
                 </a>
                 <a href="{{ route('social.redirect', 'facebook') }}" class="social-btn facebook">

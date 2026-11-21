@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/components/cart/CartContext';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import TrustIcon from '@/components/layout/TrustIcon';
+import { collections } from '@/data/store-editorial.json';
 import './StoreMobileMenu.css';
 
 const menuIcons = {
@@ -16,9 +17,30 @@ const menuIcons = {
   brand: 'M12 3.5 19.5 12 12 20.5 4.5 12 12 3.5Zm0 5v7m-3.5-3.5h7',
   contact: 'M21 11.5a8 8 0 0 1-8.5 8H5l1.2-3A7.4 7.4 0 0 1 4 11.5a8 8 0 0 1 8.5-8 8 8 0 0 1 8.5 8ZM8.5 11.5h8m-8 3h5',
   blog: 'M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm2 5h8m-8 4h8m-8 4h5',
+  night: 'M20.9 13.2A8.8 8.8 0 0 1 10.8 3.1 9 9 0 1 0 20.9 13.2Z',
+  quiz: 'M12 2 9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2Z',
+  account: 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v2',
 };
 
 type NavigationLink = { href: string; label: string; icon: keyof typeof menuIcons | 'delivery' };
+
+const collectionIcons: Record<string, NavigationLink['icon']> = {
+  'signature-power-perfumes': 'perfume',
+  'fresh-clean-perfumes': 'notes',
+  'night-warm-perfumes': 'night',
+  'oud-perfumes': 'brand',
+};
+const blogLink: NavigationLink = { href: '/blog', label: 'المدونة', icon: 'blog' };
+const accountLink: NavigationLink = { href: '/account', label: 'حسابي', icon: 'account' };
+const supportLinks: NavigationLink[] = [
+  { href: '/pages/shipping-policy', label: 'التوصيل', icon: 'delivery' },
+  { href: '/pages/contact', label: 'تواصل معنا', icon: 'contact' },
+];
+const storeLinks: NavigationLink[] = [
+  ...collections.map(({ slug, name }) => ({ href: `/collections/${slug}`, label: name, icon: collectionIcons[slug] ?? 'perfume' })),
+  { href: '/find-your-scent', label: 'اختار شفرتك', icon: 'quiz' },
+  blogLink,
+];
 
 export default function Header() {
   const { openCart, totalItems } = useCart();
@@ -28,17 +50,17 @@ export default function Header() {
   const pathname = usePathname();
   const home = pathname?.match(/^\/preview\/concept-[12356]$/) ? pathname : '/';
   const collectionAnchor = home.endsWith('-6') ? 'collection' : home.endsWith('-3') ? 'signature-line' : 'signature';
-  const links: NavigationLink[] = [
+  const links: NavigationLink[] = home === '/' ? storeLinks : [
     { href: `${home}#${collectionAnchor}`, label: 'العطور', icon: 'perfume' },
     ...(!home.endsWith('-1') && !home.endsWith('-3') ? [{ href: `${home}#gifting`, label: 'الهدايا', icon: 'gift' as const }] : []),
     ...(home === '/' || home.endsWith('-1') || home.endsWith('-6') ? [{ href: `${home}#notes`, label: 'النفحات', icon: 'notes' as const }] : []),
-    { href: '/pages/shipping-policy', label: 'التوصيل', icon: 'delivery' },
-    { href: '/pages/contact', label: 'تواصل معنا', icon: 'contact' },
-    { href: '/blog', label: 'المدونة', icon: 'blog' },
+    blogLink,
   ];
   const mobileLinks: NavigationLink[] = [
     { href: home, label: 'الرئيسية', icon: 'home' },
+    accountLink,
     ...links,
+    ...supportLinks,
     { href: '/pages/our-story', label: 'من نحن', icon: 'brand' },
   ];
 
@@ -47,7 +69,7 @@ export default function Header() {
   }
 
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 48rem)');
+    const desktop = window.matchMedia('(min-width: 64rem)');
     const closeOnDesktop = (event: MediaQueryListEvent) => {
       if (event.matches) mobileMenu.current?.close();
     };
@@ -64,13 +86,18 @@ export default function Header() {
           <span className="font-serif text-2xl font-bold tracking-widest gold-gradient-text">{site.name}</span>
         </Link>
 
-        <nav aria-label="التنقل الرئيسي" className="hidden items-center gap-8 text-sm text-[#B9B1A5] md:flex">
+        <nav aria-label="التنقل الرئيسي" className="hidden items-center gap-4 text-sm text-[#B9B1A5] lg:flex xl:gap-7">
           {links.map(({ href, label }) => (
-            <Link key={href} href={href} className="flex min-h-11 items-center hover:text-[#ECC480]">{label}</Link>
+            <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined} className="flex min-h-11 items-center whitespace-nowrap hover:text-[#ECC480] aria-[current=page]:text-[#ECC480]">{label}</Link>
           ))}
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <Link href={accountLink.href} aria-label={accountLink.label} aria-current={pathname === accountLink.href ? 'page' : undefined} className="hidden size-11 place-items-center rounded-lg border border-[#38332D] bg-[#161412] text-[#ECC480] hover:border-[#C4A265] lg:grid">
+            <svg aria-hidden="true" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <path d={menuIcons.account} />
+            </svg>
+          </Link>
           <button
             type="button"
             onClick={openCart}
@@ -90,7 +117,7 @@ export default function Header() {
               mobileMenu.current?.showModal();
               setMobileMenuOpen(true);
             }}
-            className="flex size-11 items-center justify-center rounded-lg border border-[#2B2723] text-[#E2D3BC] hover:text-white md:hidden"
+            className="flex size-11 items-center justify-center rounded-lg border border-[#2B2723] text-[#E2D3BC] hover:text-white lg:hidden"
             aria-label="فتح القائمة"
             aria-expanded={mobileMenuOpen}
             aria-haspopup="dialog"

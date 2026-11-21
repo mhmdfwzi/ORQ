@@ -9,6 +9,7 @@ export default function CinematicAtomizerHero() {
   const { products: PRODUCTS } = useCatalog();
   const { addToCart } = useCart();
   const heroProduct = (PRODUCTS.filter((p) => p.isBestSeller)[1] ?? PRODUCTS[1] ?? PRODUCTS[0]);
+  const variant = heroProduct.variants.find((item) => item.size === '50ml');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [sprayActive, setSprayActive] = useState(false);
@@ -229,7 +230,7 @@ export default function CinematicAtomizerHero() {
             {/* Brand Tag & Title */}
             <div className="space-y-1.5">
               <span className="font-serif tracking-[0.3em] text-[#C4A265] text-xs font-bold uppercase block">
-                ORQ HAUTE PARFUMERIE
+                ORQ
               </span>
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
                 {heroProduct.name}
@@ -247,16 +248,17 @@ export default function CinematicAtomizerHero() {
             {/* Price & Status */}
             <div className="pt-1 flex items-baseline justify-center sm:justify-start gap-3">
               <span className="text-2xl sm:text-4xl font-extrabold text-[#ECC480] font-mono whitespace-nowrap">
-                {formatPrice(heroProduct.variants[1].price)} ج.م
+                {variant ? `${formatPrice(variant.price)} ج.م` : 'غير متوفر'}
               </span>
-              <span className="text-xs text-zinc-400 font-mono">100 ML • EDP</span>
-              <span className="text-xs text-emerald-400 font-semibold">● متوفر بالمخزون</span>
+              <span className="text-xs text-zinc-400 font-mono">50 ML • EDP</span>
+              {variant?.inStock && <span className="text-xs text-emerald-400 font-semibold">● متوفر بالمخزون</span>}
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
               <button
-                onClick={() => addToCart(heroProduct, '100ml')}
+                disabled={!variant?.inStock}
+                onClick={() => addToCart(heroProduct, '50ml')}
                 className="gold-button text-xs sm:text-sm px-8 py-3.5 rounded-full font-bold shadow-2xl shadow-[#C4A265]/25 hover:scale-105 transition-transform flex items-center gap-2 min-h-[44px]"
               >
                 <span>أضف للسلة الآن</span>

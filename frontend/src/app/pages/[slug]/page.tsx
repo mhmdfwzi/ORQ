@@ -6,6 +6,7 @@ import ContactForm from '@/components/layout/ContactForm';
 import StorePageLayout from '@/components/layout/StorePageLayout';
 import { getSiteSettings } from '@/lib/api';
 import { getStorePage, storePageGroups, storePages } from '@/lib/store-pages';
+import { sharingMetadata } from '@/lib/sharing';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -23,8 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: content.heading,
     description: content.description,
     alternates: { canonical: url, languages: { 'ar-EG': url, ar: url } },
-    openGraph: { title: content.heading, description: content.description, url, type: 'website' },
-    twitter: { card: 'summary', title: content.heading, description: content.description },
+    ...sharingMetadata({ title: content.heading, description: content.description, url }),
   };
 }
 
@@ -79,7 +79,7 @@ async function ContactDetails() {
 export default function StorePage({ params }: Props) {
   return (
     <Suspense fallback={
-      <StorePageLayout title="صفحات المتجر">
+      <StorePageLayout title="صفحات المتجر" loading>
         <p role="status" className="text-sm text-[#D2C3AF]">جارٍ تحميل الصفحة…</p>
       </StorePageLayout>
     }>

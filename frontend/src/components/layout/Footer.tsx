@@ -28,6 +28,7 @@ export default function Footer() {
               { href: '/#signature', label: 'تسوّق العطور' },
               { href: '/#gifting', label: 'باقات الهدايا' },
               { href: '/#notes', label: 'النفحات العطرية' },
+              { href: '/find-your-scent', label: 'اختار شفرتك' },
               { href: '/blog', label: 'مدونة ORQ' },
             ].map(({ href, label }) => (
               <Link key={href} href={href} className="flex min-h-11 items-center gap-2 text-[#EDDDC6] transition hover:text-[#ECC480]">

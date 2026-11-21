@@ -2,6 +2,12 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Models\ProductVariant;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -9,6 +15,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -22,22 +29,20 @@ class VariantsRelationManager extends RelationManager
             ->components([
                 Select::make('size')
                     ->label('المقاس')
-                    ->options([
-                        '50ml' => '50ml',
-                        '100ml' => '100ml',
-                    ])
+                    ->options([ProductVariant::STOREFRONT_SIZE => '50 مل'])
+                    ->default(ProductVariant::STOREFRONT_SIZE)
                     ->required(),
 
                 TextInput::make('price')
                     ->label('السعر')
                     ->numeric()
                     ->required()
-                    ->prefix('$'),
+                    ->prefix('ج.م'),
 
                 TextInput::make('sale_price')
                     ->label('سعر التخفيض')
                     ->numeric()
-                    ->prefix('$'),
+                    ->prefix('ج.م'),
 
                 TextInput::make('stock_quantity')
                     ->label('الكمية')
@@ -58,6 +63,7 @@ class VariantsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('size', ProductVariant::STOREFRONT_SIZE))
             ->columns([
                 Tables\Columns\TextColumn::make('size')
                     ->label('المقاس')
@@ -65,11 +71,11 @@ class VariantsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('price')
                     ->label('السعر')
-                    ->money('USD'),
+                    ->money('EGP'),
 
                 Tables\Columns\TextColumn::make('sale_price')
                     ->label('سعر التخفيض')
-                    ->money('USD'),
+                    ->money('EGP'),
 
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label('الكمية'),
@@ -78,15 +84,15 @@ class VariantsRelationManager extends RelationManager
                     ->label('نشط'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

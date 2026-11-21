@@ -2,14 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\ProductResource\Pages\EditProduct;
+use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\OnlineOrderService;
 use Database\Seeders\ORQProductSeeder;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class StorefrontCheckoutTest extends TestCase
@@ -31,6 +36,7 @@ class StorefrontCheckoutTest extends TestCase
             '2026_01_06_000011_create_settings_tables',
             '2026_01_07_000001_add_images_to_products_table',
             '2026_02_06_182700_add_offer_fields_to_products_table',
+            '2026_02_20_115200_add_arabic_description_to_products',
             '2026_11_11_224006_create_notifications_table',
             '2026_11_12_000001_add_perfume_fields_to_products_table',
             '2026_11_12_000002_create_product_variants_table',
@@ -164,6 +170,45 @@ class StorefrontCheckoutTest extends TestCase
         ])->assertNoContent();
         $this->assertDatabaseCount('orders', 1);
         $this->assertSame(2, $admin->notifications()->count());
+    }
+
+    public function test_catalogue_migration_archives_100ml_and_updates_live_copy(): void
+    {
+        $product = Product::where('slug', 'royal-oud')->firstOrFail();
+        $legacyVariant = $product->variants()->where('size', '100ml')->firstOrFail();
+        DB::table('products')->where('id', $product->id)->update(['sku' => 'ORQ-ROYAL-OUD', 'description' => 'Old copy']);
+        DB::table('product_variants')->where('id', $legacyVariant->id)->update(['is_active' => true]);
+        DB::table('settings')->updateOrInsert(['key' => 'site_settings'], ['value' => json_encode([
+            'commerce' => ['shipping_cost' => 35],
+            'footer' => ['copyright' => '© ORQ Haute Parfumerie'],
+        ]), 'group' => 'general']);
+
+        $order = $this->orderData();
+        $order['payment_method'] = 'cod';
+        $order['items'][0]['slug'] = 'royal-oud';
+        $order['items'][0]['size'] = '100ml';
+        $this->postJson('/api/v1/orders', $order)->assertUnprocessable()->assertJsonValidationErrors('items');
+
+        $migration = require database_path('migrations/2026_11_21_000001_update_orq_storefront_catalog.php');
+        $migration->up();
+
+        $this->assertFalse($legacyVariant->fresh()->is_active);
+        $this->assertSame($legacyVariant->stock_quantity, $legacyVariant->fresh()->stock_quantity);
+        $this->assertNotSame('Old copy', $product->fresh()->description);
+        $this->getJson('/api/v1/products/royal-oud')->assertOk()
+            ->assertJsonPath('data.sku', 'ORQ-MOTAMARED')
+            ->assertJsonCount(1, 'data.variants')
+            ->assertJsonPath('data.variants.0.size', '50ml');
+        $this->getJson('/api/v1/site')->assertOk()
+            ->assertJsonPath('data.footer.copyright', '© ORQ')
+            ->assertJsonPath('data.commerce.shipping_cost', 35);
+
+        $this->actingAs(User::factory()->create(['role' => 'admin', 'phone' => '01000000001']));
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        Livewire::test(VariantsRelationManager::class, [
+            'ownerRecord' => $product,
+            'pageClass' => EditProduct::class,
+        ])->assertCanNotSeeTableRecords([$legacyVariant]);
     }
 
     private function orderData(): array

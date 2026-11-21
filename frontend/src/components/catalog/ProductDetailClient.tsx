@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { Product, ProductVariant } from '@/types/product';
+import type { Product } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import ProductCard from '@/components/catalog/ProductCard';
 import { useCatalog } from '@/components/catalog/CatalogContext';
@@ -11,15 +11,13 @@ import type { ProductEditorial } from '@/lib/product-editorial';
 
 export default function ProductDetailClient({ product, editorial }: { product: Product; editorial?: ProductEditorial }) {
   const { products, site } = useCatalog();
-  const { addToCart } = useCart();
-  const defaultVariant = product.variants.find((variant) => variant.size === '100ml' && variant.inStock)
-    ?? product.variants.find((variant) => variant.inStock)
-    ?? product.variants[0];
-  const [selectedSize, setSelectedSize] = useState<ProductVariant['size'] | undefined>(defaultVariant?.size);
+  const { addToCart, addPairToCart } = useCart();
+  const selectedVariant = product.variants.find(({ size }) => size === '50ml');
   const [quantity, setQuantity] = useState(1);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [pairUnavailable, setPairUnavailable] = useState(false);
   const photos = product.gallery ?? (product.image ? [product.image] : []);
-  const selectedVariant = product.variants.find((variant) => variant.size === selectedSize) ?? defaultVariant;
+  const partner = products.find((item) => (item.pageSlug ?? item.slug) === editorial?.layering_with);
   const relatedSlugs = editorial?.related ?? [];
   const relatedProducts = products.filter((item) => relatedSlugs.includes(item.pageSlug ?? item.slug));
   const recommendations = (relatedProducts.length ? relatedProducts : products.filter((item) => item.slug !== product.slug)).slice(0, 4);
@@ -35,7 +33,7 @@ export default function ProductDetailClient({ product, editorial }: { product: P
         {photos.length > 0 && (
           <div className="space-y-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photos[photoIndex] ?? photos[0]} alt={'عطر ' + product.name + ' من ORQ'} fetchPriority="high" className="aspect-square w-full max-h-[32rem] rounded-2xl border border-[#2B2723] bg-[#14110E] object-contain" />
+            <img src={photos[photoIndex] ?? photos[0]} alt={editorial?.image_alt ?? ('عطر ' + product.name + ' من ORQ')} fetchPriority="high" className="aspect-square w-full max-h-[32rem] rounded-2xl border border-[#2B2723] bg-[#14110E] object-contain" />
             {photos.length > 1 && (
               <div className="flex flex-wrap gap-2" role="group" aria-label="صور العطر">
                 {photos.map((photo, index) => (
@@ -56,32 +54,11 @@ export default function ProductDetailClient({ product, editorial }: { product: P
             {editorial && <Link className="inline-flex min-h-11 items-center text-sm text-[#ECC480] hover:underline" href={'/collections/' + editorial.collection}>تصفّح المجموعة</Link>}
           </div>
 
-          {product.variants.length > 0 && (
-            <fieldset className="min-w-0 space-y-2">
-              <legend className="mb-2 text-sm font-bold text-white">الحجم</legend>
-              <div className="grid grid-cols-2 gap-2">
-                {product.variants.map((variant) => (
-                  <button
-                    key={variant.size}
-                    type="button"
-                    onClick={() => setSelectedSize(variant.size)}
-                    aria-pressed={selectedVariant?.size === variant.size}
-                    className={`flex min-h-11 flex-wrap items-center justify-between gap-x-2 rounded-lg border px-3 py-2 text-sm ${selectedVariant?.size === variant.size
-                      ? 'border-[#C4A265] bg-[#211B14] text-[#ECC480]'
-                      : 'border-[#332E28] bg-[#141210] text-[#E2D3BC]'}`}
-                  >
-                    <span>{parseInt(variant.size, 10)} مل</span>
-                    <span className="font-bold">{variant.inStock ? `${formatPrice(variant.price)} ${currency}` : 'نفد'}</span>
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-          )}
-
           <div className="space-y-3">
             {selectedVariant && (
               <div className="flex flex-wrap items-baseline gap-x-3">
                 <span className="text-2xl font-bold text-[#ECC480]">{formatPrice(selectedVariant.price * quantity)} {currency}</span>
+                <span className="text-sm text-[#B9B1A5]">50 مل</span>
                 {selectedVariant.compareAtPrice && selectedVariant.compareAtPrice > selectedVariant.price && (
                   <del className="text-sm text-[#A0988C]">{formatPrice(selectedVariant.compareAtPrice * quantity)} {currency}</del>
                 )}
@@ -120,6 +97,15 @@ export default function ProductDetailClient({ product, editorial }: { product: P
                     <p><strong className="text-[#ECC480]">الانتشار</strong> {editorial.when.intensity} · {editorial.when.season}</p>
                     <p><strong className="text-[#ECC480]">المناسبة</strong> {editorial.when.occasion}</p>
                     <p>{editorial.layering}</p>
+                    {partner && (
+                      <div className="space-y-2 rounded-lg border border-[#544333] p-3">
+                        <p>ادمجه مع <Link className="font-semibold text-[#ECC480] underline" href={`/products/${partner.pageSlug ?? partner.slug}`}>{partner.name}</Link></p>
+                        <button type="button" className="gold-button min-h-11 rounded-lg px-4 text-sm" onClick={() => setPairUnavailable(!addPairToCart(product, partner))}>
+                          أضف الاتنين للسلة
+                        </button>
+                        {pairUnavailable && <p role="status">العطرين مش متاحين مع بعض حاليًا.</p>}
+                      </div>
+                    )}
                   </div>
                 </details>
                 <details>

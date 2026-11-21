@@ -7,6 +7,9 @@ import ProductDetailClient from '@/components/catalog/ProductDetailClient';
 import { getProductBySlug } from '@/lib/api';
 import { getCatalog } from '@/lib/catalog';
 import { getProductEditorial } from '@/lib/product-editorial';
+import JsonLd from '@/components/seo/JsonLd';
+import { productGraph } from '@/lib/structured-data';
+import { sharingMetadata } from '@/lib/sharing';
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
@@ -28,12 +31,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     title: editorial ? { absolute: editorial.meta_title } : product.name,
     description: editorial?.meta_description ?? product.description,
     alternates: { canonical: path, languages: { 'ar-EG': path, ar: path } },
-    openGraph: {
+    ...sharingMetadata({
       title: editorial?.meta_title ?? product.name,
       description: editorial?.meta_description ?? product.description,
       url: path,
-      images: product.image ? [product.image] : undefined,
-    },
+      image: product.image,
+    }),
   };
 }
 
@@ -64,5 +67,10 @@ async function ProductContent({ params }: ProductPageProps) {
     );
   }
 
-  return <ProductDetailClient key={product.slug} product={product} editorial={getProductEditorial(product.slug)} />;
+  return (
+    <>
+      <JsonLd data={productGraph(product)} />
+      <ProductDetailClient key={product.slug} product={product} editorial={getProductEditorial(product.slug)} />
+    </>
+  );
 }

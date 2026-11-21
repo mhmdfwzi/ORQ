@@ -10,6 +10,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\StorefrontAccountController;
+use App\Http\Middleware\ShareCartCount;
 
 
 // Access Destinations API
@@ -122,14 +124,25 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Social Login Routes
+// Customer OAuth is under the Laravel API proxy, with the session and CSRF middleware of web routes.
+Route::prefix('api/v1/account')->controller(StorefrontAccountController::class)
+    ->withoutMiddleware(ShareCartCount::class)->group(function () {
+        Route::get('/session', 'session')->middleware('throttle:60,1,storefront-session');
+        Route::get('/google', 'redirectToGoogle')->middleware('throttle:12,1,storefront-google');
+        Route::get('/google/callback', 'googleCallback')->middleware('throttle:12,1,storefront-google');
+        Route::post('/logout', 'logout')->middleware('throttle:12,1,storefront-logout');
+    });
+
+Route::get('/auth/google', [StorefrontAccountController::class, 'accountPage'])->name('social.google');
+
+// Legacy Facebook sign-in.
 Route::get('/auth/{provider}', [\App\Http\Controllers\SocialAuthController::class, 'redirect'])
     ->name('social.redirect')
-    ->whereIn('provider', ['google', 'facebook']);
+    ->where('provider', 'facebook');
 
 Route::get('/auth/{provider}/callback', [\App\Http\Controllers\SocialAuthController::class, 'callback'])
     ->name('social.callback')
-    ->whereIn('provider', ['google', 'facebook']);
+    ->where('provider', 'facebook');
 
 // Complete Profile (for social users without phone)
 Route::middleware('auth')->group(function () {

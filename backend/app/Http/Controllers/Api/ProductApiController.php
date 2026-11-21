@@ -22,7 +22,7 @@ class ProductApiController extends Controller
     {
         $products = Product::published()
             ->where('is_bundle', false)
-            ->with(['variants' => fn ($q) => $q->where('is_active', true)])
+            ->with(['variants' => fn ($q) => $q->forSale()])
             ->orderBy('id')
             ->get();
 
@@ -35,7 +35,7 @@ class ProductApiController extends Controller
     public function show(string $slug): ProductResource|JsonResponse
     {
         $product = Product::published()
-            ->with(['variants' => fn ($q) => $q->where('is_active', true)])
+            ->with(['variants' => fn ($q) => $q->forSale()])
             ->where('slug', $slug)
             ->first();
 
@@ -54,7 +54,7 @@ class ProductApiController extends Controller
         $products = Product::published()
             ->where('is_bundle', false)
             ->byMood($mood)
-            ->with(['variants' => fn ($q) => $q->where('is_active', true)])
+            ->with(['variants' => fn ($q) => $q->forSale()])
             ->orderBy('id')
             ->get();
 
@@ -69,7 +69,7 @@ class ProductApiController extends Controller
         $products = Product::published()
             ->where('is_bundle', false)
             ->bestSellers()
-            ->with(['variants' => fn ($q) => $q->where('is_active', true)])
+            ->with(['variants' => fn ($q) => $q->forSale()])
             ->orderBy('id')
             ->get();
 
@@ -83,7 +83,7 @@ class ProductApiController extends Controller
     {
         $product = Product::published()
             ->bundles()
-            ->with(['variants' => fn ($q) => $q->where('is_active', true)])
+            ->with(['variants' => fn ($q) => $q->forSale()])
             ->first();
 
         if (!$product) {

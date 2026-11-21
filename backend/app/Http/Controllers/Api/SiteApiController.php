@@ -21,8 +21,7 @@ class SiteApiController extends Controller
     {
         $published = Product::published()->where('is_bundle', false);
 
-        $prices = ProductVariant::query()
-            ->where('is_active', true)
+        $prices = ProductVariant::forSale()
             ->whereIn('product_id', (clone $published)->select('id'))
             ->selectRaw('COALESCE(sale_price, price) as effective')
             ->pluck('effective');

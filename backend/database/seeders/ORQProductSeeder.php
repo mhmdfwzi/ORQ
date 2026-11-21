@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,10 +24,19 @@ class ORQProductSeeder extends Seeder
             512,
             JSON_THROW_ON_ERROR
         );
+        $approved = collect(json_decode(
+            file_get_contents(database_path('seeders/data/orq_catalog_20261121.json')),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        ))->keyBy(fn (array $item) => $item['old_slug'] ?? $item['slug']);
 
         // Skip the revalidation observer while bulk seeding.
-        Product::withoutEvents(fn () => DB::transaction(function () use ($items) {
-            foreach ($items as $i => $item) {
+        Product::withoutEvents(fn () => DB::transaction(function () use ($items, $approved) {
+            foreach ($items as $item) {
+                $copy = $approved->get($item['slug']);
+                $description = $copy ? implode("\n\n", $copy['description']) : $item['description'];
+                $sku = $copy['sku'] ?? 'ORQ-' . strtoupper($item['slug']);
                 $category = Category::firstOrCreate(
                     ['slug' => Str::slug($item['category'])],
                     ['name' => $item['category'], 'is_active' => true]
@@ -42,8 +52,10 @@ class ORQProductSeeder extends Seeder
                         'original_inspiration' => $item['originalInspiration'],
                         'brand_feel'           => $item['brandFeel'],
                         'scent_type'           => $item['scentType'],
-                        'description'          => $item['description'],
-                        'sku'                  => 'ORQ-' . strtoupper($item['slug']),
+                        'description'          => $description,
+                        'sku'                  => $sku,
+                        'meta_title'           => $copy['meta_title'] ?? null,
+                        'meta_description'     => $copy['meta_description'] ?? null,
                         'price'                => $item['variants'][0]['price'],
                         'stock_quantity'       => 100,
                         'mood'                 => $item['mood'],
@@ -68,8 +80,8 @@ class ORQProductSeeder extends Seeder
                             'price'          => $variant['compareAtPrice'] ?? $variant['price'],
                             'sale_price'     => isset($variant['compareAtPrice']) ? $variant['price'] : null,
                             'stock_quantity' => ($variant['inStock'] ?? true) ? 100 : 0,
-                            'sku'            => 'ORQ-' . strtoupper($item['slug']) . '-' . $variant['size'],
-                            'is_active'      => true,
+                            'sku'            => $sku . '-' . $variant['size'],
+                            'is_active'      => $variant['size'] === ProductVariant::STOREFRONT_SIZE,
                             'sort_order'     => $order,
                         ]
                     );

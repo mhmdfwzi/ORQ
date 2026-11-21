@@ -50,7 +50,7 @@ export default function ConceptFiveView() {
                 </p>
               </div>
               <span className="text-xs text-[#80581B] font-mono font-bold bg-[#EFE9DD] px-3 py-1 rounded-full border border-[#DDD5C5]">
-                {PRODUCTS.length} عطراً نيش معتقاً
+                {PRODUCTS.length} عطراً رجاليًا
               </span>
             </div>
           </ScrollReveal>
@@ -175,13 +175,13 @@ export default function ConceptFiveView() {
       <section className="py-20 bg-gradient-to-b from-[#F7F4EE] to-[#FAF8F5] text-center border-b border-[#E8E2D5]">
         <div className="max-w-3xl mx-auto px-4 space-y-4">
           <span className="font-serif tracking-[0.25em] text-xs text-[#80581B] uppercase block font-bold">
-            ORQ HAUTE PARFUMERIE • WHITE ATELIER
+            ORQ • WHITE ATELIER
           </span>
           <h3 className="text-2xl sm:text-3xl font-serif text-[#1C1917] leading-relaxed">
             &ldquo;حضورك له أثر لا يمحى من الذاكرة&rdquo;
           </h3>
           <p className="text-xs sm:text-sm text-[#575147] max-w-xl mx-auto leading-relaxed">
-            نقاء المكونات، وتركيزات مكثفة تدوم لأكثر من 12 ساعة لتترك انطباعاً ساحراً يليق بذوقك الرفيع.
+            خلاصات منتقاة بعناية. صُمم ليدوم معك طوال اليوم.
           </p>
         </div>
       </section>

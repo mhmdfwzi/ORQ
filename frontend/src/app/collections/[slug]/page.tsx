@@ -5,6 +5,9 @@ import ProductCard from '@/components/catalog/ProductCard';
 import StorePageLayout from '@/components/layout/StorePageLayout';
 import { getProducts } from '@/lib/api';
 import { collections } from '@/data/store-editorial.json';
+import JsonLd from '@/components/seo/JsonLd';
+import { collectionGraph } from '@/lib/structured-data';
+import { sharingMetadata } from '@/lib/sharing';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -26,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: collection.meta_title },
     description: collection.meta_description,
     alternates: { canonical: url, languages: { ar: url, 'ar-EG': url } },
-    openGraph: { title: collection.h1, description: collection.meta_description, url },
+    ...sharingMetadata({ title: collection.h1, description: collection.meta_description, url, image: collection.cover }),
   };
 }
 
@@ -36,6 +39,7 @@ export default async function CollectionPage({ params }: Props) {
 
   return (
     <StorePageLayout title={collection.h1} intro={collection.intro}>
+      <JsonLd data={collectionGraph(collection)} />
       <section className="space-y-4">
         <h2 className="text-xl font-bold text-[#ECC480]">{collection.name}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">

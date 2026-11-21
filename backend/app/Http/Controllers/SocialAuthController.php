@@ -14,7 +14,7 @@ class SocialAuthController extends Controller
     /**
      * Supported providers
      */
-    protected array $providers = ['google', 'facebook'];
+    protected array $providers = ['facebook'];
 
     /**
      * Redirect to provider
@@ -51,6 +51,10 @@ class SocialAuthController extends Controller
 
         // Check if user exists with this email
         $user = User::where('email', $socialUser->getEmail())->first();
+
+        if ($user?->google_id && $user->facebook_id !== $socialUser->getId()) {
+            return redirect()->route('login')->withErrors(['error' => 'Use the sign-in method already connected to this account.']);
+        }
 
         if ($user) {
             // Update social provider info

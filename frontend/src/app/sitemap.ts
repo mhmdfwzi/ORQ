@@ -21,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     ...productRoutes,
-    ...['/blog', ...articles.map(({ slug }) => '/blog/' + slug), ...collections.map(({ slug }) => '/collections/' + slug)].map((path) => ({
+    ...['/find-your-scent', '/blog', ...articles.map(({ slug }) => '/blog/' + slug), ...collections.map(({ slug }) => '/collections/' + slug)].map((path) => ({
       url: new URL(path, SITE_URL).href,
       changeFrequency: 'monthly' as const,
       priority: 0.6,

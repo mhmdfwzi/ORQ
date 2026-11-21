@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -24,6 +25,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class ProductVariant extends Model
 {
     use HasFactory;
+
+    public const STOREFRONT_SIZE = '50ml';
+
+    public function scopeForSale(Builder $query): Builder
+    {
+        return $query->where('size', self::STOREFRONT_SIZE)->where('is_active', true);
+    }
 
     protected $fillable = [
         'product_id',

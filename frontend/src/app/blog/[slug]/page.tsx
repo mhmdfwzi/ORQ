@@ -6,6 +6,9 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import StorePageLayout from '@/components/layout/StorePageLayout';
 import articles from '@/data/blog-articles.json';
+import JsonLd from '@/components/seo/JsonLd';
+import { articleGraph } from '@/lib/structured-data';
+import { sharingMetadata } from '@/lib/sharing';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -27,14 +30,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: article.metaTitle },
     description: article.description,
     alternates: { canonical: url, languages: { ar: url, 'ar-EG': url } },
-    openGraph: { title: article.title, description: article.description, url, type: 'article', images: [article.image] },
+    ...sharingMetadata({ title: article.title, description: article.description, url, image: article.image, publishedTime: article.datePublished }),
   };
 }
 
 export default async function ArticlePage({ params }: Props) {
   const article = await getArticle(params);
   return (
-    <StorePageLayout title={article.title} intro={article.excerpt}>
+    <StorePageLayout title={article.title} intro={article.excerpt} publishedOn={article.datePublished}>
+      <JsonLd data={articleGraph(article)} />
       <article className="mx-auto max-w-3xl">
         <Link href="/blog" className="mb-4 inline-flex min-h-11 items-center text-sm font-bold text-[#ECC480] hover:underline">كل المقالات</Link>
         <Image src={article.image} alt={article.imageAlt} width={768} height={520} sizes="(min-width: 800px) 768px, 100vw" className="mx-auto mb-8 max-h-[32rem] w-full rounded-xl border border-[#493321] bg-[#0C0A08] object-contain" />

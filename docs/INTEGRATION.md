@@ -33,6 +33,21 @@ cd frontend && npm install && npm run build && npm run start
 - Guest checkout uses `POST /api/v1/orders`. The server recalculates prices and stock from the submitted product slugs, sizes and quantities. Cash on delivery is the default. Paymob orders also require a billing email and a unique checkout key.
 - Set the shipping fee under Filament → إعدادات الموقع → إعدادات الشحن والدفع.
 
+## Customer sign-in with Google
+
+Create a **Web application** OAuth client in Google Auth Platform. Configure the consent screen for ORQ and register the exact callback URL for each environment. When the client is in testing mode, add the Google accounts that will test the flow to its test users.
+
+| Environment | Authorized redirect URI |
+| --- | --- |
+| Production | `https://orqperfume.com/api/v1/account/google/callback` |
+| Local | `http://localhost:3000/api/v1/account/google/callback` |
+
+Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` in `backend/.env`. For production, set `FRONTEND_URL=https://orqperfume.com`, `SESSION_SECURE_COOKIE=true`, and `SESSION_SAME_SITE=lax`. Deploy through `scripts/deploy.sh` to run the database migration and refresh Laravel's configuration. The existing `/api/v1/` proxy routes the account endpoints to Laravel on the same domain as the storefront. For local development, Next uses the loopback `API_URL` to forward account requests.
+
+Open `/account` and verify sign-in, refusal on the consent screen, and sign-out. The customer session is separate from Filament authentication. Signing in identifies returning customers by their linked Google account. An existing local account with the same email requires verified account linking. Checkout continues to use the guest order API.
+
+[Google OAuth client setup](https://developers.google.com/identity/protocols/oauth2/web-server).
+
 ## Paymob Egypt
 
 1. In `backend/.env`, set `PAYMOB_SECRET_KEY`, `PAYMOB_PUBLIC_KEY`, `PAYMOB_INTEGRATION_ID` (Egypt card integration), and `PAYMOB_HMAC_SECRET` from the same Paymob account. Start with test keys and the test integration ID.

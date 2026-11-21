@@ -15,7 +15,8 @@ import { getProductEditorial, withProductEditorial } from '@/lib/product-editori
 const API_URL = process.env.API_URL ?? 'http://127.0.0.1:8001/api/v1';
 
 async function fetchJson<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${API_URL}${path}`, { headers: { Accept: 'application/json' } });
+  // The enclosing tagged function caches the result. Avoid reusing fetch data across builds.
+  const res = await fetch(`${API_URL}${path}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`ORQ API ${path} failed with status ${res.status}`);
   const body = (await res.json()) as { data: T };

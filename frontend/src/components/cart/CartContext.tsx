@@ -9,6 +9,7 @@ interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   addToCart: (product: Product, size: '50ml' | '100ml', quantity?: number) => void;
+  addPairToCart: (first: Product, second: Product) => boolean;
   removeFromCart: (slug: string, size: '50ml' | '100ml') => void;
   updateQuantity: (slug: string, size: '50ml' | '100ml', quantity: number) => void;
   clearCart: () => void;
@@ -19,6 +20,13 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+function purchasableItem(product: Product, size: CartItem['size'], quantity: number): CartItem | undefined {
+  const variant = product.variants.find((item) => item.size === size && item.inStock);
+  if (size !== '50ml' || !variant) return undefined;
+
+  return { slug: product.slug, name: product.name, size, price: variant.price, quantity, image: product.image };
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -26,32 +34,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
-  const addToCart = (product: Product, size: '50ml' | '100ml', quantity = 1) => {
-    const variant = product.variants.find((v) => v.size === size) || product.variants[0];
-    const price = variant ? variant.price : 1290;
-
-    setItems((prevItems) => {
-      const existing = prevItems.find((item) => item.slug === product.slug && item.size === size);
-      if (existing) {
-        return prevItems.map((item) =>
-          item.slug === product.slug && item.size === size
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [
-        ...prevItems,
-        {
-          slug: product.slug,
-          name: product.name,
-          size,
-          price,
-          quantity,
-          image: product.image
-        }
-      ];
-    });
+  const addItems = (additions: CartItem[]) => {
+    setItems((current) => additions.reduce((next, addition) => {
+      const existing = next.findIndex((item) => item.slug === addition.slug && item.size === addition.size);
+      if (existing === -1) return [...next, addition];
+      return next.map((item, index) => index === existing ? { ...item, quantity: item.quantity + addition.quantity } : item);
+    }, current));
     setIsOpen(true);
+  };
+
+  const addToCart = (product: Product, size: CartItem['size'], quantity = 1) => {
+    const item = purchasableItem(product, size, quantity);
+    if (item) addItems([item]);
+  };
+
+  const addPairToCart = (first: Product, second: Product) => {
+    const firstItem = purchasableItem(first, '50ml', 1);
+    const secondItem = purchasableItem(second, '50ml', 1);
+    if (!firstItem || !secondItem) return false;
+    addItems([firstItem, secondItem]);
+    return true;
   };
 
   const removeFromCart = (slug: string, size: '50ml' | '100ml') => {
@@ -81,11 +83,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         openCart,
         closeCart,
         addToCart,
+        addPairToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         restoreCart: (savedItems) => {
-          setItems((current) => current.length ? current : savedItems);
+          setItems((current) => current.length ? current : savedItems.filter((item) => item.size === '50ml'));
           openCart();
         },
         totalAmount,
