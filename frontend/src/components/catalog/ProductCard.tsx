@@ -15,7 +15,7 @@ export default function ProductCard({ product, showScentType = false }: ProductC
   const { addToCart } = useCart();
   const { commerce } = useCatalog().site;
   const variant = product.variants.find((item) => item.size === '50ml');
-  const href = '/products/' + (product.pageSlug ?? product.slug);
+  const href = '/products/' + product.slug;
 
   return (
     <article className={`group flex h-full min-w-0 flex-col rounded-xl border border-[#35291E] bg-[#16110E] p-2 transition hover:border-[#C4A265]/60 motion-safe:hover:-translate-y-1 sm:p-3 ${showScentType ? 'storefront-card-enter' : ''}`}>

@@ -2,7 +2,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import type { Product } from '@/types/product';
 import type { BrandStory } from '@/types/brand';
 import type { SiteSettings } from '@/types/site';
-import { getProductEditorial, withProductEditorial } from '@/lib/product-editorial';
+import { withProductEditorial } from '@/lib/product-editorial';
 
 /**
  * Data layer for the ORQ Laravel API (server-side only).
@@ -34,10 +34,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   'use cache';
   cacheLife('hours');
   cacheTag('products');
-  const path = '/products/' + encodeURIComponent(slug);
-  const alternate = getProductEditorial(slug)?.old_slug;
-  const product = (await fetchJson<Product>(path))
-    ?? (alternate && alternate !== slug ? await fetchJson<Product>('/products/' + encodeURIComponent(alternate)) : null);
+  const product = await fetchJson<Product>('/products/' + encodeURIComponent(slug));
   return product ? withProductEditorial(product) : null;
 }
 

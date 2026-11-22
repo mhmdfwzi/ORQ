@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\ProductSlugs;
 use App\Support\SiteSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -113,9 +114,10 @@ class OrderService
         $merged = [];
 
         foreach ($items as $item) {
-            $key = $item['slug'] . '|' . $item['size'];
+            $slug = ProductSlugs::canonical($item['slug']);
+            $key = $slug . '|' . $item['size'];
             $merged[$key] = [
-                'slug'     => $item['slug'],
+                'slug'     => $slug,
                 'size'     => $item['size'],
                 'quantity' => ($merged[$key]['quantity'] ?? 0) + (int) $item['quantity'],
             ];

@@ -130,9 +130,6 @@ class ProductResource extends Resource
                                 TextInput::make('subtitle')
                                     ->label('الشعار الفرعي')
                                     ->maxLength(255),
-                                TextInput::make('original_inspiration')
-                                    ->label('الإلهام الأصلي')
-                                    ->maxLength(255),
                                 TextInput::make('brand_feel')
                                     ->label('إحساس العلامة')
                                     ->maxLength(255),

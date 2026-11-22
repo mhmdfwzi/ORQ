@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ProductCard from '@/components/catalog/ProductCard';
@@ -33,9 +34,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CollectionPage({ params }: Props) {
+export default function CollectionPage({ params }: Props) {
+  return (
+    <Suspense fallback={<StorePageLayout title="المجموعات العطرية" loading>
+      <p role="status" className="text-sm text-[#D2C3AF]">جارٍ تحميل المجموعة…</p>
+    </StorePageLayout>}>
+      <CollectionContent params={params} />
+    </Suspense>
+  );
+}
+
+async function CollectionContent({ params }: Props) {
   const [collection, products] = await Promise.all([getCollection(params), getProducts()]);
-  const bySlug = new Map(products.map((product) => [product.pageSlug ?? product.slug, product]));
+  const bySlug = new Map(products.map((product) => [product.slug, product]));
 
   return (
     <StorePageLayout title={collection.h1} intro={collection.intro}>

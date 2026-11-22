@@ -31,6 +31,7 @@ class StorefrontCheckoutTest extends TestCase
             '0001_01_01_000000_create_users_table',
             '2026_01_06_000001_create_categories_table',
             '2026_01_06_000002_create_products_table',
+            '2026_01_06_000003_create_product_images_table',
             '2026_01_06_000006_create_addresses_table',
             '2026_01_06_000007_create_orders_table',
             '2026_01_06_000011_create_settings_tables',
@@ -174,7 +175,7 @@ class StorefrontCheckoutTest extends TestCase
 
     public function test_catalogue_migration_archives_100ml_and_updates_live_copy(): void
     {
-        $product = Product::where('slug', 'royal-oud')->firstOrFail();
+        $product = Product::where('slug', 'motamared')->firstOrFail();
         $legacyVariant = $product->variants()->where('size', '100ml')->firstOrFail();
         DB::table('products')->where('id', $product->id)->update(['sku' => 'ORQ-ROYAL-OUD', 'description' => 'Old copy']);
         DB::table('product_variants')->where('id', $legacyVariant->id)->update(['is_active' => true]);
@@ -209,6 +210,57 @@ class StorefrontCheckoutTest extends TestCase
             'ownerRecord' => $product,
             'pageClass' => EditProduct::class,
         ])->assertCanNotSeeTableRecords([$legacyVariant]);
+    }
+
+    public function test_canonical_product_ids_keep_past_orders_and_old_cart_links_valid(): void
+    {
+        $aliases = ['royal-oud' => 'motamared', 'oud-ambassador' => 'ghoroor', 'oud-madawi' => 'kaseh'];
+        $products = Product::whereIn('slug', array_values($aliases))->get()->keyBy('slug');
+        $orderData = $this->orderData();
+        $orderData['payment_method'] = 'cod';
+        $orderData['items'] = array_map(fn ($slug) => ['slug' => $slug, 'size' => '50ml', 'quantity' => 1], array_values($aliases));
+        $this->postJson('/api/v1/orders', $orderData)->assertCreated();
+        $pastItems = Order::firstOrFail()->items()->orderBy('id')->get(['id', 'product_id', 'product_variant_id', 'product_sku'])->toArray();
+
+        foreach ($aliases as $old => $new) {
+            DB::table('products')->where('id', $products[$new]->id)->update([
+                'slug' => $old,
+                'images' => json_encode(["/media/orq/{$old}.webp", 'products/uploaded.webp']),
+                'original_inspiration' => 'old copy kept in private archive',
+            ]);
+        }
+
+        $rename = require database_path('migrations/2026_11_22_000001_canonicalize_orq_product_slugs.php');
+        $archive = require database_path('migrations/2026_11_22_000002_archive_orq_product_inspiration.php');
+        $rename->up();
+        $archive->up();
+        $archive->up();
+
+        foreach ($aliases as $old => $new) {
+            $this->assertSame($products[$new]->id, Product::where('slug', $new)->value('id'));
+            $this->assertNull($products[$new]->fresh()->original_inspiration);
+            $this->assertDatabaseMissing('products', ['slug' => $old]);
+            $this->getJson('/api/v1/products/' . $new)->assertOk()->assertJsonPath('data.slug', $new)
+                ->assertJsonPath('data.gallery.0', "/media/orq/{$new}.webp")
+                ->assertJsonPath('data.gallery.1', asset('storage/products/uploaded.webp'))
+                ->assertJsonMissingPath('data.originalInspiration')->assertJsonMissingPath('data.brandFeel');
+            $this->getJson('/api/v1/products/' . $old)->assertOk()->assertJsonPath('data.slug', $new);
+        }
+        $this->assertSame($pastItems, Order::firstOrFail()->items()->orderBy('id')->get(['id', 'product_id', 'product_variant_id', 'product_sku'])->toArray());
+
+        $orderData['items'][0]['slug'] = 'royal-oud';
+        $orderData['items'][] = ['slug' => 'motamared', 'size' => '50ml', 'quantity' => 1];
+        $this->postJson('/api/v1/orders', $orderData)->assertCreated();
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => Order::latest('id')->firstOrFail()->id,
+            'product_id' => $products['motamared']->id,
+            'quantity' => 2,
+        ]);
+
+        $archive->down();
+        $rename->down();
+        $this->assertSame('old copy kept in private archive', $products['motamared']->fresh()->original_inspiration);
+        $this->assertSame('royal-oud', $products['motamared']->fresh()->slug);
     }
 
     private function orderData(): array

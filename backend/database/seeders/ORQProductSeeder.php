@@ -29,7 +29,7 @@ class ORQProductSeeder extends Seeder
             true,
             512,
             JSON_THROW_ON_ERROR
-        ))->keyBy(fn (array $item) => $item['old_slug'] ?? $item['slug']);
+        ))->keyBy('slug');
 
         // Skip the revalidation observer while bulk seeding.
         Product::withoutEvents(fn () => DB::transaction(function () use ($items, $approved) {
@@ -49,7 +49,6 @@ class ORQProductSeeder extends Seeder
                         'name'                 => $item['name'],
                         'name_ar'              => $item['arabicName'],
                         'subtitle'             => $item['subtitle'],
-                        'original_inspiration' => $item['originalInspiration'],
                         'brand_feel'           => $item['brandFeel'],
                         'scent_type'           => $item['scentType'],
                         'description'          => $description,

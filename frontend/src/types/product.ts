@@ -16,13 +16,10 @@ export interface ProductVariant {
 export interface Product {
   slug: string;
   sku?: string;
-  pageSlug?: string;
   name: string;
   arabicName: string;
   subtitle: string;
-  originalInspiration: string;
   category: string;
-  brandFeel: string;
   scentType: string;
   description: string;
   mood: ScentMood;

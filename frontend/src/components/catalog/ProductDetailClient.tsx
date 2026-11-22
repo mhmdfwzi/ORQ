@@ -17,9 +17,9 @@ export default function ProductDetailClient({ product, editorial }: { product: P
   const [photoIndex, setPhotoIndex] = useState(0);
   const [pairUnavailable, setPairUnavailable] = useState(false);
   const photos = product.gallery ?? (product.image ? [product.image] : []);
-  const partner = products.find((item) => (item.pageSlug ?? item.slug) === editorial?.layering_with);
+  const partner = products.find((item) => item.slug === editorial?.layering_with);
   const relatedSlugs = editorial?.related ?? [];
-  const relatedProducts = products.filter((item) => relatedSlugs.includes(item.pageSlug ?? item.slug));
+  const relatedProducts = products.filter((item) => relatedSlugs.includes(item.slug));
   const recommendations = (relatedProducts.length ? relatedProducts : products.filter((item) => item.slug !== product.slug)).slice(0, 4);
   const { currency } = site.commerce;
 
@@ -86,7 +86,6 @@ export default function ProductDetailClient({ product, editorial }: { product: P
               <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold text-white">عن العطر</summary>
               <div className="space-y-2 pb-3 text-sm leading-relaxed text-[#B9B1A5]">
                 {(editorial?.description ?? [product.description]).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                {!editorial && product.originalInspiration && <p>{product.originalInspiration}</p>}
               </div>
             </details>
             {editorial && (
@@ -99,7 +98,7 @@ export default function ProductDetailClient({ product, editorial }: { product: P
                     <p>{editorial.layering}</p>
                     {partner && (
                       <div className="space-y-2 rounded-lg border border-[#544333] p-3">
-                        <p>ادمجه مع <Link className="font-semibold text-[#ECC480] underline" href={`/products/${partner.pageSlug ?? partner.slug}`}>{partner.name}</Link></p>
+                        <p>ادمجه مع <Link className="font-semibold text-[#ECC480] underline" href={`/products/${partner.slug}`}>{partner.name}</Link></p>
                         <button type="button" className="gold-button min-h-11 rounded-lg px-4 text-sm" onClick={() => setPairUnavailable(!addPairToCart(product, partner))}>
                           أضف الاتنين للسلة
                         </button>

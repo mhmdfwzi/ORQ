@@ -32,6 +32,10 @@ function faqPage(items: Faq[]) {
   };
 }
 
+export function faqGraph(items: Faq[]) {
+  return graph(faqPage(items));
+}
+
 export function siteGraph(site: SiteSettings) {
   return graph({
     '@type': 'Organization',
@@ -56,7 +60,7 @@ export function productGraph(product: Product) {
   const editorial = getProductEditorial(product.slug);
   const collection = collections.find((item) => item.slug === editorial?.collection);
   const variant = product.variants.find((item) => item.size === '50ml');
-  const href = `/products/${product.pageSlug ?? product.slug}`;
+  const href = `/products/${product.slug}`;
   const url = absolute(href);
   const properties = [
     ['Concentration', 'Eau de Parfum'],
@@ -89,7 +93,7 @@ export function productGraph(product: Product) {
       availability: `https://schema.org/${variant.inStock ? 'InStock' : 'OutOfStock'}`,
       itemCondition: 'https://schema.org/NewCondition',
       seller: { '@id': organization },
-      acceptedPaymentMethod: 'Cash on Delivery',
+      acceptedPaymentMethod: { '@type': 'PaymentMethod', name: 'Cash on Delivery' },
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'EG',
@@ -111,7 +115,13 @@ export function collectionGraph(collection: (typeof collections)[number]) {
   );
 }
 
-export function articleGraph(article: (typeof articles)[number]) {
+function articleDateTime(value: string): string {
+  // The editorial handoff uses 10:00 Cairo time for date-only publication records.
+  const timestamp = /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T10:00:00+02:00` : value;
+  return new Date(timestamp).toISOString();
+}
+
+export function articleGraph(article: (typeof articles)[number] & { dateModified?: string }) {
   const href = `/blog/${article.slug}`;
   const url = absolute(href);
   return graph({
@@ -121,7 +131,8 @@ export function articleGraph(article: (typeof articles)[number]) {
     headline: article.title,
     description: article.description,
     inLanguage: 'ar-EG',
-    datePublished: article.datePublished,
+    datePublished: articleDateTime(article.datePublished),
+    dateModified: articleDateTime(article.dateModified ?? article.datePublished),
     image: [absolute(article.image)],
     author: { '@type': 'Organization', name: 'فريق تحرير ORQ', url: absolute('/blog') },
     publisher: { '@id': organization },

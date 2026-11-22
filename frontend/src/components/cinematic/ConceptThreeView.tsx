@@ -61,7 +61,7 @@ export default function ConceptThreeView() {
                     <span className="gold-gradient-text">بصمة عطرية واحدة</span>
                   </h1>
                   <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                    من هيبة العود المعتق والجلود النادرة، إلى نضارة البحر الأبيض المتوسط ونقاء المسك البودري.
+                    من هيبة العود والجلود، إلى نضارة البحر الأبيض المتوسط ونقاء المسك البودري.
                   </p>
                 </div>
 

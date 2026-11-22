@@ -37,7 +37,12 @@ const nextConfig: NextConfig = {
       { source: '/privacy', destination: '/pages/privacy-policy', permanent: true },
       { source: '/terms', destination: '/pages/terms', permanent: true },
       { source: '/login', destination: '/account', permanent: false },
-      ...redirects.map(({ from, to }) => ({ source: from, destination: to, permanent: true })),
+      ...redirects.map(({ from, to, code }) => ({ source: from, destination: to, statusCode: code })),
+      ...redirects.map(({ from, to, code }) => ({
+        source: from.replace('/products/', '/media/orq/') + '.webp',
+        destination: to.replace('/products/', '/media/orq/') + '.webp',
+        statusCode: code,
+      })),
     ];
   },
   // Cap build parallelism: 11 default workers can exhaust memory on small machines.

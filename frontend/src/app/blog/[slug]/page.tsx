@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -34,7 +35,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ArticlePage({ params }: Props) {
+export default function ArticlePage({ params }: Props) {
+  return (
+    <Suspense fallback={<StorePageLayout title="المدونة" loading>
+      <p role="status" className="text-sm text-[#D2C3AF]">جارٍ تحميل المقال…</p>
+    </StorePageLayout>}>
+      <ArticleContent params={params} />
+    </Suspense>
+  );
+}
+
+async function ArticleContent({ params }: Props) {
   const article = await getArticle(params);
   return (
     <StorePageLayout title={article.title} intro={article.excerpt} publishedOn={article.datePublished}>

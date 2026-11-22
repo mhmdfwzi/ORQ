@@ -2,11 +2,14 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Markdown from 'react-markdown';
 import ContactForm from '@/components/layout/ContactForm';
 import StorePageLayout from '@/components/layout/StorePageLayout';
+import JsonLd from '@/components/seo/JsonLd';
 import { getSiteSettings } from '@/lib/api';
 import { getStorePage, storePageGroups, storePages } from '@/lib/store-pages';
 import { sharingMetadata } from '@/lib/sharing';
+import { faqGraph } from '@/lib/structured-data';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -21,10 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const url = '/pages/' + slug;
   return {
-    title: content.heading,
+    title: { absolute: content.metaTitle },
     description: content.description,
     alternates: { canonical: url, languages: { 'ar-EG': url, ar: url } },
-    ...sharingMetadata({ title: content.heading, description: content.description, url }),
+    ...sharingMetadata({ title: content.metaTitle, description: content.description, url }),
   };
 }
 
@@ -95,16 +98,26 @@ async function StorePageContent({ params }: Props) {
 
   return (
     <StorePageLayout title={content.heading} intro={content.intro} sidebar={<StorePageLinks current={slug} />}>
-      {slug === 'contact' ? <ContactDetails /> : (
-        <div className="divide-y divide-[#342820] text-base leading-8 text-[#D2C3AF]">
-          {content.sections?.map(({ heading, paragraphs, points }) => (
-            <section key={heading} className="space-y-2 py-5 first:pt-0 last:pb-0">
-              <h2 className="text-xl font-bold text-[#ECC480]">{heading}</h2>
-              {points && <ul className="list-disc space-y-1 ps-6">{points.map((point) => <li key={point}>{point}</li>)}</ul>}
-              {paragraphs?.map((text) => <p key={text}>{text}</p>)}
-            </section>
-          ))}
+      {content.body && (
+        <div className="space-y-4 text-base leading-8 text-[#D2C3AF] [&_h2]:pt-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[#ECC480] [&_h2:first-child]:pt-0 [&_li]:pb-1 [&_ol]:list-decimal [&_ol]:ps-6 [&_strong]:text-[#F2EBDD] [&_ul]:list-disc [&_ul]:ps-6">
+          <Markdown skipHtml>{content.body.join('\n\n')}</Markdown>
         </div>
+      )}
+      {content.faq && (
+        <>
+          <JsonLd data={faqGraph(content.faq)} />
+          <dl className="divide-y divide-[#342820] text-base leading-8 text-[#D2C3AF]">
+            {content.faq.map(({ q, a }) => (
+              <div key={q} className="space-y-2 py-5 first:pt-0 last:pb-0">
+                <dt className="text-xl font-bold text-[#ECC480]">{q}</dt>
+                <dd>{a}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )}
+      {slug === 'contact' && (
+        <div className="mt-6"><ContactDetails /></div>
       )}
       {['our-story', 'how-to-choose'].includes(slug) && (
         <Link href="/#signature" className="gold-button mt-7 inline-flex min-h-11 items-center rounded-lg px-5 text-sm">تسوّق العطور</Link>

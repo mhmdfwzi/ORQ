@@ -16,7 +16,7 @@ type ProductPageProps = { params: Promise<{ slug: string }> };
 export async function generateStaticParams() {
   const { products } = await getCatalog();
   return products.map((product) => ({
-    slug: product.pageSlug ?? product.slug,
+    slug: product.slug,
   }));
 }
 
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getProductBySlug(slug);
   if (!product) return { robots: { index: false } };
 
-  const path = '/products/' + (product.pageSlug ?? product.slug);
+  const path = '/products/' + product.slug;
   const editorial = getProductEditorial(product.slug);
   return {
     title: editorial ? { absolute: editorial.meta_title } : product.name,

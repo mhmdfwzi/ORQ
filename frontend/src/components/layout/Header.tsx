@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/components/cart/CartContext';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import TrustIcon from '@/components/layout/TrustIcon';
-import { collections } from '@/data/store-editorial.json';
+import { collections, home as homeEditorial } from '@/data/store-editorial.json';
 import './StoreMobileMenu.css';
 
 const menuIcons = {
@@ -43,11 +43,22 @@ const storeLinks: NavigationLink[] = [
 ];
 
 export default function Header() {
+  return (
+    <Suspense fallback={<StoreHeader pathname={null} />}>
+      <HeaderForCurrentPath />
+    </Suspense>
+  );
+}
+
+function HeaderForCurrentPath() {
+  return <StoreHeader pathname={usePathname()} />;
+}
+
+function StoreHeader({ pathname }: { pathname: string | null }) {
   const { openCart, totalItems } = useCart();
   const { site } = useCatalog();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenu = useRef<HTMLDialogElement>(null);
-  const pathname = usePathname();
   const home = pathname?.match(/^\/preview\/concept-[12356]$/) ? pathname : '/';
   const collectionAnchor = home.endsWith('-6') ? 'collection' : home.endsWith('-3') ? 'signature-line' : 'signature';
   const links: NavigationLink[] = home === '/' ? storeLinks : [
@@ -80,7 +91,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-[#221F1C] bg-[#0A0908]/95 backdrop-blur-md">
       <div className="mx-auto flex h-15 max-w-7xl items-center justify-between gap-3 px-4 sm:h-18 sm:px-6 lg:px-8">
-        <Link href={home} className="flex min-h-11 min-w-0 items-center gap-2.5">
+        <Link href={home} aria-label={home === '/' ? homeEditorial.logo_alt : undefined} className="flex min-h-11 min-w-0 items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-mark.png" alt="" width={640} height={631} className="h-8 w-auto shrink-0 mix-blend-screen sm:h-9" />
           <span className="font-serif text-2xl font-bold tracking-widest gold-gradient-text">{site.name}</span>

@@ -14,7 +14,7 @@ import { useCatalog } from '@/components/catalog/CatalogContext';
 import type { ScentMood } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import { formatPrice } from '@/lib/format';
-import { collections } from '@/data/store-editorial.json';
+import { collections, home } from '@/data/store-editorial.json';
 
 export default function ConceptFourView() {
   const { giftBundle, getProductsByMood, site } = useCatalog();
@@ -36,8 +36,8 @@ export default function ConceptFourView() {
       <section id="signature" aria-labelledby="collection-title" className="scroll-mt-20 border-b border-[#312519] bg-gradient-to-b from-[#120e0b] to-[#090807] py-9 sm:py-14">
         <div className="mx-auto max-w-7xl space-y-4 px-4 sm:space-y-6 sm:px-6 lg:px-8">
           <div className="space-y-2">
-            <h2 id="collection-title" className="text-2xl font-bold text-[#F5E8D2] sm:text-4xl">اختار عطرك</h2>
-            <p className="text-sm leading-relaxed text-[#C4B7A4]">عود لليالي الطويلة، ونفحات منعشة لبداية اليوم.</p>
+            <h2 id="collection-title" className="text-2xl font-bold text-[#F5E8D2] sm:text-4xl">{home.sections.collections.h2}</h2>
+            <p className="text-sm leading-relaxed text-[#C4B7A4]">{home.sections.collections.text}</p>
           </div>
           <nav id="collections" aria-label="المجموعات العطرية" className="grid scroll-mt-24 grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-5">
             {collections.map(({ slug, cover, name }) => (
@@ -85,8 +85,8 @@ export default function ConceptFourView() {
               <img src={giftBundle.image} alt={giftBundle.name} loading="lazy" className="aspect-square w-full max-h-96 rounded-xl bg-[#0A0908] object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.025]" />
             )}
             <div className="min-w-0 space-y-3 px-2 pb-2 sm:p-2">
-              <h2 id="gift-title" className="text-xl font-bold text-[#F5E8D2] sm:text-3xl">{giftBundle.name}</h2>
-              <p className="text-sm leading-relaxed text-[#E1CFB8]">هدية جاهزة تجمع زجاجة عطر ومعطر سيارة وأربع عينات لاكتشاف التشكيلة.</p>
+              <h2 id="gift-title" className="text-xl font-bold text-[#F5E8D2] sm:text-3xl">{home.sections.gift.h2}</h2>
+              <p className="text-sm leading-relaxed text-[#E1CFB8]">{home.sections.gift.text}</p>
               <ul className="flex flex-wrap gap-2 text-xs text-[#E2D3BC] sm:text-sm">
                 {site.bundle.highlights.map(({ title }) => (
                   <li key={title} className="rounded-md border border-[#3A3025] px-2 py-1">{title}</li>
@@ -117,11 +117,15 @@ export default function ConceptFourView() {
         </div>
       </section>
 
-      <BrandStory />
-      <div className="mx-auto flex max-w-7xl flex-wrap gap-x-6 px-4 py-5 sm:px-6 lg:px-8">
-        <Link href="/pages/our-story" className="inline-flex min-h-11 items-center font-bold text-[#ECC480] hover:underline">اقرأ شفرة ORQ</Link>
-        <Link href="/blog" className="inline-flex min-h-11 items-center font-bold text-[#ECC480] hover:underline">تصفّح مدونة ORQ</Link>
-      </div>
+      <BrandStory title={home.sections.brand.h2} intro={home.sections.brand.text} />
+      <section aria-labelledby="delivery-title" className="mx-auto max-w-7xl space-y-2 px-4 py-5 sm:px-6 lg:px-8">
+        <h2 id="delivery-title" className="text-xl font-bold text-[#F5E8D2]">{home.sections.delivery.h2}</h2>
+        <p className="text-sm leading-relaxed text-[#C4B7A4]">{home.sections.delivery.text}</p>
+        <div className="flex flex-wrap gap-x-6">
+          <Link href="/pages/our-story" className="inline-flex min-h-11 items-center font-bold text-[#ECC480] hover:underline">{home.secondary_cta}</Link>
+          <Link href="/blog" className="inline-flex min-h-11 items-center font-bold text-[#ECC480] hover:underline">تصفّح مدونة ORQ</Link>
+        </div>
+      </section>
       <Footer />
     </div>
   );

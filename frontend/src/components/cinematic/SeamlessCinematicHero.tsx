@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useSyncExternalStore, type TouchEvent } from 'react';
+import Link from 'next/link';
 import { useCart } from '@/components/cart/CartContext';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
@@ -27,7 +28,7 @@ export default function SeamlessCinematicHero() {
   const { products, site } = useCatalog();
   const { addToCart } = useCart();
   const featured = featuredSlugs.flatMap((slug) => {
-    const product = products.find((item) => (item.pageSlug ?? item.slug) === slug);
+    const product = products.find((item) => item.slug === slug);
     return product ? [product] : [];
   });
   const slides = featured.length ? featured : products.slice(0, 1);
@@ -94,12 +95,13 @@ export default function SeamlessCinematicHero() {
     >
       <div className="orq-hero-layout mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="orq-hero-headline">
-          <p dir="ltr" className="orq-hero-tagline">{motto}</p>
-          <h1 id="hero-title" className="orq-hero-title">{headline}</h1>
+          <p dir="ltr" aria-hidden="true" className="orq-hero-tagline">{motto}</p>
+          <h1 id="hero-title" className="orq-hero-title"><span className="sr-only">{motto} — </span>{headline}</h1>
           <p className="orq-hero-intro">{home.subheadline}</p>
         </div>
 
-        <div className="orq-hero-stage" role="group" aria-roledescription="عرض شرائح" aria-label="عطور ORQ المميزة">
+        <div className="orq-hero-stage" role="group" aria-roledescription="عرض شرائح" aria-label={home.sections.featured.h2} aria-describedby="hero-featured-description">
+          <p id="hero-featured-description" className="sr-only">{home.sections.featured.text}</p>
           <div
             id="hero-slides"
             className="orq-hero-frame"
@@ -214,9 +216,9 @@ export default function SeamlessCinematicHero() {
             >
               {variant?.inStock ? 'أضف للسلة' : 'غير متوفر'}
             </button>
-            <a href="#signature" className="orq-hero-discover flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 text-sm font-bold sm:flex-none sm:px-5">
-              اكتشف العطور
-            </a>
+            <Link href="/find-your-scent" className="orq-hero-discover flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 text-sm font-bold sm:flex-none sm:px-5">
+              {home.primary_cta}
+            </Link>
           </div>
         </div>
       </div>

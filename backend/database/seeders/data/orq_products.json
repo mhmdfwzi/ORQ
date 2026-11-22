@@ -1,10 +1,9 @@
 [
     {
-        "slug":  "royal-oud",
-        "name":  "ROYAL OUD",
+        "slug":  "motamared",
+        "name":  "متمرد",
         "arabicName":  "متمرد",
         "subtitle":  "عود عصري متمرد على التقاليد",
-        "originalInspiration":  "توليفة خشبية حرة مع العود المصفى",
         "category":  "Oud / Luxury",
         "brandFeel":  "Rebellious royalty",
         "scentType":  "عود • خشبي • متبل",
@@ -40,7 +39,7 @@
                              "inStock":  true
                          }
                      ],
-        "image":  "/media/orq/royal-oud.webp",
+        "image":  "/media/orq/motamared.webp",
         "isBundle":  false
     },
     {
@@ -48,7 +47,6 @@
         "name":  "CHAOS",
         "arabicName":  "كايوس",
         "subtitle":  "حضور بري وهيمنة مغناطيسية",
-        "originalInspiration":  "توليفة برية من البرغموت والأمبروكسان",
         "category":  "Power / Signature",
         "brandFeel":  "Wild dominance",
         "scentType":  "منعش • متبل • خشبي",
@@ -91,7 +89,6 @@
         "name":  "ALPHA",
         "arabicName":  "ألفا",
         "subtitle":  "طاقة النصر ومغناطيس الإطراءات",
-        "originalInspiration":  "توليفة بحرية مفعمة بالحيوية والظفر",
         "category":  "Power / Signature",
         "brandFeel":  "Winner / leader",
         "scentType":  "منعش • حلو • مائي",
@@ -133,7 +130,6 @@
         "name":  "DOM",
         "arabicName":  "دوم",
         "subtitle":  "عطر السهرات والجاذبية الصريحة",
-        "originalInspiration":  "توليفة ليلية جذابة بالباشن فروت والتونكا",
         "category":  "Social / Loud",
         "brandFeel":  "Social dominance",
         "scentType":  "حلو • عطري • مسائي",
@@ -174,7 +170,6 @@
         "name":  "POMPOUS",
         "arabicName":  "بومبوس",
         "subtitle":  "فخامة صاخبة وأثر عطري هائل",
-        "originalInspiration":  "توليفة فاكهية مخملية بالمسك النقي",
         "category":  "Attention / Loud",
         "brandFeel":  "Flashy luxury",
         "scentType":  "فاكهي • مسكي • حلو",
@@ -215,7 +210,6 @@
         "name":  "ELECTRO",
         "arabicName":  "إلكترو",
         "subtitle":  "طاقة حركية وحضور مشحون بالنقاء",
-        "originalInspiration":  "توليفة رياضية حمضية متألقة",
         "category":  "Energy / Active",
         "brandFeel":  "Charged presence",
         "scentType":  "حمضي • كريمي • رياضي",
@@ -258,7 +252,6 @@
         "name":  "GIGANTIC",
         "arabicName":  "جيجانتيك",
         "subtitle":  "دفء مغرٍ وحضور آسر للقلوب",
-        "originalInspiration":  "توليفة كستناء مدخنة وفانيليا آسرة",
         "category":  "Intense / Addictive",
         "brandFeel":  "Overwhelming presence",
         "scentType":  "دافئ • حلو • فانيليا",
@@ -301,7 +294,6 @@
         "name":  "DARKNIGHT",
         "arabicName":  "دارك نايت",
         "subtitle":  "الهيبة الصامتة والعمق الأرستقراطي",
-        "originalInspiration":  "توليفة خشبية بخورية كلاسيكية غامضة",
         "category":  "Fresh / Deep",
         "brandFeel":  "Silent dominance",
         "scentType":  "خشبي • عطري • منعش",
@@ -346,7 +338,6 @@
         "name":  "VIGOROUS",
         "arabicName":  "فيجوروس",
         "subtitle":  "انتعاش مائي وحيوية نقية لا تنضب",
-        "originalInspiration":  "توليفة بحرية عشبية منعشة",
         "category":  "Fresh / Clean",
         "brandFeel":  "Active freshness",
         "scentType":  "مائي • أخضر • منعش",
@@ -390,7 +381,6 @@
         "name":  "SAINT",
         "arabicName":  "سينت",
         "subtitle":  "نقاء المسك البودري ورقي الحضور الهادئ",
-        "originalInspiration":  "توليفة نقية من أصفى أنواع المسك الأبيض",
         "category":  "Clean / Skin",
         "brandFeel":  "Pure superiority",
         "scentType":  "مسكي • بودري • ناعم",
@@ -426,11 +416,10 @@
         "isBundle":  false
     },
     {
-        "slug":  "oud-ambassador",
+        "slug":  "ghoroor",
         "name":  "غرور",
-        "arabicName":  "Oud Ambassador",
+        "arabicName":  "غرور",
         "subtitle":  "العود الناعم والتفوق الهادئ",
-        "originalInspiration":  "عود معتق فاخر بلمسات الورد والزعفران",
         "category":  "Oud / Luxury",
         "brandFeel":  "Calm superiority",
         "scentType":  "عود • حلو • خشبي",
@@ -447,7 +436,7 @@
                                     "خشب الصندل"
                                 ],
                       "base":  [
-                                   "العود المعتق الفاخر",
+                                   "العود",
                                    "الفانيليا المخملية"
                                ]
                   },
@@ -463,15 +452,14 @@
                              "inStock":  true
                          }
                      ],
-        "image":  "/media/orq/oud-ambassador.webp",
+        "image":  "/media/orq/ghoroor.webp",
         "isBundle":  false
     },
     {
-        "slug":  "oud-madawi",
+        "slug":  "kaseh",
         "name":  "كاسح",
-        "arabicName":  "Oud Madawi",
+        "arabicName":  "كاسح",
         "subtitle":  "فوحان كاسح وهيمنة لا تتكرر",
-        "originalInspiration":  "عود شرقي مكثف بلمسات الفاكهة والعنبر",
         "category":  "Oud / Luxury",
         "brandFeel":  "Overpowering dominance",
         "scentType":  "عود • حلو • فاكهي",
@@ -504,7 +492,7 @@
                              "inStock":  true
                          }
                      ],
-        "image":  "/media/orq/oud-madawi.webp",
+        "image":  "/media/orq/kaseh.webp",
         "isBundle":  false
     },
     {
@@ -512,7 +500,6 @@
         "name":  "باقة الهدايا الملكية",
         "arabicName":  "صندوق التجربة المتكامل",
         "subtitle":  "عطر 50 مل + معطر سيارة + 4 عينات لاكتشاف التشكيلة",
-        "originalInspiration":  "إصدار الهدايا والتجربة الشاملة من ORQ",
         "category":  "Exclusive Bundle",
         "brandFeel":  "The Complete Gift Experience",
         "scentType":  "صندوق فاخر متكامل",

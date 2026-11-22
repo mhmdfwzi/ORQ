@@ -10,6 +10,8 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $hidden = ['original_inspiration'];
+
     protected $fillable = [
         'category_id',
         'name',

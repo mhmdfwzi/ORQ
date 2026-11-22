@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Support\ProductSlugs;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -36,7 +37,7 @@ class ProductApiController extends Controller
     {
         $product = Product::published()
             ->with(['variants' => fn ($q) => $q->forSale()])
-            ->where('slug', $slug)
+            ->where('slug', ProductSlugs::canonical($slug))
             ->first();
 
         if (!$product) {
