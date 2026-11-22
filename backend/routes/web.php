@@ -11,6 +11,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StorefrontAccountController;
+use App\Http\Controllers\StorefrontOrderController;
+use App\Http\Controllers\Api\OrderApiController;
+use App\Http\Middleware\EnsureStorefrontCustomer;
 use App\Http\Middleware\ShareCartCount;
 
 
@@ -128,9 +131,19 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::prefix('api/v1/account')->controller(StorefrontAccountController::class)
     ->withoutMiddleware(ShareCartCount::class)->group(function () {
         Route::get('/session', 'session')->middleware('throttle:60,1,storefront-session');
+        Route::post('/login', 'login')->middleware('throttle:8,1,storefront-login');
+        Route::post('/register', 'register')->middleware('throttle:5,10,storefront-register');
+        Route::post('/forgot-password', 'forgotPassword')->middleware('throttle:5,10,storefront-forgot');
+        Route::post('/reset-password', 'resetPassword')->middleware('throttle:8,1,storefront-reset');
         Route::get('/google', 'redirectToGoogle')->middleware('throttle:12,1,storefront-google');
         Route::get('/google/callback', 'googleCallback')->middleware('throttle:12,1,storefront-google');
         Route::post('/logout', 'logout')->middleware('throttle:12,1,storefront-logout');
+        Route::middleware(EnsureStorefrontCustomer::class)->group(function () {
+            Route::patch('/profile', 'updateProfile')->middleware('throttle:12,1,storefront-profile');
+            Route::get('/orders', [StorefrontOrderController::class, 'index'])->middleware('throttle:60,1,storefront-orders');
+            Route::get('/orders/{number}', [StorefrontOrderController::class, 'show'])->middleware('throttle:60,1,storefront-orders');
+            Route::post('/orders', [OrderApiController::class, 'storeForCustomer'])->middleware('throttle:10,1,storefront-checkout');
+        });
     });
 
 Route::get('/auth/google', [StorefrontAccountController::class, 'accountPage'])->name('social.google');

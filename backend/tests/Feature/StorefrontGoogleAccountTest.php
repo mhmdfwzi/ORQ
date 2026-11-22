@@ -10,6 +10,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Testing\TestResponse;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\GoogleProvider;
@@ -93,7 +94,8 @@ class StorefrontGoogleAccountTest extends TestCase
         $this->postJson(self::API . '/logout')->assertNoContent();
         $this->assertGuest('storefront');
         $this->assertAuthenticatedAs($admin, 'web');
-        $this->getJson(self::API . '/session')->assertJsonPath('customer', null)->assertJsonPath('csrfToken', null);
+        $session = $this->getJson(self::API . '/session')->assertJsonPath('customer', null);
+        $this->assertIsString($session->json('csrfToken'));
     }
 
     public function test_rejects_invalid_state_and_email_conflicts_and_keeps_the_same_linked_identity(): void
@@ -125,6 +127,46 @@ class StorefrontGoogleAccountTest extends TestCase
         $this->get(self::API . '/google/callback?error=access_denied')->assertRedirect(self::STORE . '/account?google=cancelled');
         $this->assertDatabaseCount('users', 0);
         $this->assertGuest('storefront');
+    }
+
+    public function test_password_registration_and_both_identifiers_use_the_customer_guard(): void
+    {
+        $account = [
+            'name' => 'ORQ Shopper', 'email' => 'ORQ@example.test', 'phone' => '+20 101 234 5678',
+            'password' => 'password123', 'password_confirmation' => 'password123',
+        ];
+        $this->postJson(self::API . '/register', $account)->assertCreated()
+            ->assertJsonPath('customer.email', 'orq@example.test')->assertJsonPath('customer.phone', '01012345678');
+        $customer = User::where('email', 'orq@example.test')->sole();
+        $this->assertAuthenticatedAs($customer, 'storefront');
+        $this->patchJson(self::API . '/profile', ['name' => 'Updated Shopper'])->assertOk()
+            ->assertJsonPath('customer.name', 'Updated Shopper');
+        $this->postJson(self::API . '/logout')->assertNoContent();
+        $this->postJson(self::API . '/login', ['method' => 'email', 'identity' => 'ORQ@EXAMPLE.TEST', 'password' => 'password123'])
+            ->assertOk()->assertJsonPath('customer.email', 'orq@example.test');
+        $this->postJson(self::API . '/logout')->assertNoContent();
+        $this->postJson(self::API . '/login', ['method' => 'phone', 'identity' => '٠١٠١٢٣٤٥٦٧٨', 'password' => 'password123'])
+            ->assertOk()->assertJsonPath('customer.email', 'orq@example.test');
+        $this->postJson(self::API . '/logout')->assertNoContent();
+
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        $this->postJson(self::API . '/login', ['method' => 'email', 'identity' => $admin->email, 'password' => 'password'])
+            ->assertUnprocessable();
+        $this->assertGuest('storefront');
+    }
+
+    public function test_a_customer_can_use_an_email_reset_token_once(): void
+    {
+        $customer = User::factory()->create(['status' => 'active', 'google_id' => 'linked-google']);
+        $this->postJson(self::API . '/forgot-password', ['email' => $customer->email])->assertNoContent();
+        $this->assertDatabaseHas('password_reset_tokens', ['email' => $customer->email]);
+        $token = Password::createToken($customer);
+        $data = ['email' => $customer->email, 'token' => $token, 'password' => 'password123', 'password_confirmation' => 'password123'];
+        $this->postJson(self::API . '/reset-password', $data)->assertNoContent();
+        $this->postJson(self::API . '/reset-password', $data)->assertUnprocessable();
+        $this->postJson(self::API . '/login', ['method' => 'email', 'identity' => $customer->email, 'password' => 'password123'])
+            ->assertOk()->assertJsonPath('customer.email', $customer->email);
+        $this->assertSame('linked-google', $customer->fresh()->google_id);
     }
 
     private function completeGoogleSignIn(string $state = 'test-state'): TestResponse

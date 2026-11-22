@@ -101,6 +101,7 @@ function PaymentStatusDetails({ token }: { token: string }) {
         {session?.items.length && status === 'expired' ? (
           <button className="gold-button min-h-11 rounded-lg px-4 text-sm" type="button" onClick={() => restoreCart(session.items)}>استعادة السلة</button>
         ) : null}
+        {status === 'paid' && <Link href="/account" className="inline-flex min-h-11 items-center text-[#ECC480] underline">تابع طلباتك من حسابي</Link>}
         <Link href="/pages/contact" className="inline-flex min-h-11 items-center text-[#ECC480] underline">تواصل معنا</Link>
         <Link href="/#signature" className="inline-flex min-h-11 items-center text-[#ECC480] underline">متابعة التسوق</Link>
       </div>

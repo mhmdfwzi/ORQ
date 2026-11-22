@@ -11,7 +11,7 @@ use App\Services\StorefrontOrderNotifications;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Guest checkout endpoint for the Next.js storefront.
+ * Checkout for guest and signed-in storefront customers.
  */
 class OrderApiController extends Controller
 {
@@ -25,9 +25,28 @@ class OrderApiController extends Controller
         StorefrontOrderNotifications $notifications,
     ): JsonResponse
     {
+        return $this->checkout($request, $onlineOrders, $notifications, null);
+    }
+
+    public function storeForCustomer(
+        StoreOrderRequest $request,
+        OnlineOrderService $onlineOrders,
+        StorefrontOrderNotifications $notifications,
+    ): JsonResponse
+    {
+        return $this->checkout($request, $onlineOrders, $notifications, $request->user('storefront')->id);
+    }
+
+    private function checkout(
+        StoreOrderRequest $request,
+        OnlineOrderService $onlineOrders,
+        StorefrontOrderNotifications $notifications,
+        ?int $customerId,
+    ): JsonResponse
+    {
         $data = $request->validated();
         $usesCard = ($data['payment_method'] ?? 'cod') === 'card';
-        $order = $usesCard ? $onlineOrders->place($data) : $this->orders->placeGuestOrder($data);
+        $order = $usesCard ? $onlineOrders->place($data, $customerId) : $this->orders->placeOrder($data, $customerId);
 
         if (!$usesCard) {
             $notifications->send($order);

@@ -19,17 +19,17 @@ class OnlineOrderService
         private readonly PaymobService $paymob,
     ) {}
 
-    public function place(array $data): Order
+    public function place(array $data, ?int $customerId = null): Order
     {
         $key = strtolower($data['checkout_key']);
         $data['checkout_key'] = $key;
         $requestHash = hash('sha256', json_encode($data, JSON_THROW_ON_ERROR));
 
         try {
-            return Cache::lock('orq.checkout.' . $key, 30)->block(5, function () use ($data, $key, $requestHash) {
+            return Cache::lock('orq.checkout.' . $key, 30)->block(5, function () use ($data, $key, $requestHash, $customerId) {
                 $existing = Order::where('payment_checkout_key', $key)->first();
                 if ($existing) {
-                    abort_unless(hash_equals($existing->payment_request_hash, $requestHash), 409, 'بيانات محاولة الدفع مختلفة. ابدأ محاولة جديدة.');
+                    abort_unless($existing->user_id === $customerId && hash_equals($existing->payment_request_hash, $requestHash), 409, 'بيانات محاولة الدفع مختلفة. ابدأ محاولة جديدة.');
 
                     return $existing;
                 }
@@ -38,8 +38,8 @@ class OnlineOrderService
 
                 // The checkout URL is only returned after both the reservation and the
                 // Paymob order ID are committed. A provider error rolls back the stock.
-                return DB::transaction(function () use ($data, $key, $requestHash) {
-                    $order = $this->orders->placeGuestOrder($data);
+                return DB::transaction(function () use ($data, $key, $requestHash, $customerId) {
+                    $order = $this->orders->placeOrder($data, $customerId);
                     $checkout = $this->paymob->createCheckout($order, $data['billing_email'], $key);
                     $order->forceFill([
                         'payment_checkout_key' => $key,

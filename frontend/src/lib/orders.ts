@@ -1,4 +1,5 @@
 import type { CartItem } from '@/types/product';
+import { accountApi, accountRequest, type AccountSession } from '@/lib/account';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8001/api/v1';
 
@@ -66,15 +67,18 @@ export class OrderError extends Error {
 }
 
 /**
- * Guest checkout. Only slug/size/quantity are sent: the server resolves
+ * Guest and customer checkout. Only slug/size/quantity are sent: the server resolves
  * prices and stock itself, so the cart's displayed prices are never trusted.
  */
 export async function placeOrder(form: CheckoutForm, items: CartItem[]): Promise<PlacedOrder> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}/orders`, {
+    const session = await accountRequest<AccountSession>('/session');
+    const headers = new Headers({ 'Content-Type': 'application/json', Accept: 'application/json' });
+    if (session.customer) headers.set('X-CSRF-TOKEN', session.csrfToken);
+    res = await fetch((session.customer ? accountApi : API_URL) + '/orders', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      headers,
       body: JSON.stringify({
         ...form,
         items: items.map(({ slug, size, quantity }) => ({ slug, size, quantity })),
@@ -91,6 +95,9 @@ export async function placeOrder(form: CheckoutForm, items: CartItem[]): Promise
   }
   if (res.status === 422) {
     throw new OrderError(body?.message ?? 'بيانات الطلب غير صحيحة.', body?.errors ?? {});
+  }
+  if ([401, 419].includes(res.status)) {
+    throw new OrderError('جلسة حسابك انتهت أثناء الطلب. حدّث الصفحة وحاول مرة تانية.');
   }
   if (res.status === 429) {
     throw new OrderError('محاولات كثيرة. برجاء الانتظار دقيقة ثم المحاولة مرة أخرى.');

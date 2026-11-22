@@ -61,18 +61,14 @@ class OrderResource extends Resource
                             ->dehydrated(false),
                         
                         Select::make('user_id')
-                            ->relationship('user', 'name')
-                            ->disabled()
-                            ->dehydrated(false),
+                            ->label('حساب العميل')
+                            ->relationship('user', 'email', modifyQueryUsing: fn ($query) => $query->where('role', 'customer')->where('status', 'active'))
+                            ->searchable(['name', 'email', 'phone'])
+                            ->disabled(fn (Order $record): bool => $record->user_id !== null)
+                            ->helperText('اربط طلب الضيف بعد تأكيد ملكية الطلب مع العميل.'),
                         
                         Select::make('status')
-                            ->options([
-                                'pending' => 'Pending',
-                                'processing' => 'Processing',
-                                'shipped' => 'Shipped',
-                                'delivered' => 'Delivered',
-                                'cancelled' => 'Cancelled',
-                            ])
+                            ->options(Order::STATUSES)
                             ->disabled(fn (Order $record): bool => $record->paymob_order_id && $record->payment_status === 'pending')
                             ->required()
                             ->native(false),
@@ -105,6 +101,8 @@ class OrderResource extends Resource
                     ->schema([
                         Placeholder::make('address')
                             ->content(fn (Order $record): string => $record->shipping_address_text),
+                        TextInput::make('shipping_carrier')->label('شركة الشحن')->maxLength(255),
+                        TextInput::make('tracking_number')->label('رقم التتبع')->maxLength(255),
                     ]),
             ]);
     }
@@ -124,14 +122,13 @@ class OrderResource extends Resource
                     ->sortable(),
                 
                 Tables\Columns\SelectColumn::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'processing' => 'Processing',
-                        'shipped' => 'Shipped',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
-                    ])
+                    ->options(Order::STATUSES)
                     ->disabled(fn (Order $record): bool => $record->paymob_order_id && $record->payment_status === 'pending')
+                    ->updateStateUsing(function (Order $record, string $state): string {
+                        $record->updateStatus($state);
+
+                        return $state;
+                    })
                     ->sortable(),
                 
                 Tables\Columns\TextColumn::make('total')
@@ -154,13 +151,7 @@ class OrderResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'processing' => 'Processing',
-                        'shipped' => 'Shipped',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
-                    ]),
+                    ->options(Order::STATUSES),
                 
                 Tables\Filters\SelectFilter::make('payment_status')
                     ->options([

@@ -11,9 +11,9 @@ const inputClass =
   'min-h-11 w-full rounded-lg border border-[#40382F] bg-[#100F0E] px-3 py-2 text-base text-white placeholder:text-[#A0988C] focus:outline-none focus:border-[#C4A265]';
 const labelClass = 'mb-1 block text-sm font-medium text-[#E2D3BC]';
 
-/** Guest checkout rendered inside the cart drawer. */
+/** Checkout rendered inside the cart drawer. */
 export default function CheckoutForm({ onBack }: { onBack: () => void }) {
-  const { items, totalAmount, clearCart } = useCart();
+  const { items, totalAmount, clearCart, closeCart } = useCart();
   const { commerce, whatsapp_order_confirmation_available: whatsappAvailable, online_payment_available: cardAvailable } = useCatalog().site;
   const shipping = commerce.shipping_cost;
   const [form, setForm] = useState({ name: '', phone: '', governorate: '', address: '', notes: '' });
@@ -86,6 +86,7 @@ export default function CheckoutForm({ onBack }: { onBack: () => void }) {
           الإجمالي: <span className="text-[#ECC480] font-bold">{formatPrice(placed.total)} {commerce.currency}</span> — {commerce.payment_note}
         </div>
         <p className="text-sm text-[#B9B1A5]">هنتواصل معك لتأكيد الطلب.</p>
+        <Link href="/account" onClick={closeCart} className="inline-flex min-h-11 items-center text-sm font-semibold text-[#ECC480] underline">تابع طلباتك من حسابي</Link>
       </div>
     );
   }

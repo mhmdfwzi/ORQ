@@ -38,6 +38,7 @@ class Order extends Model
     protected $hidden = ['payment_checkout_key', 'payment_request_hash', 'paymob_checkout_url'];
 
     protected $casts = [
+        'user_id' => 'integer',
         'whatsapp_confirmation_requested' => 'boolean',
         'paymob_checkout_url' => 'encrypted',
         'paymob_expires_at' => 'datetime',

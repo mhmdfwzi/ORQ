@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\ProductResource\Pages\EditProduct;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Order;
@@ -36,6 +37,7 @@ class StorefrontCheckoutTest extends TestCase
             '2026_01_06_000007_create_orders_table',
             '2026_01_06_000011_create_settings_tables',
             '2026_01_07_000001_add_images_to_products_table',
+            '2026_01_07_000003_add_tracking_to_orders_table',
             '2026_02_06_182700_add_offer_fields_to_products_table',
             '2026_02_20_115200_add_arabic_description_to_products',
             '2026_11_11_224006_create_notifications_table',
@@ -261,6 +263,67 @@ class StorefrontCheckoutTest extends TestCase
         $rename->down();
         $this->assertSame('old copy kept in private archive', $products['motamared']->fresh()->original_inspiration);
         $this->assertSame('royal-oud', $products['motamared']->fresh()->slug);
+    }
+
+    public function test_customers_only_see_orders_belonging_to_their_storefront_account(): void
+    {
+        $api = '/api/v1/account/orders';
+        $this->getJson($api)->assertUnauthorized();
+        $data = array_replace($this->orderData(), ['payment_method' => 'cod']);
+        $guest = $this->postJson('/api/v1/orders', $data)->assertCreated()->json('data.orderNumber');
+        $first = User::factory()->create(['phone' => '01000000008', 'status' => 'active', 'role' => 'customer']);
+        $second = User::factory()->create(['phone' => '01000000009', 'status' => 'active', 'role' => 'customer']);
+        $this->actingAs($first, 'storefront');
+        $number = $this->postJson($api, $data + ['user_id' => $second->id])->assertCreated()->json('data.orderNumber');
+        $order = Order::where('order_number', $number)->sole();
+        $this->assertSame($first->id, $order->user_id);
+        $order->update(['tracking_number' => 'SHIP-TEST', 'shipping_carrier' => 'ORQ Delivery']);
+        $order->updateStatus('shipped');
+        $this->getJson($api)->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.number', $number)
+            ->assertHeader('Cache-Control', 'no-store, private');
+        $this->getJson($api . '/' . $number)->assertOk()->assertJsonPath('data.status', 'shipped')
+            ->assertJsonPath('data.trackingNumber', 'SHIP-TEST')->assertJsonPath('data.timeline.3.completed', true)
+            ->assertJsonPath('data.paymentMethod', 'cod')->assertJsonMissingPath('data.payment_checkout_key');
+        $this->getJson($api . '/' . $guest)->assertNotFound();
+        $this->actingAs($second, 'storefront');
+        $this->getJson($api . '/' . $number)->assertNotFound();
+        $this->getJson($api)->assertOk()->assertJsonCount(0, 'data');
+    }
+
+    public function test_card_checkout_retries_keep_the_original_customer_owner(): void
+    {
+        Http::fake([self::INTENTION => Http::response(['intention_order_id' => 123456, 'client_secret' => 'test-client-token'], 201)]);
+        $customer = User::factory()->create(['phone' => '01000000008', 'status' => 'active', 'role' => 'customer']);
+        $this->actingAs($customer, 'storefront');
+        $api = '/api/v1/account/orders';
+        $data = $this->orderData();
+        $order = $this->postJson($api, $data)->assertCreated()->json('data.orderNumber');
+        $this->postJson($api, $data)->assertCreated()->assertJsonPath('data.orderNumber', $order);
+        $this->assertSame($customer->id, Order::sole()->user_id);
+        $this->postJson('/api/v1/orders', $data)->assertConflict();
+        Http::assertSentCount(1);
+    }
+
+    public function test_an_admin_can_link_a_guest_order_and_update_tracking_in_the_panel(): void
+    {
+        $data = array_replace($this->orderData(), ['payment_method' => 'cod']);
+        $number = $this->postJson('/api/v1/orders', $data)->assertCreated()->json('data.orderNumber');
+        $order = Order::where('order_number', $number)->sole();
+        $customer = User::factory()->create(['phone' => '01000000008', 'role' => 'customer', 'status' => 'active']);
+        $admin = User::factory()->create(['phone' => '01000000009', 'role' => 'admin', 'status' => 'active']);
+        $this->actingAs($admin, 'web');
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        Livewire::test(EditOrder::class, ['record' => $order->getRouteKey()])->fillForm([
+            'user_id' => $customer->id, 'status' => 'shipped',
+            'shipping_carrier' => 'ORQ Delivery', 'tracking_number' => 'TEST-TRACKING',
+        ])->call('save')->assertHasNoFormErrors();
+
+        $this->assertSame($customer->id, $order->fresh()->user_id);
+        $this->assertNotNull($order->fresh()->shipped_at);
+        $this->actingAs($customer, 'storefront');
+        $this->getJson('/api/v1/account/orders/' . $number)->assertOk()
+            ->assertJsonPath('data.trackingNumber', 'TEST-TRACKING');
     }
 
     private function orderData(): array

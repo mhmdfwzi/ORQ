@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Places guest (account-less) orders and reserves their stock.
+ * Places storefront orders and reserves their stock.
  *
  * Never trusts client data for money: prices and availability are resolved
  * from the database inside a transaction with row locks on stock.
@@ -23,11 +23,11 @@ class OrderService
      *
      * @throws ValidationException when an item is unavailable or out of stock
      */
-    public function placeGuestOrder(array $data): Order
+    public function placeOrder(array $data, ?int $customerId = null): Order
     {
         $lines = $this->mergeLines($data['items']);
 
-        return DB::transaction(function () use ($data, $lines) {
+        return DB::transaction(function () use ($data, $lines, $customerId) {
             $paymentMethod = $data['payment_method'] ?? 'cod';
             $subtotal = 0;
             $resolved = [];
@@ -65,6 +65,7 @@ class OrderService
             $shipping = SiteSettings::shippingCost();
 
             $order = Order::create([
+                'user_id'              => $customerId,
                 'order_number'         => Order::generateOrderNumber(),
                 'customer_name'        => trim($data['name']),
                 'customer_phone'       => $this->normalizePhone($data['phone']),
