@@ -51,7 +51,7 @@ export default function ConceptFourView() {
                     src={cover}
                     alt=""
                     fill
-                    sizes="(min-width: 1280px) 290px, (min-width: 640px) 25vw, 50vw"
+                    unoptimized
                     className="object-contain"
                   />
                 </div>
