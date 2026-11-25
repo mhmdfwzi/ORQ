@@ -155,6 +155,8 @@
 .orq-delta[data-direction="1"] { color: var(--orq-positive); }
 .orq-delta[data-direction="-1"] { color: var(--orq-negative); }
 .orq-dashboard-grid, .orq-report-grid { display: grid; gap: 1rem; align-items: start; }
+.orq-overview-side { display: grid; gap: 1rem; min-width: 0; }
+#product-views { scroll-margin-top: 5rem; }
 .orq-dashboard-grid { grid-template-columns: minmax(0, 1.7fr) minmax(17rem, 1fr); }
 .orq-report-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .orq-card { padding: 1.05rem; }

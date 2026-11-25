@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/types/product';
 import { useCart } from '@/components/cart/CartContext';
 import ProductCard from '@/components/catalog/ProductCard';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
+import { trackProductView } from '@/lib/attribution';
 import type { ProductEditorial } from '@/lib/product-editorial';
 
 export default function ProductDetailClient({ product, editorial }: { product: Product; editorial?: ProductEditorial }) {
@@ -22,6 +23,10 @@ export default function ProductDetailClient({ product, editorial }: { product: P
   const relatedProducts = products.filter((item) => relatedSlugs.includes(item.slug));
   const recommendations = (relatedProducts.length ? relatedProducts : products.filter((item) => item.slug !== product.slug)).slice(0, 4);
   const { currency } = site.commerce;
+
+  useEffect(() => {
+    trackProductView(product.slug);
+  }, [product.slug]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-4 pb-9 sm:px-6 lg:px-8">

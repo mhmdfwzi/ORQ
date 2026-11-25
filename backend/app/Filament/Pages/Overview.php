@@ -29,6 +29,7 @@ class Overview extends Dashboard
             'trend' => $reports->trend($period),
             'operations' => $reports->operations(),
             'latest' => $reports->latest($period),
+            'popularProducts' => $reports->productViews($period, 5)->where('views', '>', 0),
         ];
     }
 }

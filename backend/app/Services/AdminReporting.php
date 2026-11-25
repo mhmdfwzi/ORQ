@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Review;
 use App\Support\CampaignAttribution;
@@ -40,6 +41,7 @@ class AdminReporting
         return [
             'campaigns' => $this->campaigns($period),
             'products' => $this->products($period),
+            'productViews' => $this->productViews($period),
             'regions' => $this->regions($period),
             'totals' => $this->totals($period),
             'statuses' => $this->statuses($period),
@@ -134,6 +136,22 @@ class AdminReporting
             ->selectRaw("order_items.product_id, COALESCE({$arabicName}, {$productName}, {$storedName}) AS label")
             ->selectRaw('SUM(order_items.quantity) AS units, SUM(order_items.total_price) AS sales')
             ->groupBy('order_items.product_id')->orderByDesc('units')->orderByDesc('sales')->orderBy('order_items.product_id')->limit(10)->get();
+    }
+
+    public function productViews(ReportPeriod $period, ?int $limit = null): Collection
+    {
+        $views = DB::table('storefront_product_views')
+            ->whereBetween('day', array_values($period->query()))
+            ->selectRaw('product_id, COUNT(*) AS views')
+            ->groupBy('product_id');
+
+        return Product::query()->toBase()
+            ->leftJoinSub($views, 'product_view_totals', 'product_view_totals.product_id', '=', 'products.id')
+            ->select('products.id', 'products.name', 'products.name_ar')
+            ->selectRaw('COALESCE(product_view_totals.views, 0) AS views')
+            ->orderByDesc('views')->orderBy('products.id')
+            ->when($limit !== null, fn ($query) => $query->limit($limit))
+            ->get();
     }
 
     public function regions(ReportPeriod $period): Collection

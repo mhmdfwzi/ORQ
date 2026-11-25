@@ -68,20 +68,25 @@ export function trackStorefrontStage(stage: Stage) {
   if (!sessionId) return;
 
   // A visit is also sent on the first cart action if the page request failed.
-  if (stage !== 'visit') sendEvent(sessionId, 'visit');
-  sendEvent(sessionId, stage);
+  if (stage !== 'visit') sendEvent('/funnel', sessionId, 'visit', { stage: 'visit' });
+  sendEvent('/funnel', sessionId, stage, { stage });
 }
 
-function sendEvent(sessionId: string, stage: Stage) {
+export function trackProductView(slug: string) {
+  const sessionId = checkoutAttribution()?.session_id;
+  if (sessionId) sendEvent('/products/' + encodeURIComponent(slug) + '/views', sessionId, 'product:' + slug);
+}
+
+function sendEvent(path: string, sessionId: string, event: string, details: Record<string, string> = {}) {
   const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(new Date());
-  const key = `${sessionId}:${stage}:${day}`;
+  const key = `${sessionId}:${event}:${day}`;
   if (pendingEvents.has(key)) return;
   pendingEvents.add(key);
 
-  void fetch(API_URL + '/funnel', {
+  void fetch(API_URL + path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ session_id: sessionId, stage }),
+    body: JSON.stringify({ ...details, session_id: sessionId }),
     keepalive: true,
   }).then((response) => {
     if (!response.ok) pendingEvents.delete(key);

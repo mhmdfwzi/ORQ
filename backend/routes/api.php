@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ContactApiController;
 use App\Http\Controllers\Api\PaymobController;
 use App\Http\Controllers\Api\SiteApiController;
 use App\Http\Controllers\Api\StorefrontFunnelController;
+use App\Http\Controllers\Api\StorefrontProductViewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/best-sellers', [ProductApiController::class, 'bestSellers']);
     Route::get('/products/bundle', [ProductApiController::class, 'bundle']);
     Route::get('/products/{slug}', [ProductApiController::class, 'show']);
+    Route::post('/products/{slug}/views', StorefrontProductViewController::class)
+        ->middleware('throttle:60,1,orq-product-views:');
 
     // Brand story ("شفرة ORQ")
     Route::get('/brand', [BrandApiController::class, 'show']);

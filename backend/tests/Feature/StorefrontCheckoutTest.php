@@ -55,6 +55,7 @@ class StorefrontCheckoutTest extends TestCase
             '2026_11_18_000001_add_whatsapp_confirmation_to_orders',
             '2026_11_20_000001_add_paymob_checkout_to_orders',
             '2026_11_25_000001_add_growth_reporting',
+            '2026_11_25_000002_create_storefront_product_views_table',
         ];
 
         return ['--path' => array_map(fn (string $name) => 'database/migrations/' . $name . '.php', $names)];
@@ -423,6 +424,40 @@ class StorefrontCheckoutTest extends TestCase
         $csv = $this->get('/admin/reports/campaigns.csv')->assertOk()->assertDownload()->streamedContent();
         $this->assertStringStartsWith("\xef\xbb\xbf", $csv);
         $this->assertStringContainsString('العائد على الإنفاق', $csv);
+    }
+
+    public function test_product_views_count_once_per_session_product_and_cairo_day(): void
+    {
+        $evening = now('Africa/Cairo')->setDate(2026, 11, 25)->setTime(23, 59)->toImmutable();
+        $this->travelTo($evening);
+        $view = ['session_id' => Str::uuid()->toString()];
+
+        $this->getJson('/api/v1/products/chaos')->assertOk();
+        $this->assertDatabaseCount('storefront_product_views', 0);
+        $this->postJson('/api/v1/products/chaos/views', $view)->assertNoContent();
+        $this->postJson('/api/v1/products/chaos/views', $view)->assertNoContent();
+        $this->postJson('/api/v1/products/chaos/views', ['session_id' => Str::uuid()->toString()])->assertNoContent();
+        $this->postJson('/api/v1/products/royal-oud/views', $view)->assertNoContent();
+        $this->postJson('/api/v1/products/motamared/views', $view)->assertNoContent();
+        $this->postJson('/api/v1/products/non-existent/views', $view)->assertNotFound();
+        $this->postJson('/api/v1/products/chaos/views', ['session_id' => 'unknown'])->assertUnprocessable();
+        $this->assertDatabaseCount('storefront_product_views', 3);
+
+        $this->travelTo($evening->addMinutes(2));
+        $this->postJson('/api/v1/products/chaos/views', $view)->assertNoContent();
+        $this->assertDatabaseCount('storefront_product_views', 4);
+        $period = ReportPeriod::fromFilters(['from' => '2026-11-25', 'to' => '2026-11-25']);
+        $products = Product::whereIn('slug', ['chaos', 'motamared', 'alpha'])->pluck('id', 'slug');
+        $views = app(AdminReporting::class)->productViews($period)->pluck('views', 'id');
+        $this->assertSame(2, (int) $views[$products['chaos']]);
+        $this->assertSame(1, (int) $views[$products['motamared']]);
+        $this->assertSame(0, (int) $views[$products['alpha']]);
+
+        $admin = User::factory()->create(['role' => 'admin', 'phone' => '01000000994', 'status' => 'active']);
+        $this->actingAs($admin)->get('/admin/reports?from=2026-11-25&to=2026-11-25')
+            ->assertOk()->assertSee('مشاهدات المنتجات')->assertSee('مشاهدات');
+        $this->get('/admin?from=2026-11-25&to=2026-11-25')
+            ->assertOk()->assertSee('أكثر المنتجات مشاهدة')->assertSee('#product-views', false);
     }
 
     private function orderData(): array

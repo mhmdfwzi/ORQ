@@ -93,6 +93,25 @@
         <p class="orq-note">العائد = مبيعات الحملة ÷ الإنفاق المسجّل. تكلفة الطلب = الإنفاق المسجّل ÷ الطلبات المحققة. راجع اكتمال تسجيل الإنفاق قبل المقارنة.</p>
     </section>
 
+    <section class="orq-card" id="product-views">
+        <div class="orq-card-head"><div><h2>مشاهدات المنتجات</h2><p>كل فتح لصفحة عطر يُحسب مرة لكل جلسة في اليوم بتوقيت القاهرة. الأرقام حسب الفترة المختارة.</p></div></div>
+        <div class="orq-table-wrap" tabindex="0" role="region" aria-label="مشاهدات المنتجات">
+            <table class="orq-table">
+                <thead><tr><th scope="col">المنتج</th><th scope="col">المشاهدات</th></tr></thead>
+                <tbody>
+                    @forelse ($productViews as $product)
+                        <tr>
+                            <th scope="row"><bdi>{{ $product->name_ar ?: $product->name }}</bdi></th>
+                            <td><bdi>{{ number_format($product->views) }}</bdi></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="2" class="orq-empty">مفيش منتجات في الكتالوج.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <div class="orq-report-grid">
         <section class="orq-card">
             <div class="orq-card-head"><div><h2>مسار الشراء</h2><p>جلسات المتجر اللي تم قياسها خلال الفترة</p></div></div>

@@ -130,16 +130,33 @@
             @endif
         </section>
 
-        <section class="orq-card">
-            <div class="orq-card-head"><div><h2>مخزون يحتاج متابعة</h2><p>الأقل توفراً من الأحجام المعروضة للبيع</p></div><a class="orq-text-link" href="{{ ProductResource::getUrl() }}">المنتجات @svg('heroicon-o-arrow-left')</a></div>
-            @forelse ($operations['lowStock'] as $variant)
-                <a class="orq-stock-row" href="{{ ProductResource::getUrl('edit', ['record' => $variant->product_id]) }}">
-                    <span>{{ $variant->product->name_ar ?: $variant->product->name }} <small>{{ (int) $variant->size }} مل</small></span>
-                    <span class="orq-status" data-status="{{ $variant->stock_quantity > 0 ? 'pending' : 'cancelled' }}">{{ $variant->stock_quantity > 0 ? $variant->stock_quantity.' متبقي' : 'نفد' }}</span>
-                </a>
-            @empty
-                <p class="orq-empty">كل الأحجام المتاحة للبيع مخزونها أعلى من حد التنبيه.</p>
-            @endforelse
-        </section>
+        <div class="orq-overview-side">
+            <section class="orq-card">
+                <div class="orq-card-head orq-card-head-wrap">
+                    <div><h2>أكثر المنتجات مشاهدة</h2><p>خلال الفترة المختارة</p></div>
+                    <a class="orq-text-link" href="{{ StoreReports::getUrl(parameters: $period->query()) }}#product-views">مشاهدات كل المنتجات @svg('heroicon-o-arrow-left')</a>
+                </div>
+                @forelse ($popularProducts as $product)
+                    <a class="orq-stock-row" href="{{ ProductResource::getUrl('edit', ['record' => $product->id]) }}">
+                        <bdi>{{ $product->name_ar ?: $product->name }}</bdi>
+                        <strong class="orq-count"><bdi>{{ number_format($product->views) }}</bdi> <small>مشاهدة</small></strong>
+                    </a>
+                @empty
+                    <p class="orq-empty">مفيش مشاهدات مسجّلة للمنتجات في الفترة المختارة.</p>
+                @endforelse
+            </section>
+
+            <section class="orq-card">
+                <div class="orq-card-head"><div><h2>مخزون يحتاج متابعة</h2><p>الأقل توفراً من الأحجام المعروضة للبيع</p></div><a class="orq-text-link" href="{{ ProductResource::getUrl() }}">المنتجات @svg('heroicon-o-arrow-left')</a></div>
+                @forelse ($operations['lowStock'] as $variant)
+                    <a class="orq-stock-row" href="{{ ProductResource::getUrl('edit', ['record' => $variant->product_id]) }}">
+                        <span>{{ $variant->product->name_ar ?: $variant->product->name }} <small>{{ (int) $variant->size }} مل</small></span>
+                        <span class="orq-status" data-status="{{ $variant->stock_quantity > 0 ? 'pending' : 'cancelled' }}">{{ $variant->stock_quantity > 0 ? $variant->stock_quantity.' متبقي' : 'نفد' }}</span>
+                    </a>
+                @empty
+                    <p class="orq-empty">كل الأحجام المتاحة للبيع مخزونها أعلى من حد التنبيه.</p>
+                @endforelse
+            </section>
+        </div>
     </div>
 </x-filament-panels::page>
