@@ -8,6 +8,7 @@ use App\Models\ProductVariant;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class OnlineOrderService
 {
@@ -23,7 +24,7 @@ class OnlineOrderService
     {
         $key = strtolower($data['checkout_key']);
         $data['checkout_key'] = $key;
-        $requestHash = hash('sha256', json_encode($data, JSON_THROW_ON_ERROR));
+        $requestHash = hash('sha256', json_encode(Arr::except($data, 'attribution'), JSON_THROW_ON_ERROR));
 
         try {
             return Cache::lock('orq.checkout.' . $key, 30)->block(5, function () use ($data, $key, $requestHash, $customerId) {

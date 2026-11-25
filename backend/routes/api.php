@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BrandApiController;
 use App\Http\Controllers\Api\ContactApiController;
 use App\Http\Controllers\Api\PaymobController;
 use App\Http\Controllers\Api\SiteApiController;
+use App\Http\Controllers\Api\StorefrontFunnelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,7 @@ Route::prefix('v1')->group(function () {
 
     // Guest checkout. Throttled per IP to limit abuse.
     Route::post('/orders', [OrderApiController::class, 'store'])->middleware('throttle:10,1');
+    Route::post('/funnel', StorefrontFunnelController::class)->middleware('throttle:60,1,orq-funnel:');
     Route::post('/payments/paymob/webhook', [PaymobController::class, 'webhook']);
     Route::get('/payments/paymob/return/{key}', [PaymobController::class, 'returned'])->whereUuid('key');
     Route::get('/payments/paymob/status/{key}', [PaymobController::class, 'status'])->whereUuid('key')->middleware('throttle:30,1');

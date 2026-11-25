@@ -27,26 +27,15 @@ class JobResource extends Resource
 {
     protected static ?string $model = JobListing::class;
 
+    protected static ?string $modelLabel = 'وظيفة';
+
+    protected static ?string $pluralModelLabel = 'الوظائف';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
-
-    public static function getNavigationLabel(): string
-    {
-        return 'Jobs';
-    }
-
-    public static function getModelLabel(): string
-    {
-        return 'Job';
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return 'Jobs';
-    }
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Recruitment';
+        return 'التوظيف';
     }
 
     public static function getNavigationSort(): ?int

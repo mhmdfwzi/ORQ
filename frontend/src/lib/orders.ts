@@ -1,5 +1,6 @@
 import type { CartItem } from '@/types/product';
 import { accountApi, accountRequest, type AccountSession } from '@/lib/account';
+import { checkoutAttribution } from '@/lib/attribution';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8001/api/v1';
 
@@ -73,6 +74,7 @@ export class OrderError extends Error {
 export async function placeOrder(form: CheckoutForm, items: CartItem[]): Promise<PlacedOrder> {
   let res: Response;
   try {
+    const attribution = checkoutAttribution();
     const session = await accountRequest<AccountSession>('/session');
     const headers = new Headers({ 'Content-Type': 'application/json', Accept: 'application/json' });
     if (session.customer) headers.set('X-CSRF-TOKEN', session.csrfToken);
@@ -81,6 +83,7 @@ export async function placeOrder(form: CheckoutForm, items: CartItem[]): Promise
       headers,
       body: JSON.stringify({
         ...form,
+        attribution,
         items: items.map(({ slug, size, quantity }) => ({ slug, size, quantity })),
       }),
     });

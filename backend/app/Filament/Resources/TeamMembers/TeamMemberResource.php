@@ -27,11 +27,15 @@ class TeamMemberResource extends Resource
 {
     protected static ?string $model = TeamMember::class;
 
+    protected static ?string $modelLabel = 'عضو فريق';
+
+    protected static ?string $pluralModelLabel = 'فريق العمل';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content Management';
+        return 'المحتوى';
     }
 
     public static function form(Schema $schema): Schema

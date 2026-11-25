@@ -23,11 +23,15 @@ class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
+    protected static ?string $modelLabel = 'صفحة';
+
+    protected static ?string $pluralModelLabel = 'صفحات المتجر';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'المحتوى';
     }
 
     public static function shouldRegisterNavigation(): bool

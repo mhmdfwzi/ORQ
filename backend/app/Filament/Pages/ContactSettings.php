@@ -20,15 +20,15 @@ class ContactSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhone;
-    protected static ?string $navigationLabel = 'Contact Settings';
-    protected static ?string $title = 'Contact Settings';
+    protected static ?string $navigationLabel = 'إعدادات التواصل';
+    protected static ?string $title = 'إعدادات التواصل';
     protected static ?int $navigationSort = 1;
     
     protected string $view = 'filament.pages.contact-settings';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'الإعدادات';
     }
 
     public ?array $data = [];

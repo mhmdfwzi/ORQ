@@ -34,7 +34,7 @@ class SiteSettings extends Page implements HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'الإعدادات';
     }
 
     public ?array $data = [];
@@ -87,7 +87,7 @@ class SiteSettings extends Page implements HasForms
                             ->schema([
                                 Select::make('icon')->label('الأيقونة')->options([
                                     'sample' => 'عينة', 'delivery' => 'توصيل', 'cod' => 'دفع عند الاستلام', 'oils' => 'زيوت/جودة',
-                                ])->required(),
+                                ])->native(false)->placeholder('اختر أيقونة')->required(),
                                 TextInput::make('title')->label('العنوان')->required(),
                                 Textarea::make('desc')->label('الوصف')->rows(2)->required()->columnSpanFull(),
                             ])->columns(2)->maxItems(6)->reorderableWithButtons()->collapsible(),
@@ -97,11 +97,10 @@ class SiteSettings extends Page implements HasForms
                 Tab::make('فلاتر الطابع (Mood)')->schema([
                     TextInput::make('moods.all_label')->label('اسم فلتر "الكل" (العدد يُضاف تلقائياً)')->required(),
                     Repeater::make('moods.items')->label('الفلاتر')
+                        ->helperText('كل طابع يظهر مرة واحدة. استخدم الأسهم لتغيير ترتيب الفلاتر.')
                         ->schema([
-                            Select::make('id')->label('الطابع')->options([
-                                'royal_oud' => 'royal_oud', 'night_allure' => 'night_allure',
-                                'sporty_fresh' => 'sporty_fresh', 'warm_formal' => 'warm_formal',
-                            ])->required(),
+                            Select::make('id')->label('الطابع')->options(__('admin.mood', locale: 'ar'))
+                                ->native(false)->placeholder('اختر الطابع')->distinct()->required(),
                             TextInput::make('label')->label('الاسم الظاهر')->required(),
                             TextInput::make('icon')->label('إيموجي')->maxLength(8),
                         ])->columns(3)->maxItems(4)->reorderableWithButtons(),

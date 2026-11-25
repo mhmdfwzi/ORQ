@@ -26,11 +26,15 @@ class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;
 
+    protected static ?string $modelLabel = 'كوبون';
+
+    protected static ?string $pluralModelLabel = 'الكوبونات';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTicket;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Sales';
+        return 'التسويق';
     }
 
     public static function getNavigationSort(): ?int

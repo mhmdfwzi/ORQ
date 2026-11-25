@@ -22,26 +22,15 @@ class JobApplicationResource extends Resource
 {
     protected static ?string $model = JobApplication::class;
 
+    protected static ?string $modelLabel = 'طلب توظيف';
+
+    protected static ?string $pluralModelLabel = 'طلبات التوظيف';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
-
-    public static function getNavigationLabel(): string
-    {
-        return 'Applications';
-    }
-
-    public static function getModelLabel(): string
-    {
-        return 'Application';
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return 'Job Applications';
-    }
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Recruitment';
+        return 'التوظيف';
     }
 
     public static function getNavigationSort(): ?int

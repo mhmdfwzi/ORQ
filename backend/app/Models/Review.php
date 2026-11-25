@@ -58,7 +58,7 @@ class Review extends Model
     /**
      * Reject the review
      */
-    public function reject(string $reason = null): void
+    public function reject(?string $reason = null): void
     {
         $this->update([
             'status' => 'rejected',

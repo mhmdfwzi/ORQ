@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\CampaignAttribution;
 use App\Support\ProductSlugs;
 use App\Support\SiteSettings;
 use Illuminate\Support\Facades\DB;
@@ -63,6 +64,11 @@ class OrderService
             }
 
             $shipping = SiteSettings::shippingCost();
+            $attribution = $data['attribution'] ?? [];
+            $tracking = CampaignAttribution::fieldsFrom($attribution);
+            if (isset($attribution['session_id'])) {
+                $tracking['analytics_session_id'] = strtolower($attribution['session_id']);
+            }
 
             $order = Order::create([
                 'user_id'              => $customerId,
@@ -80,7 +86,7 @@ class OrderService
                 'payment_status'       => 'pending',
                 'notes'                => $data['notes'] ?? null,
                 'whatsapp_confirmation_requested' => $paymentMethod === 'cod' && (bool) ($data['whatsapp_confirmation_requested'] ?? false),
-            ]);
+            ] + $tracking);
 
             foreach ($resolved as $row) {
                 $order->items()->create([

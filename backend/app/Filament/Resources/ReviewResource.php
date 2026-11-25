@@ -25,11 +25,15 @@ class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
 
+    protected static ?string $modelLabel = 'تقييم';
+
+    protected static ?string $pluralModelLabel = 'التقييمات';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedStar;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content';
+        return 'العملاء';
     }
 
     public static function getNavigationSort(): ?int

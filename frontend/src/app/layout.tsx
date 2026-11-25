@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Cairo, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/components/cart/CartContext';
@@ -8,6 +9,7 @@ import { CatalogProvider } from '@/components/catalog/CatalogContext';
 import { getCatalog } from '@/lib/catalog';
 import { SITE_SHARE_IMAGE, SITE_URL } from '@/lib/site-url';
 import { siteGraph } from '@/lib/structured-data';
+import StorefrontTracking from '@/components/StorefrontTracking';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -106,6 +108,7 @@ export default async function RootLayout({
         <JsonLd data={siteGraph(site)} />
       </head>
       <body className="bg-[#0B0B0B] text-[#F2EBDD] min-h-screen selection:bg-[#C4A265] selection:text-black">
+        <Suspense fallback={null}><StorefrontTracking /></Suspense>
         <CatalogProvider products={products} giftBundle={giftBundle} brand={brand} site={site}>
           <CartProvider>
             <main className="min-h-screen">

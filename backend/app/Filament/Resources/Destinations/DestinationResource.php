@@ -18,7 +18,16 @@ class DestinationResource extends Resource
 {
     protected static ?string $model = Destination::class;
 
+    protected static ?string $modelLabel = 'وجهة شحن';
+
+    protected static ?string $pluralModelLabel = 'وجهات الشحن';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'الإعدادات';
+    }
 
     public static function form(Schema $schema): Schema
     {

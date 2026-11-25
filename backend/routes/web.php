@@ -13,9 +13,12 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StorefrontAccountController;
 use App\Http\Controllers\StorefrontOrderController;
 use App\Http\Controllers\Api\OrderApiController;
+use App\Http\Controllers\AdminCampaignExportController;
 use App\Http\Middleware\EnsureStorefrontCustomer;
 use App\Http\Middleware\ShareCartCount;
 
+Route::get('/admin/reports/campaigns.csv', AdminCampaignExportController::class)
+    ->withoutMiddleware(ShareCartCount::class)->middleware('auth')->name('admin.reports.campaigns');
 
 // Access Destinations API
 Route::get('/api/destinations/{parent}/children', function (\App\Models\Destination $parent) {

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { CartItem, Product } from '@/types/product';
+import { trackStorefrontStage } from '@/lib/attribution';
 
 interface CartContextType {
   items: CartItem[];
@@ -35,6 +36,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const closeCart = () => setIsOpen(false);
 
   const addItems = (additions: CartItem[]) => {
+    trackStorefrontStage('cart');
     setItems((current) => additions.reduce((next, addition) => {
       const existing = next.findIndex((item) => item.slug === addition.slug && item.size === addition.size);
       if (existing === -1) return [...next, addition];

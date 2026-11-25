@@ -33,9 +33,13 @@ class Order extends Model
         'confirmed_at',
         'shipped_at',
         'delivered_at',
+        'analytics_session_id',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
     ];
 
-    protected $hidden = ['payment_checkout_key', 'payment_request_hash', 'paymob_checkout_url'];
+    protected $hidden = ['payment_checkout_key', 'payment_request_hash', 'paymob_checkout_url', 'analytics_session_id', 'utm_source', 'utm_medium', 'utm_campaign'];
 
     protected $casts = [
         'user_id' => 'integer',

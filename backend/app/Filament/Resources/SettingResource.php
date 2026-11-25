@@ -21,11 +21,15 @@ class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
+    protected static ?string $modelLabel = 'إعداد';
+
+    protected static ?string $pluralModelLabel = 'إعدادات النظام';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'الإعدادات';
     }
 
     public static function form(Schema $schema): Schema

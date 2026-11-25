@@ -32,11 +32,15 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
+    protected static ?string $modelLabel = 'منتج';
+
+    protected static ?string $pluralModelLabel = 'المنتجات';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Catalog';
+        return 'الكتالوج';
     }
 
     public static function getNavigationSort(): ?int
@@ -137,13 +141,9 @@ class ProductResource extends Resource
                                     ->label('نوع الرائحة')
                                     ->maxLength(255),
                                 Select::make('mood')
-                                    ->label('المزاج')
-                                    ->options([
-                                        'royal_oud' => 'Royal Oud - عود ملكي',
-                                        'night_allure' => 'Night Allure - ليلي جذاب',
-                                        'sporty_fresh' => 'Sporty Fresh - رياضي منعش',
-                                        'warm_formal' => 'Warm Formal - دافئ رسمي',
-                                    ]),
+                                    ->label('الطابع')
+                                    ->native(false)->placeholder('اختر الطابع')
+                                    ->options(__('admin.mood', locale: 'ar')),
                                 Toggle::make('is_best_seller')
                                     ->label('الأكثر مبيعاً'),
                                 Toggle::make('is_new')
@@ -297,7 +297,8 @@ class ProductResource extends Resource
                     ->label('Featured'),
 
                 Tables\Columns\TextColumn::make('mood')
-                    ->label('المزاج')
+                    ->label('الطابع')
+                    ->formatStateUsing(fn (string $state): string => __('admin.mood.'.$state, locale: 'ar'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'royal_oud' => 'warning',
@@ -322,12 +323,11 @@ class ProductResource extends Resource
                     ]),
 
                 Tables\Filters\SelectFilter::make('mood')
-                    ->options([
-                        'royal_oud' => 'Royal Oud',
-                        'night_allure' => 'Night Allure',
-                        'sporty_fresh' => 'Sporty Fresh',
-                        'warm_formal' => 'Warm Formal',
-                    ]),
+                    ->label('الطابع')->options(__('admin.mood', locale: 'ar')),
+
+                Tables\Filters\Filter::make('low_stock')
+                    ->label('مخزون منخفض')
+                    ->query(fn ($query) => $query->published()->whereHas('variants', fn ($variants) => $variants->forSale()->where('stock_quantity', '<=', 5))),
             ])
             ->actions([
                 EditAction::make(),

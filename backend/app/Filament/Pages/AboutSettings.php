@@ -20,15 +20,15 @@ class AboutSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInformationCircle;
-    protected static ?string $navigationLabel = 'About Page';
-    protected static ?string $title = 'About Page Settings';
+    protected static ?string $navigationLabel = 'صفحة عن ORQ';
+    protected static ?string $title = 'صفحة عن ORQ';
     protected static ?int $navigationSort = 3;
 
     protected string $view = 'filament.pages.about-settings';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'الإعدادات';
     }
 
     public ?array $data = [];

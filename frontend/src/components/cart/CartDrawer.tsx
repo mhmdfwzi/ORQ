@@ -5,6 +5,7 @@ import { useCart } from './CartContext';
 import CheckoutForm from './CheckoutForm';
 import { useCatalog } from '@/components/catalog/CatalogContext';
 import { formatPrice } from '@/lib/format';
+import { trackStorefrontStage } from '@/lib/attribution';
 
 export default function CartDrawer() {
   const { isOpen } = useCart();
@@ -96,7 +97,10 @@ function CartDialog() {
                     <dd className="text-[#ECC480]">{formatPrice(totalAmount + shipping)} {commerce.currency}</dd>
                   </div>
                 </dl>
-                <button type="button" onClick={() => setCheckingOut(true)} className="gold-button min-h-11 w-full rounded-lg px-3 text-sm">
+                <button type="button" onClick={() => {
+                  trackStorefrontStage('checkout');
+                  setCheckingOut(true);
+                }} className="gold-button min-h-11 w-full rounded-lg px-3 text-sm">
                   متابعة الطلب
                 </button>
               </div>

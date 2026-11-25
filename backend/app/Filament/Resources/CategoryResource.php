@@ -28,11 +28,15 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
+    protected static ?string $modelLabel = 'تصنيف';
+
+    protected static ?string $pluralModelLabel = 'التصنيفات';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Catalog';
+        return 'الكتالوج';
     }
 
     public static function getNavigationSort(): ?int

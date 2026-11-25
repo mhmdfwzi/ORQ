@@ -29,26 +29,15 @@ class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
+    protected static ?string $modelLabel = 'مقال';
+
+    protected static ?string $pluralModelLabel = 'المقالات';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedNewspaper;
-
-    public static function getNavigationLabel(): string
-    {
-        return 'Blog Posts';
-    }
-
-    public static function getModelLabel(): string
-    {
-        return 'Post';
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return 'Blog Posts';
-    }
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content';
+        return 'المحتوى';
     }
 
     public static function getNavigationSort(): ?int

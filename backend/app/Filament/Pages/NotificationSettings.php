@@ -20,15 +20,15 @@ class NotificationSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBell;
-    protected static ?string $navigationLabel = 'Notification Channels';
-    protected static ?string $title = 'Notification Channels';
+    protected static ?string $navigationLabel = 'قنوات التنبيهات';
+    protected static ?string $title = 'قنوات التنبيهات';
     protected static ?int $navigationSort = 2;
     
     protected string $view = 'filament.pages.notification-settings';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'الإعدادات';
     }
 
     public ?array $data = [];

@@ -8,12 +8,15 @@ use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationMana
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\AdminReporting;
 use App\Services\OnlineOrderService;
+use App\Support\ReportPeriod;
 use Database\Seeders\ORQProductSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -35,10 +38,15 @@ class StorefrontCheckoutTest extends TestCase
             '2026_01_06_000003_create_product_images_table',
             '2026_01_06_000006_create_addresses_table',
             '2026_01_06_000007_create_orders_table',
+            '2026_01_06_000008_create_reviews_table',
             '2026_01_06_000011_create_settings_tables',
             '2026_01_07_000001_add_images_to_products_table',
             '2026_01_07_000003_add_tracking_to_orders_table',
+            '2026_02_15_180000_create_destinations_table',
+            '2026_02_15_180631_add_destination_columns_to_users_and_addresses',
             '2026_02_06_182700_add_offer_fields_to_products_table',
+            '2026_02_19_220000_create_jobs_listing_table',
+            '2026_02_19_220100_create_job_applications_table',
             '2026_02_20_115200_add_arabic_description_to_products',
             '2026_11_11_224006_create_notifications_table',
             '2026_11_12_000001_add_perfume_fields_to_products_table',
@@ -46,6 +54,7 @@ class StorefrontCheckoutTest extends TestCase
             '2026_11_12_000003_add_guest_checkout_to_orders',
             '2026_11_18_000001_add_whatsapp_confirmation_to_orders',
             '2026_11_20_000001_add_paymob_checkout_to_orders',
+            '2026_11_25_000001_add_growth_reporting',
         ];
 
         return ['--path' => array_map(fn (string $name) => 'database/migrations/' . $name . '.php', $names)];
@@ -87,7 +96,7 @@ class StorefrontCheckoutTest extends TestCase
             ->assertJsonPath('data.paymentMethod', 'card')
             ->assertJsonPath('data.checkoutUrl', 'https://accept.paymob.com/unifiedcheckout/?publicKey=pk_test_checkout&clientSecret=test-client-token');
 
-        $this->postJson('/api/v1/orders', $data)->assertCreated()
+        $this->postJson('/api/v1/orders', $data + ['attribution' => ['session_id' => Str::uuid()->toString()]])->assertCreated()
             ->assertJsonPath('data.orderNumber', $first->json('data.orderNumber'));
         Http::assertSentCount(1);
         Http::assertSent(fn ($request) => $request->url() === self::INTENTION
@@ -324,6 +333,79 @@ class StorefrontCheckoutTest extends TestCase
         $this->actingAs($customer, 'storefront');
         $this->getJson('/api/v1/account/orders/' . $number)->assertOk()
             ->assertJsonPath('data.trackingNumber', 'TEST-TRACKING');
+    }
+
+    public function test_realized_sales_campaign_costs_and_funnel_use_checkout_data(): void
+    {
+        $this->travelTo(now('Africa/Cairo')->setDate(2026, 11, 25)->setTime(16, 0));
+        config(['services.paymob.enabled' => false]);
+        Notification::fake();
+        $session = Str::uuid()->toString();
+        foreach (['visit', 'visit', 'cart', 'checkout'] as $stage) {
+            $this->postJson('/api/v1/funnel', ['stage' => $stage, 'session_id' => $session])->assertNoContent();
+        }
+        $this->assertDatabaseCount('storefront_funnel_events', 3);
+        $this->postJson('/api/v1/funnel', ['stage' => 'sale', 'session_id' => $session])->assertUnprocessable();
+
+        $checkout = array_replace($this->orderData(), [
+            'payment_method' => 'cod',
+            'whatsapp_confirmation_requested' => false,
+            'attribution' => ['session_id' => $session, 'utm_source' => 'Instagram', 'utm_medium' => 'Paid_Social', 'utm_campaign' => 'Winter Launch'],
+        ]);
+        $orderNumber = $this->postJson('/api/v1/orders', $checkout)->assertCreated()
+            ->assertJsonMissingPath('data.utm_source')->json('data.orderNumber');
+        $sale = Order::where('order_number', $orderNumber)->firstOrFail();
+        $this->assertSame('winter launch', $sale->utm_campaign);
+        $this->assertSame($session, $sale->analytics_session_id);
+        $sale->updateStatus('delivered');
+        $sale->forceFill(['created_at' => '2026-11-24 22:00:00'])->save();
+
+        foreach ([
+            ['pending', 'pending'],
+            ['cancelled', 'paid'],
+            ['returned', 'paid'],
+            ['delivered', 'refunded'],
+        ] as [$status, $payment]) {
+            $record = $sale->replicate();
+            $record->fill(['order_number' => Order::generateOrderNumber(), 'status' => $status, 'payment_status' => $payment])->save();
+        }
+        $outside = $sale->replicate();
+        $outside->forceFill(['order_number' => Order::generateOrderNumber(), 'created_at' => '2026-11-24 21:59:59'])->save();
+
+        DB::table('campaign_spends')->insert([
+            ['day' => '2026-11-25', 'utm_source' => 'instagram', 'utm_medium' => 'paid_social', 'utm_campaign' => 'winter launch', 'amount' => 200],
+            ['day' => '2026-11-25', 'utm_source' => 'google', 'utm_medium' => 'cpc', 'utm_campaign' => 'launch', 'amount' => 100],
+        ]);
+        $period = ReportPeriod::fromFilters(['from' => '2026-11-25', 'to' => '2026-11-25']);
+        $reports = app(AdminReporting::class);
+        $totals = $reports->totals($period);
+        $this->assertSame(5, $totals['orders']);
+        $this->assertSame(2, $totals['lost']);
+        $this->assertSame(1, $totals['sales_count']);
+        $this->assertSame((float) $sale->total, $totals['sales']);
+        $this->assertSame(['visit' => 1, 'cart' => 1, 'checkout' => 1, 'sale' => 1], $reports->funnel($period));
+        $this->assertSame((float) $sale->total, $reports->trend($period)[0]['value']);
+        $this->assertSame('القاهرة', $reports->regions($period)->first()->label);
+        $this->assertSame(1, (int) $reports->products($period)->first()->units);
+        $this->assertCount(2, $reports->campaigns($period));
+        $campaign = $reports->campaigns($period, 'instagram')->sole();
+        $this->assertSame(200.0, (float) $campaign->spend);
+        $this->assertSame(1, (int) $campaign->sales_count);
+        $this->assertSame((float) $sale->total, (float) $campaign->sales);
+    }
+
+    public function test_admin_pages_and_campaign_export_are_protected_and_branded(): void
+    {
+        $this->get('/admin')->assertRedirect('/admin/login');
+        $customer = User::factory()->create(['role' => 'customer', 'phone' => '01000000991']);
+        $this->actingAs($customer)->get('/admin/reports/campaigns.csv')->assertForbidden();
+        $admin = User::factory()->create(['role' => 'admin', 'phone' => '01000000992', 'status' => 'active']);
+        $this->actingAs($admin)->get('/admin')->assertOk()->assertSee('نظرة عامة')->assertSee('dir="rtl"', false)->assertDontSee('Filament v');
+        $this->get('/admin/reports')->assertOk()->assertSee('مسار الشراء');
+        $this->get('/admin/marketing')->assertOk()->assertSee('حاسبة ميزانية الإعلان');
+        $csv = $this->get('/admin/reports/campaigns.csv')->assertOk()->assertDownload()->streamedContent();
+        $this->assertStringStartsWith("\xef\xbb\xbf", $csv);
+        $this->assertStringContainsString('العائد على الإنفاق', $csv);
     }
 
     private function orderData(): array

@@ -24,11 +24,15 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $modelLabel = 'مستخدم';
+
+    protected static ?string $pluralModelLabel = 'المستخدمون';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Users';
+        return 'العملاء';
     }
 
     public static function getNavigationSort(): ?int
