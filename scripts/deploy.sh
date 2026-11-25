@@ -181,6 +181,7 @@ if [[ $DO_BACKEND -eq 1 ]]; then
   if "$PHP_BIN" artisan list --raw | grep -q '^filament:optimize '; then
     "$PHP_BIN" artisan filament:optimize
   fi
+  "$PHP_BIN" artisan orq:check-admin-reports
 
   # Artisan ran as the deploy user (often root): hand writable dirs back to the web user.
   if [[ -n "$WEB_USER" && $(id -u) -eq 0 ]]; then

@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Support\CampaignAttribution;
 use App\Support\ReportPeriod;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -32,6 +33,27 @@ class AdminReporting
         return Order::query()
             ->where('orders.created_at', '>=', $period->utcStart())
             ->where('orders.created_at', '<', $period->utcEnd());
+    }
+
+    public function performance(ReportPeriod $period): array
+    {
+        return [
+            'campaigns' => $this->campaigns($period),
+            'products' => $this->products($period),
+            'regions' => $this->regions($period),
+            'totals' => $this->totals($period),
+            'statuses' => $this->statuses($period),
+            'payments' => $this->payments($period),
+            'funnel' => $this->funnel($period),
+        ];
+    }
+
+    private function comparableText(string $column): string
+    {
+        // A legacy MySQL table and a new reporting table can have different collations.
+        return DB::connection() instanceof MySqlConnection
+            ? "CONVERT({$column} USING utf8mb4) COLLATE utf8mb4_unicode_ci"
+            : $column;
     }
 
     public function totals(ReportPeriod $period): array
@@ -102,17 +124,24 @@ class AdminReporting
 
     public function products(ReportPeriod $period): Collection
     {
+        $arabicName = $this->comparableText("MAX(NULLIF(products.name_ar, ''))");
+        $productName = $this->comparableText('MAX(products.name)');
+        $storedName = $this->comparableText('MAX(order_items.product_name)');
+
         return $this->orders($period)->toBase()->whereRaw(self::RECOGNIZED)
             ->join('order_items', 'order_items.order_id', '=', 'orders.id')
             ->leftJoin('products', 'products.id', '=', 'order_items.product_id')
-            ->selectRaw("order_items.product_id, COALESCE(MAX(NULLIF(products.name_ar, '')), MAX(products.name), MAX(order_items.product_name)) AS label")
+            ->selectRaw("order_items.product_id, COALESCE({$arabicName}, {$productName}, {$storedName}) AS label")
             ->selectRaw('SUM(order_items.quantity) AS units, SUM(order_items.total_price) AS sales')
             ->groupBy('order_items.product_id')->orderByDesc('units')->orderByDesc('sales')->orderBy('order_items.product_id')->limit(10)->get();
     }
 
     public function regions(ReportPeriod $period): Collection
     {
-        $region = "COALESCE(NULLIF(orders.shipping_governorate, ''), destinations.name, NULLIF(addresses.state, ''), 'غير محددة')";
+        $shipping = $this->comparableText("NULLIF(orders.shipping_governorate, '')");
+        $destination = $this->comparableText('destinations.name');
+        $address = $this->comparableText("NULLIF(addresses.state, '')");
+        $region = "COALESCE({$shipping}, {$destination}, {$address}, 'غير محددة')";
 
         return $this->orders($period)->toBase()->whereRaw(self::RECOGNIZED)
             ->leftJoin('addresses', 'addresses.id', '=', 'orders.address_id')
@@ -145,7 +174,8 @@ class AdminReporting
         $stages = (clone $events)->whereIn('session_id', $visits)
             ->selectRaw('stage, COUNT(DISTINCT session_id) AS sessions')->groupBy('stage')->pluck('sessions', 'stage');
         $sales = $this->orders($period)->whereRaw(self::RECOGNIZED)
-            ->whereIn('analytics_session_id', $visits)->distinct()->count('analytics_session_id');
+            ->whereIn(DB::raw($this->comparableText('orders.analytics_session_id')), $visits)
+            ->distinct()->count('analytics_session_id');
 
         return [
             'visit' => (int) ($stages['visit'] ?? 0),
@@ -161,17 +191,21 @@ class AdminReporting
         $orders = $this->orders($period)->toBase()->whereNotNull('utm_source');
         $spend = DB::table('campaign_spends')->whereBetween('day', array_values($period->query()));
         if ($source !== '') {
-            $orders->where('utm_source', $source);
-            $spend->where('utm_source', $source);
+            $sourceColumn = $this->comparableText('utm_source');
+            $orders->whereRaw("{$sourceColumn} = ?", [$source]);
+            $spend->whereRaw("{$sourceColumn} = ?", [$source]);
         }
 
+        $comparable = array_map($this->comparableText(...), $fields);
+        $selection = array_map(fn (string $expression, string $field) => DB::raw("{$expression} AS {$field}"), $comparable, $fields);
+        $groupBy = implode(', ', $comparable);
         $recognized = self::RECOGNIZED;
-        $orders = $orders->select($fields)->selectRaw("COUNT(*) AS orders_count,
+        $orders = $orders->select($selection)->selectRaw("COUNT(*) AS orders_count,
             SUM(CASE WHEN {$recognized} THEN 1 ELSE 0 END) AS sales_count,
             SUM(CASE WHEN {$recognized} THEN orders.total ELSE 0 END) AS sales,
             SUM(CASE WHEN orders.status IN ('cancelled', 'returned') THEN 1 ELSE 0 END) AS lost,
-            NULL AS spend, 0 AS spend_days")->groupBy($fields);
-        $spend = $spend->select($fields)->selectRaw('0, 0, 0, 0, SUM(amount), COUNT(*)')->groupBy($fields);
+            NULL AS spend, 0 AS spend_days")->groupByRaw($groupBy);
+        $spend = $spend->select($selection)->selectRaw('0, 0, 0, 0, SUM(amount), COUNT(*)')->groupByRaw($groupBy);
 
         return DB::query()->fromSub($orders->unionAll($spend), 'campaigns')->select($fields)
             ->selectRaw('SUM(orders_count) AS orders_count, SUM(sales_count) AS sales_count, SUM(sales) AS sales,

@@ -392,6 +392,16 @@ class StorefrontCheckoutTest extends TestCase
         $this->assertSame(200.0, (float) $campaign->spend);
         $this->assertSame(1, (int) $campaign->sales_count);
         $this->assertSame((float) $sale->total, (float) $campaign->sales);
+
+        $admin = User::factory()->create(['role' => 'admin', 'phone' => '01000000993', 'status' => 'active']);
+        $this->actingAs($admin)->get('/admin/reports?from=2026-11-25&to=2026-11-25&source=instagram')
+            ->assertOk()
+            ->assertSee('winter launch')
+            ->assertSee('القاهرة')
+            ->assertSee('تم التسليم');
+        $this->artisan('orq:check-admin-reports')
+            ->expectsOutput('Admin reporting queries passed.')
+            ->assertSuccessful();
     }
 
     public function test_admin_pages_and_campaign_export_are_protected_and_branded(): void

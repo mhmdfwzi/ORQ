@@ -30,20 +30,14 @@ class StoreReports extends Page
     {
         $period = ReportPeriod::fromFilters(request()->query());
         $source = CampaignAttribution::identifier(request()->query('source')) ?? '';
-        $reports = app(AdminReporting::class);
-        $campaigns = $reports->campaigns($period);
+        $report = app(AdminReporting::class)->performance($period);
+        $campaigns = $report['campaigns'];
 
         return [
             'period' => $period,
             'source' => $source,
             'sources' => $campaigns->pluck('utm_source')->unique()->sort()->values(),
             'campaigns' => $source === '' ? $campaigns : $campaigns->where('utm_source', $source),
-            'products' => $reports->products($period),
-            'regions' => $reports->regions($period),
-            'totals' => $reports->totals($period),
-            'statuses' => $reports->statuses($period),
-            'payments' => $reports->payments($period),
-            'funnel' => $reports->funnel($period),
-        ];
+        ] + $report;
     }
 }
