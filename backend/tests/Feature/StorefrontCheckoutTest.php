@@ -391,7 +391,12 @@ class StorefrontCheckoutTest extends TestCase
         $campaign = $reports->campaigns($period, 'instagram')->sole();
         $this->assertSame(200.0, (float) $campaign->spend);
         $this->assertSame(1, (int) $campaign->sales_count);
+        $this->assertSame(5, (int) $campaign->orders_count);
+        $this->assertSame(2, (int) $campaign->lost);
         $this->assertSame((float) $sale->total, (float) $campaign->sales);
+        $spendOnly = $reports->campaigns($period, 'google')->sole();
+        $this->assertSame(0, (int) $spendOnly->orders_count);
+        $this->assertSame(100.0, (float) $spendOnly->spend);
 
         $admin = User::factory()->create(['role' => 'admin', 'phone' => '01000000993', 'status' => 'active']);
         $this->actingAs($admin)->get('/admin/reports?from=2026-11-25&to=2026-11-25&source=instagram')

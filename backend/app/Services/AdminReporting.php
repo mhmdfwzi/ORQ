@@ -143,11 +143,14 @@ class AdminReporting
         $address = $this->comparableText("NULLIF(addresses.state, '')");
         $region = "COALESCE({$shipping}, {$destination}, {$address}, 'غير محددة')";
 
-        return $this->orders($period)->toBase()->whereRaw(self::RECOGNIZED)
+        $rows = $this->orders($period)->toBase()->whereRaw(self::RECOGNIZED)
             ->leftJoin('addresses', 'addresses.id', '=', 'orders.address_id')
             ->leftJoin('destinations', 'destinations.id', '=', 'addresses.governorate_id')
-            ->selectRaw("{$region} AS label, COUNT(*) AS orders_count, SUM(orders.total) AS sales")
-            ->groupByRaw($region)->orderByDesc('sales')->orderBy('label')->limit(10)->get();
+            ->selectRaw("{$region} AS label, orders.total");
+
+        return DB::query()->fromSub($rows, 'region_rows')
+            ->selectRaw('region_rows.label, COUNT(*) AS orders_count, SUM(region_rows.total) AS sales')
+            ->groupBy('region_rows.label')->orderByDesc('sales')->orderBy('region_rows.label')->limit(10)->get();
     }
 
     public function statuses(ReportPeriod $period): Collection
@@ -198,19 +201,20 @@ class AdminReporting
 
         $comparable = array_map($this->comparableText(...), $fields);
         $selection = array_map(fn (string $expression, string $field) => DB::raw("{$expression} AS {$field}"), $comparable, $fields);
-        $groupBy = implode(', ', $comparable);
+        $groupFields = array_map(fn (string $field) => "campaign_rows.{$field}", $fields);
         $recognized = self::RECOGNIZED;
-        $orders = $orders->select($selection)->selectRaw("COUNT(*) AS orders_count,
-            SUM(CASE WHEN {$recognized} THEN 1 ELSE 0 END) AS sales_count,
-            SUM(CASE WHEN {$recognized} THEN orders.total ELSE 0 END) AS sales,
-            SUM(CASE WHEN orders.status IN ('cancelled', 'returned') THEN 1 ELSE 0 END) AS lost,
-            NULL AS spend, 0 AS spend_days")->groupByRaw($groupBy);
-        $spend = $spend->select($selection)->selectRaw('0, 0, 0, 0, SUM(amount), COUNT(*)')->groupByRaw($groupBy);
+        // Project normalized dimensions first so strict SQL modes can group by plain columns.
+        $orders = $orders->select($selection)->selectRaw("1 AS orders_count,
+            CASE WHEN {$recognized} THEN 1 ELSE 0 END AS sales_count,
+            CASE WHEN {$recognized} THEN orders.total ELSE 0 END AS sales,
+            CASE WHEN orders.status IN ('cancelled', 'returned') THEN 1 ELSE 0 END AS lost,
+            NULL AS spend, 0 AS spend_days");
+        $spend = $spend->select($selection)->selectRaw('0, 0, 0, 0, amount, 1');
 
-        return DB::query()->fromSub($orders->unionAll($spend), 'campaigns')->select($fields)
+        return DB::query()->fromSub($orders->unionAll($spend), 'campaign_rows')->select($groupFields)
             ->selectRaw('SUM(orders_count) AS orders_count, SUM(sales_count) AS sales_count, SUM(sales) AS sales,
                 SUM(lost) AS lost, SUM(spend) AS spend, SUM(spend_days) AS spend_days')
-            ->groupBy($fields)->orderByDesc('sales')->orderByDesc('orders_count')->orderByDesc('spend')
-            ->orderBy('utm_source')->orderBy('utm_medium')->orderBy('utm_campaign')->get();
+            ->groupBy($groupFields)->orderByDesc('sales')->orderByDesc('orders_count')->orderByDesc('spend')
+            ->orderBy('campaign_rows.utm_source')->orderBy('campaign_rows.utm_medium')->orderBy('campaign_rows.utm_campaign')->get();
     }
 }
