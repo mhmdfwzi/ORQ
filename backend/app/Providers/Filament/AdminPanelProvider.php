@@ -23,6 +23,9 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    // The production reverse proxy serves Laravel styles from /css/filament/.
+    private const ADMIN_STYLESHEET = 'css/filament/orq/admin.css';
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -45,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarWidth('15rem')
             ->navigationGroups(['الطلبات', 'الكتالوج', 'التسويق', 'العملاء', 'المحتوى', 'التوظيف', 'الإعدادات'])
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => new HtmlString(
-                '<link rel="stylesheet" href="'.e(asset('css/orq-admin.css').'?v='.filemtime(public_path('css/orq-admin.css'))).'">',
+                '<link rel="stylesheet" href="'.e(asset(self::ADMIN_STYLESHEET).'?v='.filemtime(public_path(self::ADMIN_STYLESHEET))).'">',
             ))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

@@ -397,6 +397,8 @@ class StorefrontCheckoutTest extends TestCase
     public function test_admin_pages_and_campaign_export_are_protected_and_branded(): void
     {
         $this->get('/admin')->assertRedirect('/admin/login');
+        $this->get('/admin/login')->assertOk()->assertSee('/css/filament/orq/admin.css?v=', false);
+        $this->assertFileExists(public_path('css/filament/orq/admin.css'));
         $customer = User::factory()->create(['role' => 'customer', 'phone' => '01000000991']);
         $this->actingAs($customer)->get('/admin/reports/campaigns.csv')->assertForbidden();
         $admin = User::factory()->create(['role' => 'admin', 'phone' => '01000000992', 'status' => 'active']);

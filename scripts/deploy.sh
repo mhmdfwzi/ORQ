@@ -95,6 +95,16 @@ serves_browser_deployment() {
     -H 'Accept-Encoding: gzip, deflate, br, zstd'
 }
 
+check_admin_stylesheet() {
+  local login_url=$1 login_html stylesheet_url response
+  login_html=$(curl -fsS --max-time 20 "$login_url") || die "Admin login is unreachable at $login_url."
+  stylesheet_url=$(sed -n 's|.*href="\([^"]*/css/filament/orq/admin\.css[^"]*\)".*|\1|p' <<< "$login_html" | sed -n '1p')
+  [[ -n $stylesheet_url ]] || die "Admin login did not reference the ORQ stylesheet."
+  response=$(curl -fsS --max-time 20 --write-out '\n%{content_type}' "$stylesheet_url") || die "Admin stylesheet is unreachable at $stylesheet_url."
+  [[ $response == *'.orq-hero'* && ${response##*$'\n'} == text/css* ]] || die "Admin stylesheet did not return ORQ CSS at $stylesheet_url."
+  ok "Admin stylesheet $stylesheet_url"
+}
+
 MAINTENANCE=0
 cleanup() {
   local code=$?
@@ -208,6 +218,9 @@ fi
 log "Health checks"
 if [[ $DO_BACKEND -eq 1 ]]; then
   curl -fsS --max-time 20 "$API_HEALTH_URL" >/dev/null && ok "API   $API_HEALTH_URL" || die "API health check failed"
+  ADMIN_BASE_URL=$(env_value APP_URL "$BACKEND/.env")
+  [[ -n $ADMIN_BASE_URL ]] || ADMIN_BASE_URL=$(env_value FRONTEND_URL "$BACKEND/.env")
+  check_admin_stylesheet "${ADMIN_BASE_URL%/}/admin/login"
 fi
 if [[ $DO_FRONTEND -eq 1 ]]; then
   ready=0
